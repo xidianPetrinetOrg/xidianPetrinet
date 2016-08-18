@@ -10,7 +10,11 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -20,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
@@ -47,15 +52,11 @@ public class PTNetGraph implements ActionListener, ItemListener {
     /** 表示选择PTNet graph或Making graph,或二者皆选。 Key: "PTNet","Marking" */
     private Map<String,JCheckBoxMenuItem> PTNetOrMarkingGraph = new HashMap<>();
     
-    /** vertex label position,如果改变，请注意在createMenuBar()中，修改快捷键，现在是：L,R,T,B */
-    private String[] labelPositionStr = {"Left","Right","Top","Bottom"};
-    
-    /** 表示vertex label position 菜单项，key: SwingConstants.LEFT,RIGHT,TOP,BOTTOM */
-    private Map<String,JMenuItem> labelPositionItem = new HashMap<>();
-   
     public PTNetGraph(PTNetGraphComponent ptnetGraph) {
 		this.ptnetGraph = ptnetGraph;
 	}
+    
+    private Action LabelLeftAction, LabelRightAction, LabelTopAction, LabelBottomAction;
 
 	private JMenuBar createMenuBar() {
         JMenuBar menuBar;
@@ -152,22 +153,168 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menu.setMnemonic(KeyEvent.VK_L);
         menuBar.add(menu);
         
-        // JMenuItems for forth menu
-        for (int i = 0; i < labelPositionStr.length; i++) {
-        	menuItem = new JMenuItem(labelPositionStr[i]);
-        	menuItem.addActionListener(this);
-        	menu.add(menuItem);
-        	labelPositionItem.put(labelPositionStr[i], menuItem);
-        }
-     
-        // Sets the keyboard mnemonic 
-        labelPositionItem.get("Left").setMnemonic(KeyEvent.VK_L);
-        labelPositionItem.get("Right").setMnemonic(KeyEvent.VK_R);
-        labelPositionItem.get("Top").setMnemonic(KeyEvent.VK_T);
-        labelPositionItem.get("Bottom").setMnemonic(KeyEvent.VK_B);
+    	createAction();
+        menuItem = new JMenuItem(LabelLeftAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem(LabelRightAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem(LabelTopAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem(LabelBottomAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
         
         return menuBar;
     }
+	
+	private JToolBar createToolBar() {
+		JButton button = null;
+
+		// Create the toolbar.
+		JToolBar toolBar = new JToolBar();
+	
+		// first button
+		button = new JButton(LabelLeftAction);
+		if (button.getIcon() != null) {
+			button.setText(""); // an icon-only button
+		}
+		toolBar.add(button);
+
+		// second button
+		button = new JButton(LabelRightAction);
+		if (button.getIcon() != null) {
+			button.setText(""); // an icon-only button
+		}
+		toolBar.add(button);
+
+		// third button
+		button = new JButton(LabelTopAction);
+		if (button.getIcon() != null) {
+			button.setText(""); // an icon-only button
+		}
+		toolBar.add(button);
+		
+		// forth button
+		button = new JButton(LabelBottomAction);
+		if (button.getIcon() != null) {
+			button.setText(""); // an icon-only button
+		}
+		toolBar.add(button);
+		
+		return toolBar;
+	}
+	
+	public class LabelLeftAction extends AbstractAction {
+		private static final long serialVersionUID = -108378340049716606L;
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public LabelLeftAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+			super(name, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e) {
+			 ptnetGraph.changeLabelPosition(SwingConstants.LEFT);
+		}
+	}
+	
+	public class LabelRightAction extends AbstractAction {
+		private static final long serialVersionUID = 2385080638496501057L;
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public LabelRightAction(String text, ImageIcon icon, String desc, Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e) {
+			 ptnetGraph.changeLabelPosition(SwingConstants.RIGHT);
+		}
+	}
+	
+	public class LabelTopAction extends AbstractAction {
+		private static final long serialVersionUID = -4044696356454034562L;
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public LabelTopAction(String text, ImageIcon icon, String desc, Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e) {
+			ptnetGraph.changeLabelPosition(SwingConstants.TOP);
+		}
+	}
+	
+	public class LabelBottomAction extends AbstractAction {
+		private static final long serialVersionUID = 245505196846345639L;
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public LabelBottomAction(String text, ImageIcon icon, String desc, Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e) {
+			ptnetGraph.changeLabelPosition(SwingConstants.BOTTOM);
+		}
+	}
+	
+	/** Returns an ImageIcon, or null if the path was invalid. */
+	private static ImageIcon createNavigationIcon(String imageName) {
+		String imgLocation = "images/" + imageName + ".gif";
+		java.net.URL imageURL = PTNetGraph.class.getResource(imgLocation);
+
+		if (imageURL == null) {
+			System.err.println("Resource not found: " + imgLocation);
+			return null;
+		} else {
+			return new ImageIcon(imageURL);
+		}
+	}
+	
+	/**
+	 * Create the actions shared by the toolbar and menu.
+	 */
+	private void createAction() {
+
+		LabelLeftAction = new LabelLeftAction("left", createNavigationIcon("left"), "left label",
+				new Integer(KeyEvent.VK_L));
+
+		LabelRightAction = new LabelRightAction("Right", createNavigationIcon("right"), "right label",
+				new Integer(KeyEvent.VK_R));
+
+		LabelTopAction = new LabelTopAction("Top", createNavigationIcon("top"), "top label",
+				new Integer(KeyEvent.VK_T));
+		LabelBottomAction = new LabelBottomAction("bottom", createNavigationIcon("bottom"), "bottom label",
+				new Integer(KeyEvent.VK_B));
+	}
 
     public void actionPerformed(ActionEvent e) {
         JMenuItem source = (JMenuItem)(e.getSource()); 
@@ -201,18 +348,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
         // 菜单项,Open,Exit, 如果是上述JRadioButtonMenuItem实例的菜单项，也符合本条件，因此不必用instanceof区分菜单项。
         if (source instanceof JMenuItem) {
         	System.out.println("Menu item selected:" + source.getText());
-        	for (Map.Entry<String, JMenuItem> entry : labelPositionItem.entrySet()) {
-        		if (source == entry.getValue()) {
-        			if (entry.getKey() == "Left")
-        			    ptnetGraph.changeLabelPosition(SwingConstants.LEFT);
-        			else if (entry.getKey() == "Right")
-    			        ptnetGraph.changeLabelPosition(SwingConstants.RIGHT);
-        			else if (entry.getKey() == "Top")
-        				ptnetGraph.changeLabelPosition(SwingConstants.TOP);
-        			else if (entry.getKey() == "Bottom")
-        				ptnetGraph.changeLabelPosition(SwingConstants.BOTTOM);
-        		}
-        	}
         }
         
         String s = "Action event detected."
@@ -257,9 +392,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
     }
     
 	private Container addComponentsToPane( ) {
-
+		
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
+		
+		JToolBar toolBar = createToolBar();
+		contentPane.add(toolBar, BorderLayout.PAGE_START);
 		
 		// Add the ptnetGraph to the content pane.
 		JScrollPane scroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
