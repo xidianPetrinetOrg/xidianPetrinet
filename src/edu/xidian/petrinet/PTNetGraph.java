@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -26,6 +27,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
+import com.mxgraph.view.mxGraph;
+import com.mxgraph.util.mxUndoManager;
+import com.mxgraph.util.mxUndoableEdit;
 
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 
@@ -52,11 +61,19 @@ public class PTNetGraph implements ActionListener, ItemListener {
     /** 表示选择PTNet graph或Making graph,或二者皆选。 Key: "PTNet","Marking" */
     private Map<String,JCheckBoxMenuItem> PTNetOrMarkingGraph = new HashMap<>();
     
+    protected mxUndoManager undoManager;
+    
     public PTNetGraph(PTNetGraphComponent ptnetGraph) {
 		this.ptnetGraph = ptnetGraph;
+		
+		this.undoManager = ptnetGraph.getUndoManager();
+	
+		undoManager.addListener(mxEvent.UNDO, undoHandler);
+		undoManager.addListener(mxEvent.REDO, undoHandler);
 	}
     
-    private Action LabelLeftAction, LabelRightAction, LabelTopAction, LabelBottomAction;
+    private Action LabelLeftAction, LabelRightAction, LabelTopAction, LabelBottomAction,
+                   undoHistoryAction, redoHistoryAction;
 
 	private JMenuBar createMenuBar() {
         JMenuBar menuBar;
@@ -170,6 +187,19 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menuItem.setIcon(null); //arbitrarily chose not to use icon
         menu.add(menuItem);
         
+        // Build the "Edit" menu
+        menu = new JMenu("Edit");
+        menu.setMnemonic(KeyEvent.VK_E);
+        menuBar.add(menu);
+        
+        menuItem = new JMenuItem(undoHistoryAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem(redoHistoryAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
         return menuBar;
     }
 	
@@ -202,6 +232,21 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		
 		// forth button
 		button = new JButton(LabelBottomAction);
+		if (button.getIcon() != null) {
+			button.setText(""); // an icon-only button
+		}
+		toolBar.add(button);
+		
+		toolBar.addSeparator();
+		
+		// undo,redo
+		button = new JButton(undoHistoryAction);
+		if (button.getIcon() != null) {
+			button.setText(""); // an icon-only button
+		}
+		toolBar.add(button);
+		
+		button = new JButton(redoHistoryAction);
 		if (button.getIcon() != null) {
 			button.setText(""); // an icon-only button
 		}
@@ -286,6 +331,53 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		}
 	}
 	
+	@SuppressWarnings("serial")
+	public class HistoryAction extends AbstractAction {
+		protected boolean undo;
+
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 * @param undo true,undo; false,redo
+		 */
+		public HistoryAction(String name, ImageIcon icon, String desc, Integer mnemonic,boolean undo) {
+			super(name, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+			this.undo = undo;
+		}
+		
+		public HistoryAction(boolean undo) {
+			this.undo = undo;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (ptnetGraph.getGraph() != null) {
+				if (undo) {
+					undoManager.undo();
+				} else {
+					undoManager.redo();
+				}
+			}
+		}
+	}
+	
+	/** Keeps the selection in sync with the command history */
+	private mxIEventListener undoHandler = new mxIEventListener()
+	{
+		public void invoke(Object source, mxEventObject evt)
+		{
+			mxGraph graph = ptnetGraph.getGraph();
+			List<mxUndoableChange> changes = ((mxUndoableEdit) evt
+					.getProperty("edit")).getChanges();
+			graph.setSelectionCells(graph
+					.getSelectionCellsForChanges(changes));
+		}
+	};
+
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	private static ImageIcon createNavigationIcon(String imageName) {
 		String imgLocation = "images/" + imageName + ".gif";
@@ -304,7 +396,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	 */
 	private void createAction() {
 
-		LabelLeftAction = new LabelLeftAction("left", createNavigationIcon("left"), "left label",
+		LabelLeftAction = new LabelLeftAction("Left", createNavigationIcon("left"), "left label",
 				new Integer(KeyEvent.VK_L));
 
 		LabelRightAction = new LabelRightAction("Right", createNavigationIcon("right"), "right label",
@@ -312,8 +404,16 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
 		LabelTopAction = new LabelTopAction("Top", createNavigationIcon("top"), "top label",
 				new Integer(KeyEvent.VK_T));
-		LabelBottomAction = new LabelBottomAction("bottom", createNavigationIcon("bottom"), "bottom label",
+		
+		LabelBottomAction = new LabelBottomAction("Bottom", createNavigationIcon("bottom"), "bottom label",
 				new Integer(KeyEvent.VK_B));
+		
+		undoHistoryAction = new HistoryAction("undo", createNavigationIcon("undo"), "undo",
+				new Integer(KeyEvent.VK_U),true);
+		redoHistoryAction = new HistoryAction("redo", createNavigationIcon("redo"), "redo",
+				new Integer(KeyEvent.VK_W),false);
+		
+		
 	}
 
     public void actionPerformed(ActionEvent e) {

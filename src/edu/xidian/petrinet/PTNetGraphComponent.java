@@ -16,8 +16,13 @@ import com.mxgraph.model.mxGeometry;
 import com.mxgraph.shape.mxTokenToShape;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventObject;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUndoManager;
+import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
 
@@ -38,6 +43,8 @@ public class PTNetGraphComponent  extends JPanel {
 	private JComponent graphPanel = null;
 
 	protected mxGraph visualGraph = null;
+	
+	private mxUndoManager undoManager;
 	
 	/** vertex of Place style */
 	private static final String PlaceStyle = "PlaceStyle"; 
@@ -65,6 +72,7 @@ public class PTNetGraphComponent  extends JPanel {
 	public PTNetGraphComponent(PTNet petriNet) throws ParameterException  {
 		Validate.notNull(petriNet);
 		this.petriNet = petriNet;
+		this.undoManager = new mxUndoManager();
 	}
 	
 	public void initialize() throws Exception {
@@ -128,6 +136,29 @@ public class PTNetGraphComponent  extends JPanel {
 		// 保证视图之外的Label能看见，平移图形
 		mxRectangle rec = visualGraph.getGraphBounds();  // 包含图形及其Label的边界
 		visualGraph.getView().setTranslate(new mxPoint(-rec.getX(), -rec.getY())); // 还原回来，设置为point(0,0)即可
+		
+		
+		// 记录历史，为undo，redo做准备
+		visualGraph.getModel().addListener(mxEvent.UNDO, undoHandler);
+		visualGraph.getView().addListener(mxEvent.UNDO, undoHandler);
+		
+	}
+	
+	private mxIEventListener undoHandler = new mxIEventListener()
+	{
+		public void invoke(Object source, mxEventObject evt)
+		{
+			undoManager.undoableEditHappened((mxUndoableEdit) evt
+					.getProperty("edit"));
+		}
+	};
+	
+	public mxUndoManager getUndoManager() {
+		return this.undoManager;
+	}
+	
+	public mxGraph getGraph() {
+		return this.visualGraph;
 	}
 	
 	/**
