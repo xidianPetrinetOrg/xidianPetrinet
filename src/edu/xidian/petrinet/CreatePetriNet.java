@@ -4,7 +4,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 
 public class CreatePetriNet {
-	static PTNet createPTnet1() {
+	public static PTNet createPTnet1() {
 		PTNet ptnet = new PTNet();
 		
 		ptnet.addPlace("p1");

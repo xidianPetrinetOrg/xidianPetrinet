@@ -1,4 +1,4 @@
-package edu.xidian.petrinet;
+package edu.xidian.petrinet.graph;
 
 
 import java.awt.BorderLayout;
@@ -33,16 +33,34 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
-
+import edu.xidian.petrinet.CreatePetriNet;
+/**
+ * PTNet表示的图形元素，使用举例：
+ * <pre> <code>
+ 	PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
+	PTNetGraphComponent component = new PTNetGraphComponent(ptnet);
+	try {
+		component.initialize();
+	} catch (Exception e) {
+		e.printStackTrace();
+	}	
+    new DisplayFrame(component,true); // 显示图形元素
+    </code></pre>
+ * 
+ * @author JiangTaoDuan
+ *
+ */
 public class PTNetGraphComponent  extends JPanel {
 	
 	private static final long serialVersionUID = -6795020261692373388L;
 	
+	/** PTNet 对象，是本类的数据来源  */
 	protected PTNet petriNet = null;
 
-	private JComponent graphPanel = null;
-
+	/** 由petriNet成员，生成的相应图形对象  */
 	protected mxGraph visualGraph = null;
+	
+	private JComponent graphPanel = null;
 	
 	private mxUndoManager undoManager;
 	
@@ -69,17 +87,31 @@ public class PTNetGraphComponent  extends JPanel {
 	/** Graph布局朝向 */
 	private int layoutOrientation = SwingConstants.NORTH;	 
 	
+	/**
+	 * 构造PTNet表示的图形元素
+	 * @param petriNet  PTNet
+	 * @throws ParameterException
+	 */
 	public PTNetGraphComponent(PTNet petriNet) throws ParameterException  {
 		Validate.notNull(petriNet);
 		this.petriNet = petriNet;
-		this.undoManager = new mxUndoManager();
 	}
 	
+	/**
+	 * 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
+	 * @throws Exception
+	 */
 	public void initialize() throws Exception {
 		setupVisualGraph();
 		setLayout(new BorderLayout(20, 0));
 		add(getGraphPanel(), BorderLayout.CENTER);
 		setPreferredSize(getGraphPanel().getPreferredSize());
+		
+		// undo相关
+		this.undoManager = new mxUndoManager();
+		// 记录历史，为undo，redo做准备
+		visualGraph.getModel().addListener(mxEvent.UNDO, undoHandler);
+		visualGraph.getView().addListener(mxEvent.UNDO, undoHandler);
 	}
 	
 	/**
@@ -137,28 +169,6 @@ public class PTNetGraphComponent  extends JPanel {
 		mxRectangle rec = visualGraph.getGraphBounds();  // 包含图形及其Label的边界
 		visualGraph.getView().setTranslate(new mxPoint(-rec.getX(), -rec.getY())); // 还原回来，设置为point(0,0)即可
 		
-		
-		// 记录历史，为undo，redo做准备
-		visualGraph.getModel().addListener(mxEvent.UNDO, undoHandler);
-		visualGraph.getView().addListener(mxEvent.UNDO, undoHandler);
-		
-	}
-	
-	private mxIEventListener undoHandler = new mxIEventListener()
-	{
-		public void invoke(Object source, mxEventObject evt)
-		{
-			undoManager.undoableEditHappened((mxUndoableEdit) evt
-					.getProperty("edit"));
-		}
-	};
-	
-	public mxUndoManager getUndoManager() {
-		return this.undoManager;
-	}
-	
-	public mxGraph getGraph() {
-		return this.visualGraph;
 	}
 	
 	/**
@@ -183,6 +193,36 @@ public class PTNetGraphComponent  extends JPanel {
 		return graphPanel;
 	}
 	
+	/**
+	 * undo handle
+	 */
+	private mxIEventListener undoHandler = new mxIEventListener()
+	{
+		public void invoke(Object source, mxEventObject evt)
+		{
+			undoManager.undoableEditHappened((mxUndoableEdit) evt.getProperty("edit"));
+		}
+	};
+	
+	/**
+	 * @return mxUndoManager对象
+	 */
+	public mxUndoManager getUndoManager() {
+		return this.undoManager;
+	}
+	
+	/**
+	 * @return mxGraph对象，表示由PTNet生成的图形对象
+	 */
+	public mxGraph getGraph() {
+		return this.visualGraph;
+	}
+	
+	/** 
+	 * 设置顶点的颜色
+	 * @param color
+	 * @param nodeNames
+	 */
 	public void setNodeColor(String color, String... nodeNames){
 		Object[] cells = new Object[nodeNames.length];
 		for(int i=0; i<nodeNames.length; i++)
@@ -190,9 +230,14 @@ public class PTNetGraphComponent  extends JPanel {
 		visualGraph.setCellStyles(mxConstants.STYLE_FILLCOLOR, color, cells);
 	}
 	
+	/**
+	 * 获取 actual marking 的Places token number
+	 * @param placeName
+	 * @return token number
+	 */
 	private int getPlaceTokenNumber(String placeName) {
-		PTMarking initialMarking = petriNet.getInitialMarking();
-		Integer tokenNum = initialMarking.get(placeName);
+		PTMarking marking = petriNet.getMarking();
+		Integer tokenNum = marking.get(placeName);
 		if (tokenNum == null) tokenNum = 0;
 		return tokenNum; 
 	}
@@ -416,12 +461,11 @@ public class PTNetGraphComponent  extends JPanel {
 		PTNet ptnet = CreatePetriNet.createPTnet1();
 		PTNetGraphComponent component = new PTNetGraphComponent(ptnet);
 		try {
-			component.initialize();
+			component.initialize();  // 创建PTNet对象
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-	    new DisplayFrame(component,true);
+	    new DisplayFrame(component,true);  // 显示图形元素
 	}
 
 }
