@@ -10,6 +10,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -95,7 +99,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
     		put("file",KeyEvent.VK_F); // menu,createMenuBar()定义menu and menu item
     		put("open",KeyEvent.VK_O); // menu item
     		put("save",KeyEvent.VK_S); 
-    		put("ptnet_item",KeyEvent.VK_P); 
+    		put("print",KeyEvent.VK_P); 
+    		put("ptnet_item",KeyEvent.VK_N); 
     		put("marking_item",KeyEvent.VK_M); 
     		put("exit",KeyEvent.VK_E); 
     		
@@ -172,6 +177,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menuItem = new JMenuItem("Save");
         //menuItem.setMnemonic(keyCode.get("save")); // 无效
         menuItem.setAction(new SaveAction("Save","Save graph...",keyCode.get("save"))); // 第三个参数指定了助记键（ALT组合键）
+        menu.add(menuItem);
+        
+        // print
+        menuItem = new JMenuItem("Print");
+        //menuItem.setMnemonic(keyCode.get("save")); // 无效
+        menuItem.setAction(new PrintAction("Print","Print graph...",keyCode.get("print"))); // 第三个参数指定了助记键（ALT组合键）
         menu.add(menuItem);
         
         menu.addSeparator();
@@ -420,6 +431,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	}
 	
 	
+	/** Save Graph */
 	@SuppressWarnings("serial")
 	public class SaveAction extends AbstractAction {
 		/**
@@ -452,6 +464,47 @@ public class PTNetGraph implements ActionListener, ItemListener {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 					status("test.png failed！");
+				}
+			}
+		}
+	}
+	
+	/** Print Graph */
+	@SuppressWarnings("serial")
+	public class PrintAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * 
+		 * @param name
+		 *            the name (Action.NAME) for the action, a value of null is
+		 *            ignored
+		 * @param desc
+		 *            description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public PrintAction(String text, String desc, Integer mnemonic) {
+			super(text);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+
+			mxGraphComponent graphComponent = new mxGraphComponent(ptnetGraphComponent.getGraph());
+			PrinterJob pj = PrinterJob.getPrinterJob();
+
+			if (pj.printDialog()) {
+				PageFormat pf = graphComponent.getPageFormat();
+				Paper paper = new Paper();
+				double margin = 36;
+				paper.setImageableArea(margin, margin, paper.getWidth() - margin * 2, paper.getHeight() - margin * 2);
+				pf.setPaper(paper);
+				pj.setPrintable(graphComponent, pf);
+
+				try {
+					pj.print();
+				} catch (PrinterException e2) {
+					System.out.println(e2);
 				}
 			}
 		}
