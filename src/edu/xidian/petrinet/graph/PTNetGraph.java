@@ -14,10 +14,13 @@ import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -193,7 +196,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menu.setMnemonic(KeyEvent.VK_L);
         menuBar.add(menu);
         
+        // Create the actions shared by the toolbar and menu. toolbra和menu共用的动作在这里生成, 按键助记符是Alt的组合键
     	createAction();
+    	
+    	//Add a couple of emacs key bindings for undo,redo.
+	    addBindings();
+	    
         menuItem = new JMenuItem(labelLeftAction);
         menuItem.setIcon(null); //arbitrarily chose not to use icon
         menu.add(menuItem);
@@ -361,10 +369,10 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		 * @param mnemonic
 		 * @param undo true,undo; false,redo
 		 */
-		public HistoryAction(String name, ImageIcon icon, String desc, Integer mnemonic,boolean undo) {
+		public HistoryAction(String name, ImageIcon icon, String desc,boolean undo) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
-			putValue(MNEMONIC_KEY, mnemonic);
+			//putValue(MNEMONIC_KEY, mnemonic); // 在addBindings()定义了control-z and control-y
 			this.undo = undo;
 		}
 		
@@ -373,6 +381,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		}
 
 		public void actionPerformed(ActionEvent e) {
+			System.out.println("undo======"+undo);
 			if (ptnetGraphComponent.getGraph() != null) {
 				if (undo) {
 					undoManager.undo();
@@ -413,6 +422,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	 * Create the actions shared by the toolbar and menu.
 	 * toolbra和menu共用的动作在这里生成,
 	 * 按键助记符是Alt的组合键
+	 * undo,redo快捷按键（Control Z/Control Y）在addBindings()中定义
 	 */
 	private void createAction() {
 
@@ -424,17 +434,46 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
 		labelTopAction = new LabelTopAction("Top", createNavigationIcon("top"), "top label",
 				new Integer(KeyEvent.VK_T));
-		
+
 		labelBottomAction = new LabelBottomAction("Bottom", createNavigationIcon("bottom"), "bottom label",
 				new Integer(KeyEvent.VK_B));
-		
-		undoHistoryAction = new HistoryAction("undo", createNavigationIcon("undo"), "undo",
-				new Integer(KeyEvent.VK_Z),true);
-		redoHistoryAction = new HistoryAction("redo", createNavigationIcon("redo"), "redo",
-				new Integer(KeyEvent.VK_Y),false);
-		
-		
+
+		undoHistoryAction = new HistoryAction("undo", createNavigationIcon("undo"), "undo", true);
+		redoHistoryAction = new HistoryAction("redo", createNavigationIcon("redo"), "redo", false);
+
 	}
+	
+	/**
+	 * Add a couple of emacs key bindings for undo,redo.
+	 * undo,redo快捷按键（Control Z/Control Y）在addBindings()中定义
+	 * toolbra和menu共用的动作在这里生成,按键助记符是Alt的组合键,在createAction()中定义
+	 */
+    private void addBindings() {
+    	// The component has the keyboard focus
+    	//InputMap inputMap = ptnetGraphComponent.getInputMap();  // 无效
+    	
+    	// The component has the keyboard focus
+    	//InputMap inputMap = ptnetGraphComponent.getInputMap( JComponent.WHEN_FOCUSED ); // 无效，相当于无参的形式，组件获得焦点时
+    	
+    	// The component contains (or is) the component that has the focus. 
+    	InputMap inputMap = ptnetGraphComponent.getInputMap( JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT); // 有效，当父组件获得焦点时
+    	
+    	// The component's window either has the focus or contains the component that has the focus. 
+    	//InputMap inputMap = ptnetGraphComponent.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW); // 有效，尽量不用，因为窗口的子组件太多
+    	
+    	ActionMap actionMap = ptnetGraphComponent.getActionMap();
+    	
+    	actionMap.put("undo", undoHistoryAction);
+    	actionMap.put("redo", redoHistoryAction);
+    	
+    	//Ctrl-Z to go undo
+    	KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK);
+    	inputMap.put(key, "undo");
+    	
+    	//Ctrl-Y to go undo
+    	key = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK);
+    	inputMap.put(key, "redo");
+    }
 
 	/** 
 	 * toolbra和menu共用的动作（createAction()中生成），在各个对应的Action类中响应
