@@ -32,6 +32,7 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
@@ -558,7 +559,10 @@ public class PTNetGraph implements ActionListener, ItemListener {
         
         // 菜单项,Open,Exit, 如果是上述JRadioButtonMenuItem实例的菜单项，也符合本条件，因此不必用instanceof区分菜单项。
         if (source instanceof JMenuItem) {
-        	System.out.println("Menu item selected:" + source.getText());
+        	//System.out.println("Menu item selected:" + source.getText());
+        	if (source.getText().equalsIgnoreCase("Exit")) {
+        		exit();
+        	}
         }
         
         String s = "Action event detected."
@@ -581,7 +585,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
         for (Map.Entry<String, JCheckBoxMenuItem> entry : PTNetOrMarkingGraph.entrySet()) {
     	    if (source == entry.getValue()) {
     	        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-    	    	System.out.println("selected:" + selected + "," + entry.getKey());
     	    	break;
     	    }
     	}
@@ -605,6 +608,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     public void status(String status) {
     	 output.append(status + newline);
          output.setCaretPosition(output.getDocument().getLength());
+         System.out.println(status);
     }
     
 	/**
@@ -653,6 +657,19 @@ public class PTNetGraph implements ActionListener, ItemListener {
         int dotIndex = classString.lastIndexOf(".");
         return classString.substring(dotIndex+1);
     }
+    
+	/**
+	 * exit program
+	 */
+	public void exit()
+	{
+		JFrame frame = (JFrame) SwingUtilities.windowForComponent(ptnetGraphComponent);
+
+		if (frame != null)
+		{
+			frame.dispose();
+		}
+	}
 
     /**
      * Create the GUI and show it.  For thread safety, this method should be invoked from the
