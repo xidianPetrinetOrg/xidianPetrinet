@@ -1,6 +1,7 @@
 package edu.xidian.petrinet.graph;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Event;
 import java.awt.event.ActionEvent;
@@ -8,10 +9,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -34,6 +39,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
@@ -87,6 +94,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     		/** File menu */
     		put("file",KeyEvent.VK_F); // menu,createMenuBar()定义menu and menu item
     		put("open",KeyEvent.VK_O); // menu item
+    		put("save",KeyEvent.VK_S); 
     		put("ptnet_item",KeyEvent.VK_P); 
     		put("marking_item",KeyEvent.VK_M); 
     		put("exit",KeyEvent.VK_E); 
@@ -158,6 +166,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menuItem = new JMenuItem("Open");
         menuItem.setMnemonic(keyCode.get("open"));
         menuItem.addActionListener(this);
+        menu.add(menuItem);
+        
+        // save
+        menuItem = new JMenuItem("Save");
+        //menuItem.setMnemonic(keyCode.get("save")); // 无效
+        menuItem.setAction(new SaveAction("Save","Save graph...",keyCode.get("save"))); // 第三个参数指定了助记键（ALT组合键）
         menu.add(menuItem);
         
         menu.addSeparator();
@@ -405,6 +419,44 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		}
 	}
 	
+	
+	@SuppressWarnings("serial")
+	public class SaveAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public SaveAction(String text, String desc, Integer mnemonic) {
+			super(text);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			mxGraphComponent graphComponent = new mxGraphComponent(ptnetGraphComponent.getGraph());
+			mxGraph graph = ptnetGraphComponent.getGraph();
+			//Color bg = graphComponent.getBackground();
+			Color bg = null; // 没有背景，才是原汁原味
+			BufferedImage image = mxCellRenderer
+					.createBufferedImage(graph, null, 1, bg,
+							graphComponent.isAntiAlias(), null,
+							graphComponent.getCanvas());
+
+			if (image != null)
+			{
+				try {
+					ImageIO.write(image, "png", new File("test.png"));
+					status("test.png ok！");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					status("test.png failed！");
+				}
+			}
+		}
+	}
+	
 	/** 历史动作 */
 	@SuppressWarnings("serial")
 	public class HistoryAction extends AbstractAction {
@@ -415,7 +467,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		 * @param name the name (Action.NAME) for the action, a value of null is ignored
 		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
 		 * @param desc description for the action, used for tooltip text
-		 * @param mnemonic
 		 * @param undo true,undo; false,redo
 		 */
 		public HistoryAction(String name, ImageIcon icon, String desc,boolean undo) {
@@ -585,6 +636,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         for (Map.Entry<String, JCheckBoxMenuItem> entry : PTNetOrMarkingGraph.entrySet()) {
     	    if (source == entry.getValue()) {
     	        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
+    	    	System.out.println("selected:" + selected + "," + entry.getKey());
     	    	break;
     	    }
     	}
