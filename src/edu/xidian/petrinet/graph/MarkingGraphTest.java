@@ -1,4 +1,4 @@
-package edu.xidian.petrinet;
+package edu.xidian.petrinet.graph;
 
 
 import de.invation.code.toval.graphic.component.DisplayFrame;
