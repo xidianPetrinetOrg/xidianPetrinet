@@ -463,7 +463,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 					status("test.png ok！");
 				} catch (IOException e1) {
 					e1.printStackTrace();
-					status("test.png failed！");
+					status("Sorry,save file failed！");
 				}
 			}
 		}
@@ -503,8 +503,10 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
 				try {
 					pj.print();
+					status("print graph...");
 				} catch (PrinterException e2) {
 					System.out.println(e2);
+					status("Sorry,print graph failed!");
 				}
 			}
 		}
@@ -642,9 +644,9 @@ public class PTNetGraph implements ActionListener, ItemListener {
         	    	selected = entry.getKey();
         	    	System.out.println("PTNet selected:" + selected);
         	    	int orientation = SwingConstants.NORTH;
-        	    	if (selected == "WEST") orientation = SwingConstants.WEST;
-        	    	else if (selected == "EAST") orientation = SwingConstants.EAST;
-        	    	else if (selected == "SOUTH") orientation = SwingConstants.SOUTH;
+        	    	if (selected.equalsIgnoreCase("WEST")) orientation = SwingConstants.WEST;
+        	    	else if (selected.equalsIgnoreCase("EAST")) orientation = SwingConstants.EAST;
+        	    	else if (selected.equalsIgnoreCase("SOUTH")) orientation = SwingConstants.SOUTH;
         	    	ptnetGraphComponent.setOrientation(orientation); // 改变图的朝向
         	    	
         	    	break;
