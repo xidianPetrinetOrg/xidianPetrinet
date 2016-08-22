@@ -17,6 +17,7 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +31,12 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
@@ -42,7 +45,9 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
+import com.mxgraph.examples.swing.editor.DefaultFileFilter;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxEvent;
@@ -434,6 +439,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Save Graph */
 	@SuppressWarnings("serial")
 	public class SaveAction extends AbstractAction {
+		protected String lastDir = null;
+		
+		protected String fileName = null;
+		
+		protected String ext = null; // .png,.jpg,...
+		
 		/**
 		 * Creates an Action with the specified name and small icon.
 		 * @param name the name (Action.NAME) for the action, a value of null is ignored
@@ -447,10 +458,22 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
+			getFileName();
+			if (fileName == null) return;
+			
 			mxGraphComponent graphComponent = new mxGraphComponent(ptnetGraphComponent.getGraph());
 			mxGraph graph = ptnetGraphComponent.getGraph();
-			//Color bg = graphComponent.getBackground();
-			Color bg = null; // 没有背景，才是原汁原味
+			
+			Color bg = null; // .png文件 没有背景，才是原汁原味;  .jpg和.jpeg无背景不好看; .wbmp有无背景均不能保存; .bmp必须有背景才能保存
+			
+//			if ((!ext.equalsIgnoreCase(".gif") && !ext.equalsIgnoreCase(".png"))
+//					&& JOptionPane.showConfirmDialog(graphComponent, "transparentBackground") == JOptionPane.YES_OPTION)
+//			{
+//				bg = graphComponent.getBackground();
+//			}
+			if (ext.equalsIgnoreCase(".bmp") || ext.equalsIgnoreCase(".jpg") || ext.equalsIgnoreCase(".jpeg")) {  
+				bg = graphComponent.getBackground();
+			}
 			BufferedImage image = mxCellRenderer
 					.createBufferedImage(graph, null, 1, bg,
 							graphComponent.isAntiAlias(), null,
@@ -459,12 +482,83 @@ public class PTNetGraph implements ActionListener, ItemListener {
 			if (image != null)
 			{
 				try {
-					ImageIO.write(image, "png", new File("test.png"));
-					status("test.png ok！");
+					ImageIO.write(image, ext.substring(1), new File(fileName));
+					status("Save " + fileName + " ok！");
 				} catch (IOException e1) {
 					e1.printStackTrace();
-					status("Sorry,save file failed！");
+					status("Sorry,Save file " + fileName + "failed！");
 				}
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(graphComponent, "noImageData");
+			}
+		}
+		
+		/**
+		 * get:fileName and ext
+		 */
+		private void getFileName() {
+			FileFilter selectedFilter = null;
+			DefaultFileFilter PngFilter = new DefaultFileFilter(".png","Png file (.png)");
+						
+			String wd;
+
+			if (lastDir != null) {
+				wd = lastDir;
+			} else {
+				wd = System.getProperty("user.dir");
+			}
+
+			JFileChooser fc = new JFileChooser(wd);
+
+			// Adds the default file format
+			FileFilter defaultFilter = PngFilter;
+			fc.addChoosableFileFilter(defaultFilter);
+
+			// Adds a filter for each supported image format
+			Object[] imageFormats = ImageIO.getReaderFormatNames();
+
+			// Finds all distinct extensions
+			HashSet<String> formats = new HashSet<String>();
+
+			for (int i = 0; i < imageFormats.length; i++) {
+				String ext = imageFormats[i].toString().toLowerCase();
+				formats.add(ext);
+			}
+
+			imageFormats = formats.toArray();
+
+			for (int i = 0; i < imageFormats.length; i++) {
+				String ext = imageFormats[i].toString();
+				fc.addChoosableFileFilter(new DefaultFileFilter("." + ext,ext.toUpperCase() + " (." + ext + ")"));
+			}
+
+			// Adds filter that accepts all supported image formats
+			fc.addChoosableFileFilter(new DefaultFileFilter.ImageFileFilter("allImages"));
+			fc.setFileFilter(defaultFilter);
+			int rc = fc.showDialog(null, "Save");
+
+			if (rc != JFileChooser.APPROVE_OPTION) {
+				fileName = null;
+				return;
+			} else {
+				lastDir = fc.getSelectedFile().getParent();
+			}
+
+			fileName = fc.getSelectedFile().getAbsolutePath();
+			selectedFilter = fc.getFileFilter();
+
+			if (selectedFilter instanceof DefaultFileFilter) {
+				ext = ((DefaultFileFilter) selectedFilter).getExtension();
+
+				if (!fileName.toLowerCase().endsWith(ext)) {
+					fileName += ext;
+				}
+			}
+
+			if (new File(fileName).exists() && JOptionPane.showConfirmDialog(ptnetGraphComponent,"overwriteExistingFile") != JOptionPane.YES_OPTION) {
+				fileName = null;
 			}
 		}
 	}
