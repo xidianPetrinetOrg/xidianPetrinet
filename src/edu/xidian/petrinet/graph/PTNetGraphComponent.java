@@ -148,6 +148,10 @@ public class PTNetGraphComponent  extends JPanel {
 //				visualGraph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "#ffffff", cells);
 //				visualGraph.setCellStyles(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_TOP,cells); // 无效
 //				visualGraph.setCellStyles(mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER,cells); // 无效
+				//visualGraph.setCellStyles(mxConstants.STYLE_EDGE, elbowEdgeStyle;elbow=horizontalmxConstants.ALIGN_CENTER,cells); // 无效
+				visualGraph.setCellStyles(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ELBOW,cells); // 无效
+				//visualGraph.setCellStyles(mxConstants.EDGESTYLE_ELBOW, mxConstants.ELBOW_HORIZONTAL,cells); // 无效
+				visualGraph.setCellStyles(mxConstants.EDGESTYLE_ELBOW, mxConstants.ELBOW_VERTICAL,cells); // 无效
 		    }
 	
 		}

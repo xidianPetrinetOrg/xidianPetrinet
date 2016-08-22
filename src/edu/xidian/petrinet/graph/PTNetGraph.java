@@ -896,7 +896,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
     public static void main(String[] args) {
     	//PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
-    	PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
+    	PTNet ptnet = PNGenerator.sharedResource(2, 1);  // states: 15
+    	//PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
     	PTNetGraphComponent ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
  		try {
  			ptnetGraphComponent.initialize();
