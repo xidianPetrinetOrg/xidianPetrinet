@@ -58,8 +58,8 @@ import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 import com.mxgraph.view.mxGraph;
 
+import de.uni.freiburg.iig.telematik.sepia.generator.PNGenerator;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
-import edu.xidian.petrinet.CreatePetriNet;
 
 /**
  * PTNet Graph and It's marking graph, 提供可视化编辑功能 ：<br>
@@ -895,7 +895,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
 
     public static void main(String[] args) {
-    	PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
+    	//PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
+    	PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
     	PTNetGraphComponent ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
  		try {
  			ptnetGraphComponent.initialize();
