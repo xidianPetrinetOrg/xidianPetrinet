@@ -20,6 +20,24 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.properties.mg.MarkingGraphEx
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.CreatePetriNet;
 
+/**
+ * 根据PTNet，计算MaringGraph，表示为图形元素(组件)。使用举例：
+ <pre> <code>
+    PTNet ptnet = CreatePetriNet.createPTnet1(); // PTNet对象
+	PTMarkingGraphComponent component = new PTMarkingGraphComponent(ptnet);
+	component.setVertexWidth(30);
+	component.setVertexHeight(30);
+	try {
+		component.calculateMarkingGraph(); // 计算markingGraph，需要一段计算时间
+		component.initialize();  // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
+		} catch (Exception e) {
+			e.printStackTrace();
+	}	
+	new DisplayFrame(component,true);  // 显示图形元素
+</code></pre>
+ * @author JiangtaoDuan
+ *
+ */
 public class PTMarkingGraphComponent extends PTNetGraphComponent {
 
 	private static final long serialVersionUID = -7271096146707469553L;
@@ -41,23 +59,26 @@ public class PTMarkingGraphComponent extends PTNetGraphComponent {
 		super(petriNet);
 	}
 	
-	public void setMarkingGraph() {
+	/**
+	 * 计算markingGaph，需要一段计算时间
+	 */
+	public void calculateMarkingGraph() {
 		try {
-			markingGraph = (PTMarkingGraph) MGConstruction.buildMarkingGraph(petriNet);
-			int VertexNum = markingGraph.getVertexCount();
-			System.out.println("PTMarkingGraph: Vertex Number(states) = " + VertexNum);
-			System.out.println(markingGraph);
+			markingGraph = (PTMarkingGraph) MGConstruction.buildMarkingGraph(petriNet); // 需要一段计算时间
+//			int VertexNum = markingGraph.getVertexCount();
+//			System.out.println("PTMarkingGraph: Vertex Number(states) = " + VertexNum);
+//			System.out.println(markingGraph);
 		} catch (MarkingGraphException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
 	
 	/**
-	 * 由petriNet信息，装配visualGraph
+	 * 由markingGaph信息，装配visualGraph
 	 * insertVextex，isertEdge
 	 * @throws Exception
 	 */
+	@Override
 	protected void setupVisualGraph() throws Exception {
 		visualGraph = new mxGraph();
 		parent = visualGraph.getDefaultParent();
@@ -164,13 +185,13 @@ public class PTMarkingGraphComponent extends PTNetGraphComponent {
 	
 	
 	public static void main(String[] args) {
-		PTNet ptnet = CreatePetriNet.createPTnet1();
+		PTNet ptnet = CreatePetriNet.createPTnet1(); // 生成PTNet对象
 		PTMarkingGraphComponent component = new PTMarkingGraphComponent(ptnet);
 		component.setVertexWidth(30);
 		component.setVertexHeight(30);
 		try {
-			component.setMarkingGraph();
-			component.initialize();  // 创建PTNet对象
+			component.calculateMarkingGraph(); // 计算markingGraph，需要一段计算时间
+			component.initialize(); // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	

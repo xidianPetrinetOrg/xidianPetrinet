@@ -35,7 +35,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.CreatePetriNet;
 /**
- * PTNet表示的图形元素，使用举例：
+ * PTNet表示的图形元素(组件)，使用举例：
  * <pre> <code>
  	PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
 	PTNetGraphComponent component = new PTNetGraphComponent(ptnet);
@@ -47,7 +47,7 @@ import edu.xidian.petrinet.CreatePetriNet;
     new DisplayFrame(component,true); // 显示图形元素
     </code></pre>
  * 
- * @author JiangTaoDuan
+ * @author JiangtaoDuan
  *
  */
 public class PTNetGraphComponent  extends JPanel {
