@@ -40,7 +40,7 @@ import edu.xidian.petrinet.CreatePetriNet;
  	PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
 	PTNetGraphComponent component = new PTNetGraphComponent(ptnet);
 	try {
-		component.initialize();
+		component.initialize(); // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
 	} catch (Exception e) {
 		e.printStackTrace();
 	}	
@@ -465,7 +465,7 @@ public class PTNetGraphComponent  extends JPanel {
 		PTNet ptnet = CreatePetriNet.createPTnet1();
 		PTNetGraphComponent component = new PTNetGraphComponent(ptnet);
 		try {
-			component.initialize();  // 创建PTNet对象
+			component.initialize();  // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	

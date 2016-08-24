@@ -29,7 +29,7 @@ import edu.xidian.petrinet.CreatePetriNet;
 	component.setVertexHeight(30);
 	try {
 		component.calculateMarkingGraph(); // 计算markingGraph，需要一段计算时间
-		component.initialize();  // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
+		component.initialize();  // 初始化，由markingGraph信息，装配visualGraph,图形元素中心布局
 		} catch (Exception e) {
 			e.printStackTrace();
 	}	
@@ -191,7 +191,7 @@ public class PTMarkingGraphComponent extends PTNetGraphComponent {
 		component.setVertexHeight(30);
 		try {
 			component.calculateMarkingGraph(); // 计算markingGraph，需要一段计算时间
-			component.initialize(); // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
+			component.initialize(); // 初始化，由markingGraph信息，装配visualGraph,图形元素中心布局
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
