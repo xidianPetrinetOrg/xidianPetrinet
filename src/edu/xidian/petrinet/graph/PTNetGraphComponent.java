@@ -65,27 +65,27 @@ public class PTNetGraphComponent  extends JPanel {
 	private mxUndoManager undoManager;
 	
 	/** vertex of Place style */
-	private static final String PlaceStyle = "PlaceStyle"; 
+	protected static final String PlaceStyle = "PlaceStyle"; 
 	
 	/** vertex of Transition style */
-	private static final String TransitionStyle = "TransitionStyle"; 
+	protected static final String TransitionStyle = "TransitionStyle"; 
 	
 	/** width,height of vertex, default 30 */
-	private int vertexWidth = 20, vertexHeight = 20;
+	protected int vertexWidth = 20, vertexHeight = 20;
 		
 	/**
 	 * key: vertex(Place/Transition) name, value: mxCell对象
 	 * for create edge from vertices
 	 */
-	private Map<String, mxCell> vertices = new HashMap<String, mxCell>(); 
+	protected Map<String, mxCell> vertices = new HashMap<String, mxCell>(); 
 	
 	/** Graph布局 */
-	private mxHierarchicalLayout layout;
+	protected mxHierarchicalLayout layout;
 	
-	private Object parent;
+	protected Object parent;
 	
 	/** Graph布局朝向 */
-	private int layoutOrientation = SwingConstants.NORTH;	 
+	protected int layoutOrientation = SwingConstants.NORTH;	 
 	
 	/**
 	 * 构造PTNet表示的图形元素
@@ -149,9 +149,9 @@ public class PTNetGraphComponent  extends JPanel {
 //				visualGraph.setCellStyles(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_TOP,cells); // 无效
 //				visualGraph.setCellStyles(mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER,cells); // 无效
 				//visualGraph.setCellStyles(mxConstants.STYLE_EDGE, elbowEdgeStyle;elbow=horizontalmxConstants.ALIGN_CENTER,cells); // 无效
-				visualGraph.setCellStyles(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ELBOW,cells); // 无效
+				//visualGraph.setCellStyles(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ELBOW,cells); // 无效
 				//visualGraph.setCellStyles(mxConstants.EDGESTYLE_ELBOW, mxConstants.ELBOW_HORIZONTAL,cells); // 无效
-				visualGraph.setCellStyles(mxConstants.EDGESTYLE_ELBOW, mxConstants.ELBOW_VERTICAL,cells); // 无效
+				//visualGraph.setCellStyles(mxConstants.EDGESTYLE_ELBOW, mxConstants.ELBOW_VERTICAL,cells); // 无效
 		    }
 	
 		}
@@ -184,10 +184,10 @@ public class PTNetGraphComponent  extends JPanel {
 	protected mxCell getVertexCell(Object parent, String vertexName, String vertexLabel) {
 		// Place
 		if (petriNet.getPlace(vertexName) != null) {
-			return (mxCell) visualGraph.insertVertex(parent, vertexName, toShape(vertexLabel,vertexLabel), 0, 0, 40, 40, PlaceStyle);
+			return (mxCell) visualGraph.insertVertex(parent, vertexName, toShape(vertexLabel,vertexLabel), 0, 0, vertexWidth, vertexHeight, PlaceStyle);
 		}
 		//Transition
-		return (mxCell) visualGraph.insertVertex(parent, vertexName, vertexLabel, 0, 0, 40, 40, TransitionStyle);
+		return (mxCell) visualGraph.insertVertex(parent, vertexName, vertexLabel, 0, 0, vertexWidth, vertexHeight, TransitionStyle);
 	}
 	
 	private JComponent getGraphPanel() {
@@ -256,7 +256,7 @@ public class PTNetGraphComponent  extends JPanel {
 	 * vertex of place style
 	 * @return styleName
 	 */
-	private void createPlaceStyle() {
+	protected void createPlaceStyle() {
 		// defaultVertex={shape=rectangle, fontColor=#774400, strokeColor=#6482B9, fillColor=#C3D9FF, align=center, verticalAlign=middle}
 		// defaultEdge={endArrow=classic, shape=connector, fontColor=#446299, strokeColor=#6482B9, align=center, verticalAlign=middle}, 
 		mxStylesheet stylesheet = visualGraph.getStylesheet();
@@ -279,7 +279,7 @@ public class PTNetGraphComponent  extends JPanel {
 	 * vertex of Transition style
 	 * @return styleName
 	 */
-	private void createTransitionStyle() {
+	protected void createTransitionStyle() {
 		mxStylesheet stylesheet = visualGraph.getStylesheet();
 		Hashtable<String, Object> style = new Hashtable<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
@@ -307,7 +307,7 @@ public class PTNetGraphComponent  extends JPanel {
 	 * 设置图形的一些属性，比如，不能删除cells; 不能编辑cells; 拖动边时，保证两端顶点是连接状态,不能脱接; cells是可以移动的，不能改变cells的大小;
 	 * 不会出现悬挂边; Label是可以拖动的
 	 */
-	private void setCellsAttribute() {
+	protected void setCellsAttribute() {
 		visualGraph.setCellsDeletable(false);
 		visualGraph.setCellsEditable(false);
 		visualGraph.setCellsDisconnectable(false);  // 不会拖动边，而使两端顶点不连接
