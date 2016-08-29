@@ -71,8 +71,14 @@ public class PTNetGraph implements ActionListener, ItemListener {
     private JTextArea output;
     private static final String newline = "\n";
     
-    /** PTNet GraphComponent */
+    /** PTNet */
+    private PTNet ptnet = null;
+    
+    /** PTNet graph component */
     private PTNetGraphComponent ptnetGraphComponent = null;
+    
+    /** PTNet Marking graph component */
+    private PTMarkingGraphComponent ptMarkingGraphComponent = null;
     
     /** 图的朝向,如果改变，请注意在createMenuBar()中，修改快捷键，现在是：N,W,S,E */
     private String[] orientationStr = {"NORTH","WEST","SOUTH","EAST"};
@@ -136,6 +142,30 @@ public class PTNetGraph implements ActionListener, ItemListener {
     		put("bottom",KeyEvent.VK_B);
     	}
     };
+    
+    /**
+     * 构造PTNetGraph对象，PTNet Graph and It's marking graph, 提供可视化编辑功能 
+     * @param ptnet PTNet对象
+     */
+    public PTNetGraph(PTNet ptnet) {
+    	this.ptnet = ptnet;
+    	this.ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
+ 		try {
+ 			ptnetGraphComponent.initialize();
+ 			
+ 			this.undoManager = ptnetGraphComponent.getUndoManager();
+ 			undoManager.addListener(mxEvent.UNDO, undoHandler);
+ 			undoManager.addListener(mxEvent.REDO, undoHandler);
+ 			
+ 			 // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
+ 	    	createAction();
+ 	    	
+ 	    	//Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
+ 		    addBindings();
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+ 		}
+    }
     
     /**
      * 构造PTNetGraph对象，PTNet Graph and It's marking graph, 提供可视化编辑功能 
@@ -892,24 +922,46 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		frame.pack();
         frame.setVisible(true);
     }
+    
+    /**
+     * Create the GUI and show it.  For thread safety, this method should be invoked from the
+     * event-dispatching thread.
+     */
+    public static void createAndShowGUI(PTNet ptnet) {		
+    	//Create and set up the window.
+    	JFrame frame = new JFrame("PTNet and MarkingGraph");
+    	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	
+    	//Create and set up the content pane.
+    	PTNetGraph ptgraph = new PTNetGraph(ptnet);
+    	frame.setJMenuBar(ptgraph.createMenuBar());
+    	
+    	frame.setContentPane(ptgraph.addComponentsToPane());
+    	
+    	//Display the window.
+    	//frame.setSize(450, 260);
+    	frame.pack();
+    	frame.setVisible(true);
+    }
 
 
     public static void main(String[] args) {
     	//PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
     	PTNet ptnet = PNGenerator.sharedResource(2, 1);  // states: 15
     	//PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
-    	PTNetGraphComponent ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
- 		try {
- 			ptnetGraphComponent.initialize();
- 		} catch (Exception e) {
- 			e.printStackTrace();
- 		}
- 		
+//    	PTNetGraphComponent ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
+// 		try {
+// 			ptnetGraphComponent.initialize();
+// 		} catch (Exception e) {
+// 			e.printStackTrace();
+// 		}
+// 		
     	//Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI(ptnetGraphComponent); // 显示PTNet对应的图形
+                //createAndShowGUI(ptnetGraphComponent); // 显示PTNet对应的图形
+                createAndShowGUI(ptnet); // 显示PTNet对应的图形
             }
         });
     }
