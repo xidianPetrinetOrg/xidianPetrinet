@@ -8,12 +8,13 @@ import de.uni.freiburg.iig.telematik.sepia.mg.pt.PTMarkingGraph;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.properties.mg.MGConstruction;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.properties.mg.MarkingGraphException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
+import edu.xidian.petrinet.CreatePetriNet;
 
 public class MarkingGraphTest {
 	public static void main(String[] args) {
-		//PTNet ptnet = CreatePetriNet.createPTnet1();       // states: 6
+		PTNet ptnet = CreatePetriNet.createPTnet1();       // states: 6
 		//PTNet ptnet = PNGenerator.sharedResource(2, 1);  // states: 15
-		PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
+		//PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
 		System.out.println(ptnet);
 		
 		System.out.println("Caculator PTMarkingGraph....");
