@@ -40,6 +40,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -60,6 +61,7 @@ import com.mxgraph.view.mxGraph;
 
 import de.uni.freiburg.iig.telematik.sepia.generator.PNGenerator;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
+import edu.xidian.petrinet.graph.PTMarkingGraphComponent.IMarkingGraphReady;
 
 /**
  * PTNet Graph and It's marking graph, 提供可视化编辑功能 ：<br>
@@ -71,15 +73,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
     private JTextArea output;
     private static final String newline = "\n";
     
-    /** PTNet */
-    private PTNet ptnet = null;
-    
     /** PTNet graph component */
     private PTNetGraphComponent ptnetGraphComponent = null;
     
     /** PTNet Marking graph component */
     private PTMarkingGraphComponent ptMarkingGraphComponent = null;
-    
+
     /** 图的朝向,如果改变，请注意在createMenuBar()中，修改快捷键，现在是：N,W,S,E */
     private String[] orientationStr = {"NORTH","WEST","SOUTH","EAST"};
     
@@ -148,44 +147,40 @@ public class PTNetGraph implements ActionListener, ItemListener {
      * @param ptnet PTNet对象
      */
     public PTNetGraph(PTNet ptnet) {
-    	this.ptnet = ptnet;
+    	//////////// PTNet graph
     	this.ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
  		try {
  			ptnetGraphComponent.initialize();
  			
- 			this.undoManager = ptnetGraphComponent.getUndoManager();
- 			undoManager.addListener(mxEvent.UNDO, undoHandler);
- 			undoManager.addListener(mxEvent.REDO, undoHandler);
- 			
- 			 // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
- 	    	createAction();
- 	    	
- 	    	//Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
- 		    addBindings();
+ 		   ///////////////// marking graph
+ 		   this.ptMarkingGraphComponent = new PTMarkingGraphComponent(ptnet);
+ 		   IMarkingGraphReady ready = new IMarkingGraphReady() {
+ 			  @Override
+ 			  public void graph(boolean isReady) {
+ 				 if (isReady) status("marking graph is ready.");
+ 			 }
+ 		   };
+ 		   // 非阻塞方式，接口回调：计算markingGaph，结果通过参数获取
+ 		   this.ptMarkingGraphComponent.markingGraphReady(ready);
+ 		   
+			 // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
+	    	createAction();
+	    	
+	    	//Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
+		    addBindings();
+		    
+            //////////////undo
+			this.undoManager = ptnetGraphComponent.getUndoManager();
+			undoManager.addListener(mxEvent.UNDO, undoHandler);
+			undoManager.addListener(mxEvent.REDO, undoHandler);
+ 		    
  		} catch (Exception e) {
  			e.printStackTrace();
  		}
+ 		
+ 		
     }
-    
-    /**
-     * 构造PTNetGraph对象，PTNet Graph and It's marking graph, 提供可视化编辑功能 
-     * @param ptnetGraphComponent
-     */
-    public PTNetGraph(PTNetGraphComponent ptnetGraphComponent) {
-		this.ptnetGraphComponent = ptnetGraphComponent;
-		
-		this.undoManager = ptnetGraphComponent.getUndoManager();
-		undoManager.addListener(mxEvent.UNDO, undoHandler);
-		undoManager.addListener(mxEvent.REDO, undoHandler);
-		
-		 // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
-    	createAction();
-    	
-    	//Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
-	    addBindings();
-	}
-    
-   
+       
     /** 生成菜单条MenuBar */
 	private JMenuBar createMenuBar() {
         JMenuBar menuBar;
@@ -851,7 +846,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	 *  
 	 * @return
 	 */
-    private Container addComponentsToPane( ) {
+    private Container addComponentsToPane() {
 		
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
@@ -859,18 +854,28 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		JToolBar toolBar = createToolBar();
 		contentPane.add(toolBar, BorderLayout.PAGE_START);
 		
-		// Add the ptnetGraphComponent to the content pane.
-		JScrollPane scroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll.setViewportView(ptnetGraphComponent);
-		//contentPane.add(scroll, BorderLayout.LINE_START);
-		contentPane.add(scroll, BorderLayout.CENTER);  // 这一部分区域大小是动态的，随着窗口大小或内容大小动态改变，其他部分非动态
-		//contentPane.add(scroll, BorderLayout.LINE_END);
-          
-
-		// add the marking graph
-		//JButton button = new JButton("Line end Button (LINE_END)");
-		//contentPane.add(button, BorderLayout.LINE_END);
+		// the ptnetGraphComponent
+		JScrollPane netPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		netPane.setViewportView(ptnetGraphComponent);
+			
+		// the markingGraphComponent
+		JScrollPane markingPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		markingPane.setViewportView(ptMarkingGraphComponent);
+			
+		// JSplitPane is used to divide two (and only two) Components
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,netPane, markingPane);
+		// true to specify that the split pane should provide a collapse/expand widget
+		splitPane.setOneTouchExpandable(true);
+		// true if the components should continuously be redrawn as the divider changes position
+		splitPane.setContinuousLayout(true);
 		
+		//markingPane.setVisible(false);
+		//netPane.setVisible(false);
+		
+		//contentPane.add(splitPane, BorderLayout.LINE_START);
+		contentPane.add(splitPane, BorderLayout.CENTER);  // 这一部分区域大小是动态的，随着窗口大小或内容大小动态改变，其他部分非动态
+		//contentPane.add(splitPane, BorderLayout.LINE_END);
+          
 		//Create a scrolled status text area.
         output = new JTextArea(5, 30);
         output.setEditable(false);
@@ -901,28 +906,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 			frame.dispose();
 		}
 	}
-
-    /**
-     * Create the GUI and show it.  For thread safety, this method should be invoked from the
-     * event-dispatching thread.
-     */
-    public static void createAndShowGUI(PTNetGraphComponent ptnetGraphComponent) {		
-        //Create and set up the window.
-        JFrame frame = new JFrame("PTNet and MarkingGraph");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Create and set up the content pane.
-        PTNetGraph ptgraph = new PTNetGraph(ptnetGraphComponent);
-        frame.setJMenuBar(ptgraph.createMenuBar());
-       
-		frame.setContentPane(ptgraph.addComponentsToPane());
-
-        //Display the window.
-        //frame.setSize(450, 260);
-		frame.pack();
-        frame.setVisible(true);
-    }
-    
+   
     /**
      * Create the GUI and show it.  For thread safety, this method should be invoked from the
      * event-dispatching thread.
@@ -947,8 +931,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
     public static void main(String[] args) {
     	//PTNet ptnet = CreatePetriNet.createPTnet1(); // 创建PTNet对象
-    	PTNet ptnet = PNGenerator.sharedResource(2, 1);  // states: 15
-    	//PTNet ptnet = PNGenerator.producerConsumer(10, 1);  // states: 1860
+    	//PTNet ptnet = PNGenerator.sharedResource(2, 1);  // states: 15
+    	PTNet ptnet = PNGenerator.producerConsumer(5, 1);  // states: 1860
 //    	PTNetGraphComponent ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
 // 		try {
 // 			ptnetGraphComponent.initialize();
