@@ -778,24 +778,32 @@ public class PTNetGraph implements ActionListener, ItemListener {
         // 单选按钮,图的朝向
         if (source instanceof JRadioButtonMenuItem) {
         	String selected = null;
+        	
+        	// PTNet graph
         	for (Map.Entry<String, JRadioButtonMenuItem> entry : netOrientationRadioBtn.entrySet()) {
         	    if (source == entry.getValue()) {
         	    	selected = entry.getKey();
-        	    	System.out.println("PTNet selected:" + selected);
+        	    	//System.out.println("PTNet selected:" + selected);
         	    	int orientation = SwingConstants.NORTH;
         	    	if (selected.equalsIgnoreCase("WEST")) orientation = SwingConstants.WEST;
         	    	else if (selected.equalsIgnoreCase("EAST")) orientation = SwingConstants.EAST;
         	    	else if (selected.equalsIgnoreCase("SOUTH")) orientation = SwingConstants.SOUTH;
         	    	ptnetGraphComponent.setOrientation(orientation); // 改变图的朝向
-        	    	
         	    	break;
         	    }
         	}
+        	
+        	// Making graph
         	if (selected == null) {
 		    	for (Map.Entry<String, JRadioButtonMenuItem> entry : markingOrientationRadioBtn.entrySet()) {
 		    	    if (source == entry.getValue()) {
 		    	    	selected = entry.getKey();
-		    	    	System.out.println("Marking selected:" + selected);
+		    	    	//System.out.println("Marking selected:" + selected);
+		    	    	int orientation = SwingConstants.NORTH;
+	        	    	if (selected.equalsIgnoreCase("WEST")) orientation = SwingConstants.WEST;
+	        	    	else if (selected.equalsIgnoreCase("EAST")) orientation = SwingConstants.EAST;
+	        	    	else if (selected.equalsIgnoreCase("SOUTH")) orientation = SwingConstants.SOUTH;
+	        	    	ptMarkingGraphComponent.setOrientation(orientation); // 改变图的朝向
 		    	    	break;
 		    	    }
 		    	}
