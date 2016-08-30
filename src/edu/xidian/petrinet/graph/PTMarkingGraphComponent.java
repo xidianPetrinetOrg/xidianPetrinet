@@ -81,7 +81,7 @@ public class PTMarkingGraphComponent extends PTNetGraphComponent {
 	
 	
 	/**
-	 * 非阻塞方式，接口回调：计算markingGaph，结果通过参数viewMarkingGraph获取
+	 * 非阻塞方式，接口回调：计算markingGaph，结果通过参数获取
 	 * @param graphReady
 	 */
 	public void markingGraphReady(IMarkingGraphReady graphReady) {
