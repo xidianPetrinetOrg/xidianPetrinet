@@ -78,6 +78,9 @@ public class PTNetGraph implements ActionListener, ItemListener {
     
     /** PTNet Marking graph component */
     private PTMarkingGraphComponent ptMarkingGraphComponent = null;
+    
+    /** marking graph is ready */
+    private boolean isMarkingGraphReady = false;
 
     /** 图的朝向,如果改变，请注意在createMenuBar()中，修改快捷键，现在是：N,W,S,E */
     private String[] orientationStr = {"NORTH","WEST","SOUTH","EAST"};
@@ -153,11 +156,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
  			ptnetGraphComponent.initialize();
  			
  		   ///////////////// marking graph
+ 		   isMarkingGraphReady = false;
  		   this.ptMarkingGraphComponent = new PTMarkingGraphComponent(ptnet);
  		   IMarkingGraphReady ready = new IMarkingGraphReady() {
  			  @Override
  			  public void graph(boolean isReady) {
  				 if (isReady) status("marking graph is ready.");
+ 				 isMarkingGraphReady = isReady;
  			 }
  		   };
  		   // 非阻塞方式，接口回调：计算markingGaph，结果通过参数获取
@@ -609,23 +614,38 @@ public class PTNetGraph implements ActionListener, ItemListener {
 
 		public void actionPerformed(ActionEvent e) {
 
-			mxGraphComponent graphComponent = new mxGraphComponent(ptnetGraphComponent.getGraph());
+			mxGraphComponent graphComponent1 = new mxGraphComponent(ptnetGraphComponent.getGraph());
+			mxGraphComponent graphComponent2 = new mxGraphComponent(ptMarkingGraphComponent.getGraph());
+	
 			PrinterJob pj = PrinterJob.getPrinterJob();
 
 			if (pj.printDialog()) {
-				PageFormat pf = graphComponent.getPageFormat();
+				PageFormat pf = graphComponent1.getPageFormat();
 				Paper paper = new Paper();
 				double margin = 36;
 				paper.setImageableArea(margin, margin, paper.getWidth() - margin * 2, paper.getHeight() - margin * 2);
 				pf.setPaper(paper);
-				pj.setPrintable(graphComponent, pf);
-
+				
+				pj.setPrintable(graphComponent1, pf);
 				try {
 					pj.print();
-					status("print graph...");
+					status("print PTNet graph...");
 				} catch (PrinterException e2) {
 					System.out.println(e2);
-					status("Sorry,print graph failed!");
+					status("Sorry,print PTNet graph failed!");
+				}
+				
+				if (!isMarkingGraphReady) {
+					status("Warning, the marking graph is not ready!");
+					return;
+				}
+				pj.setPrintable(graphComponent2, pf);
+				try {
+					pj.print();
+					status("print marking graph...");
+				} catch (PrinterException e2) {
+					System.out.println(e2);
+					status("Sorry,print marking graph failed!");
 				}
 			}
 		}
