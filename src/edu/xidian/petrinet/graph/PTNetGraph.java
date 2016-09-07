@@ -61,6 +61,7 @@ import com.mxgraph.view.mxGraph;
 
 import de.uni.freiburg.iig.telematik.sepia.generator.PNGenerator;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
+import edu.xidian.petrinet.CreatePetriNet;
 import edu.xidian.petrinet.graph.PTMarkingGraphComponent.IMarkingGraphReady;
 
 /**
@@ -72,6 +73,10 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** 输出状态信息 */
     private JTextArea output;
     private static final String newline = "\n";
+    
+    
+    /** PTNet */
+    private PTNet ptNet = null;;
     
     /** PTNet graph component */
     private PTNetGraphComponent ptnetGraphComponent = null;
@@ -98,7 +103,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     private Action labelLeftAction, labelRightAction, labelTopAction, labelBottomAction,
                    undoHistoryAction, redoHistoryAction;
     
-    protected mxUndoManager undoManager;
+    protected mxUndoManager undoManager = null;
     
     /** 
      * 整合所有快捷键,
@@ -142,6 +147,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
     		put("right",KeyEvent.VK_R); 
     		put("top",KeyEvent.VK_T); 
     		put("bottom",KeyEvent.VK_B);
+    		
+    		/** Generator menu */
+    		put("generator",KeyEvent.VK_G); // menu, createMenuBar()定义menu and menu item
+    		put("samplePTNet",KeyEvent.VK_S); // menu item
+    		put("sharedResource",KeyEvent.VK_R); // menu item
+    		put("producerConsumer",KeyEvent.VK_C); // menu item
+    		put("boundedPipeline",KeyEvent.VK_P); // menu item    		
     	}
     };
     
@@ -150,40 +162,56 @@ public class PTNetGraph implements ActionListener, ItemListener {
      * @param ptnet PTNet对象
      */
     public PTNetGraph(PTNet ptnet) {
-    	//////////// PTNet graph
-    	this.ptnetGraphComponent = new PTNetGraphComponent(ptnet); 
- 		try {
- 			ptnetGraphComponent.initialize();
- 			
- 		   ///////////////// marking graph
- 		   isMarkingGraphReady = false;
- 		   this.ptMarkingGraphComponent = new PTMarkingGraphComponent(ptnet);
- 		   IMarkingGraphReady ready = new IMarkingGraphReady() {
- 			  @Override
- 			  public void graph(boolean isReady) {
- 				 if (isReady) status("marking graph is ready.");
- 				 isMarkingGraphReady = isReady;
- 			 }
- 		   };
- 		   // 非阻塞方式，接口回调：计算markingGaph，结果通过参数获取
- 		   this.ptMarkingGraphComponent.markingGraphReady(ready);
- 		   
-			 // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
-	    	createAction();
+    	this.ptNet = ptnet;
+    	
+        /**
+         * 生成对应PTNet对象的Graph组件和markingGraph组件
+         */
+        graphComponent();
+        
+        // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
+	    createAction();
 	    	
-	    	//Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
-		    addBindings();
+	    //Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
+		addBindings();
 		    
-            //////////////undo
-			this.undoManager = ptnetGraphComponent.getUndoManager();
-			undoManager.addListener(mxEvent.UNDO, undoHandler);
-			undoManager.addListener(mxEvent.REDO, undoHandler);
- 		    
- 		} catch (Exception e) {
- 			e.printStackTrace();
- 		}
- 		
- 		
+        //////////////undo
+		this.undoManager = ptnetGraphComponent.getUndoManager();
+		undoManager.addListener(mxEvent.UNDO, undoHandler);
+		undoManager.addListener(mxEvent.REDO, undoHandler);
+	        
+    }
+    
+    /**
+     * 生成对应PTNet对象的Graph组件和markingGraph组件
+     */
+    public void graphComponent() {
+    	//////////// PTNet graph
+    	this.ptnetGraphComponent = new PTNetGraphComponent(ptNet); 
+    	try {
+    		ptnetGraphComponent.initialize();
+    		
+    		///////////////// marking graph
+    		isMarkingGraphReady = false;
+    		this.ptMarkingGraphComponent = new PTMarkingGraphComponent(ptNet);
+    		IMarkingGraphReady ready = new IMarkingGraphReady() {
+    			@Override
+    			public void graph(boolean isReady) {
+    				//if (isReady) status("marking graph is ready.");
+    				isMarkingGraphReady = isReady;
+    			}
+    		};
+    		// 非阻塞方式，接口回调：计算markingGaph，结果通过参数获取
+    		this.ptMarkingGraphComponent.markingGraphReady(ready);
+    		
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	// Clears the command history.
+    	if(undoManager != null) {
+    	  undoManager.clear();
+    	}
     }
        
     /** 生成菜单条MenuBar */
@@ -202,7 +230,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menu.setMnemonic(keyCode.get("file"));
         menuBar.add(menu);
 
-        // JMenuItems for first menu
+        // JMenuItems for the menu
         menuItem = new JMenuItem("Open");
         menuItem.setMnemonic(keyCode.get("open"));
         menuItem.addActionListener(this);
@@ -280,7 +308,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         netOrientationRadioBtn.get("SOUTH").setMnemonic(keyCode.get("south"));
         netOrientationRadioBtn.get("EAST").setMnemonic(keyCode.get("east"));
         
-        // Build the third menu: "Marking"
+        // Build the menu: "Marking"
         menu = new JMenu("Marking");
         menu.setMnemonic(keyCode.get("marking"));
         menuBar.add(menu);
@@ -302,7 +330,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         markingOrientationRadioBtn.get("SOUTH").setMnemonic(keyCode.get("south"));
         markingOrientationRadioBtn.get("EAST").setMnemonic(keyCode.get("east"));
         
-        // Build the forth menu: "Label"
+        // Build the menu: "Label"
         menu = new JMenu("Label");
         menu.setMnemonic(keyCode.get("label"));
         menuBar.add(menu);
@@ -321,6 +349,31 @@ public class PTNetGraph implements ActionListener, ItemListener {
         menu.add(menuItem);
         
         menuItem = new JMenuItem(labelBottomAction);
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        // Build the Menu: "Generator"
+        menu = new JMenu("Generator");
+        menu.setMnemonic(keyCode.get("generator"));
+        menuBar.add(menu);
+        
+        menuItem = new JMenuItem("samplePTNet");
+        menuItem.setAction(new GeneratorPTNetAction("samplePTNet", "samplePTNet", keyCode.get("samplePTNet"))); // 第三个参数指定了助记键（ALT组合键）
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem("sharedResource");
+        menuItem.setAction(new GeneratorPTNetAction("sharedResource", "sharedResourcePTNet", keyCode.get("sharedResource"))); // 第三个参数指定了助记键（ALT组合键）
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem("producerConsumer");
+        menuItem.setAction(new GeneratorPTNetAction("producerConsumer", "producerConsumerPTNet", keyCode.get("producerConsumer"))); // 第三个参数指定了助记键（ALT组合键）
+        menuItem.setIcon(null); //arbitrarily chose not to use icon
+        menu.add(menuItem);
+        
+        menuItem = new JMenuItem("boundedPipeline");
+        menuItem.setAction(new GeneratorPTNetAction("boundedPipeline", "boundedPipelinePTNet", keyCode.get("boundedPipeline"))); // 第三个参数指定了助记键（ALT组合键）
         menuItem.setIcon(null); //arbitrarily chose not to use icon
         menu.add(menuItem);
              
@@ -414,8 +467,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		 * @param desc description for the action, used for tooltip text
 		 * @param mnemonic
 		 */
-		public LabelRightAction(String text, ImageIcon icon, String desc, Integer mnemonic) {
-			super(text, icon);
+		public LabelRightAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
 			putValue(MNEMONIC_KEY, mnemonic);
 		}
@@ -435,8 +488,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		 * @param desc description for the action, used for tooltip text
 		 * @param mnemonic
 		 */
-		public LabelTopAction(String text, ImageIcon icon, String desc, Integer mnemonic) {
-			super(text, icon);
+		public LabelTopAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
 			putValue(MNEMONIC_KEY, mnemonic);
 		}
@@ -455,13 +508,56 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		 * @param desc description for the action, used for tooltip text
 		 * @param mnemonic
 		 */
-		public LabelBottomAction(String text, ImageIcon icon, String desc, Integer mnemonic) {
-			super(text, icon);
+		public LabelBottomAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
+			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
 			putValue(MNEMONIC_KEY, mnemonic);
 		}
 		public void actionPerformed(ActionEvent e) {
 			ptnetGraphComponent.changeLabelPosition(SwingConstants.BOTTOM);
+		}
+	}
+	
+	/** 生成PTNet对象 */
+	@SuppressWarnings("serial")
+	public class GeneratorPTNetAction extends AbstractAction {
+		/**
+		 * 生成PTNet对象
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
+		public GeneratorPTNetAction(String name, String desc, Integer mnemonic) {
+			super(name);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e) {
+			JMenuItem source = (JMenuItem)(e.getSource());
+			String name = source.getText();
+			System.out.println("source = " + e.getSource() + "," + name);
+			PTNet newPTNet = null;
+			if (name.equalsIgnoreCase("samplePTNet")) {
+				newPTNet = CreatePetriNet.createPTnet1(); 
+				
+			}
+			if (name.equalsIgnoreCase("sharedResource")) {
+				newPTNet = PNGenerator.sharedResource(2, 1);
+			}
+			if (name.equalsIgnoreCase("producerConsumer")) {
+				newPTNet = PNGenerator.producerConsumer(2, 1);
+			}
+			if (name.equalsIgnoreCase("boundedPipeline")) {
+				newPTNet = PNGenerator.boundedPipeline(2, 1);  
+			}
+			
+			if ((newPTNet != null) && (newPTNet != ptNet)) {
+				/**
+			     * 生成对应PTNet对象的Graph组件和markingGraph组件
+			     */
+			    graphComponent();
+				ptNet = newPTNet;
+			}
 		}
 	}
 	
