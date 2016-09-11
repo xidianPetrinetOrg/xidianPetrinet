@@ -71,7 +71,7 @@ public class PTNetGraphComponent  extends JPanel {
 	protected static final String TransitionStyle = "TransitionStyle"; 
 	
 	/** width,height of vertex, default 30 */
-	protected int vertexWidth = 20, vertexHeight = 20;
+	protected int vertexWidth = 30, vertexHeight = 30;
 		
 	/**
 	 * key: vertex(Place/Transition) name, value: mxCell对象
