@@ -62,7 +62,7 @@ public class PTNetGraphComponent  extends JPanel {
 	
 	private JComponent graphPanel = null;
 	
-	private mxUndoManager undoManager;
+	protected mxUndoManager undoManager;
 	
 	/** vertex of Place style */
 	protected static final String PlaceStyle = "PlaceStyle"; 
