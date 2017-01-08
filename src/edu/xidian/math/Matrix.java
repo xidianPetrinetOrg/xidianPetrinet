@@ -108,6 +108,7 @@ public class Matrix implements Serializable {
    /**
     * Construct a matrix from a one-dimensional packed array
     * @param vals One-dimensional array of integers, packed by columns (ala Fortran).
+    *        vals是先列后行的存储方式，采用类似于Fortran的存储方式
     * @param m Number of rows.
     * @exception IllegalArgumentException Array length must be a multiple of m.
     */
@@ -154,9 +155,11 @@ public class Matrix implements Serializable {
    
    /**
     * Check if a matrix has a row that satisfies the cardinality condition 1.1.b
-    * of the algorithm.
+    * of the algorithm. 满足算法的基数条件。基数=1，表示存在行，满足条件：仅有一个+ve或-ve
     * @return True if the matrix satisfies the condition and linear combination 
-    *              of columns followed by column elimination is required.
+    *              of columns followed by column elimination is required.<br>
+    *         >=0 存在行，满足条件：仅有一个+ve或-ve,返回该行的index<br>
+    *         <0 没有这样的行
     */
    public int cardinalityCondition(){
       int cardRow = -1; // a value >= 0 means either pPlus or pMinus have 
@@ -164,7 +167,7 @@ public class Matrix implements Serializable {
       // occurs -1 means that both pPlus and pMinus have cardinality != 1
       int pPlusCard = 0, pMinusCard = 0, countpPlus = 0, countpMinus = 0;
       int[] pPlus, pMinus; // arrays containing the indices of +ve and -ve
-      int m = getRowDimension(), n = getColumnDimension();
+      // int m = getRowDimension(), n = getColumnDimension();  // 直接使用本类的m,n即可
 
        for (int i = 0; i < m; i++){
          countpPlus = 0;
@@ -192,15 +195,16 @@ public class Matrix implements Serializable {
    /**
     * Find the column index of the element in the pPlus or pMinus set, where 
     * pPlus or pMinus has cardinality == 1.
-    * @return The column index, -1 if unsuccessful (this shouldn't happen under 
-    *                    normal operation).
+    * 满足算法的基数条件。基数=1，表示存在行，满足条件：仅有一个+ve或-ve。
+    * @return The column index(+ve或-ve所在列的index), -1 if unsuccessful (this shouldn't happen under 
+    *                    normal operation).<br>
     */
    public int cardinalityOne(){
       int k = -1; // the col index of cardinality == 1 element
       
       int pPlusCard = 0, pMinusCard = 0, countpPlus = 0, countpMinus = 0;
       int[] pPlus, pMinus; // arrays containing the indices of +ve and -ve
-      int m = getRowDimension(), n = getColumnDimension();
+      // int m = getRowDimension(), n = getColumnDimension();  // 直接使用本类的m,n即可
 
        for (int i = 0; i < m; i++){
          countpPlus = 0;
@@ -213,7 +217,7 @@ public class Matrix implements Serializable {
             }
          }
          for (int j = 0; j < n; j++){
-            if (pMinus[j] != 0) {// if there is nonzero element count it
+            if (pMinus[j] != 0) { // if there is nonzero element count it
                countpMinus++;
             }
          }
@@ -231,23 +235,27 @@ public class Matrix implements Serializable {
    
    /**
     * Check if a matrix satisfies condition 1.1 of the algorithm.
+    * 是否满足算法条件：存在非零元素，需要消除列
     * @return True if the matrix satisfies the condition and column elimination 
-    *              is required.
+    *              is required. <br>
+    *              存在非零元素，需要消除列。<br>
+    *         False: 全0<br>
+    *         函数编制太繁琐，仅根据isZeroMatrix()的返回值判断即可。
     */
    public boolean checkCase11(){
       boolean satisfies11 = false; // true means there is an empty set pPlus or pMinus
       // false means that both pPlus and pMinus are non-empty
       boolean pPlusEmpty = true, pMinusEmpty = true;
       int[] pPlus, pMinus; // arrays containing the indices of +ve and -ve
-      int m = getRowDimension();
+      // int m = getRowDimension();  // 直接使用本类的m,n即可
       
       for (int i = 0; i < m; i++){
          pPlusEmpty = true;
          pMinusEmpty = true;
          pPlus = getPositiveIndices(i); // get +ve indices of ith row
          pMinus = getNegativeIndices(i); // get -ve indices of ith row
-         int pLength = pPlus.length, mLength = pMinus.length;
-         
+         int pLength = pPlus.length, mLength = pMinus.length;  // 二者应该是相等的
+                  
          for (int j = 0; j < pLength; j++){
             if (pPlus[j] != 0) {
                // if there is nonzero element then false (non-empty set)
@@ -265,6 +273,7 @@ public class Matrix implements Serializable {
          if ((pPlusEmpty || pMinusEmpty) && !isZeroRow(i)){
             return true;
          }
+         
          // reset pPlus and pMinus to 0
          for (int j = 0; j < pLength; j++){
             pPlus[j] = 0;
@@ -288,24 +297,32 @@ public class Matrix implements Serializable {
       
       int pPlusCard = 0, pMinusCard = 0, countpPlus = 0, countpMinus = 0;
       int[] pPlus, pMinus; // arrays containing the indices of +ve and -ve
-      int m = getRowDimension();
-      int n = getColumnDimension();
+      // int m = getRowDimension();  // 直接使用本类的m,n即可
+      // int n = getColumnDimension(); // 直接使用本类的m,n即可
 
        for (int i = 0; i < m; i++){
          countpPlus = 0;
          countpMinus = 0;
          pPlus = getPositiveIndices(i); // get +ve indices of ith row
          pMinus = getNegativeIndices(i); // get -ve indices of ith row
+         
+         //print("colsToUpdate(), pPlus: " + i + " rows,");
+         //printArray(pPlus);
+         
          for (int j = 0; j < n; j++){
             if (pPlus[j] != 0) { // if there is nonzero element count it
                countpPlus++;
             }
          }
+         
          for (int j = 0; j < n; j++){
             if (pMinus[j] != 0) { // if there is nonzero element count it
                countpMinus++;
             }
          }
+         
+         //print("\n" + "countpPlus = " + countpPlus + ",countpMinus = " + countpMinus + "\n");
+         
          // if pPlus has cardinality ==1 return all the elements in pMinus reduced by 1 each
          if (countpPlus == 1) {
             return pMinus;
@@ -369,7 +386,7 @@ public class Matrix implements Serializable {
     * @return The matrix with the required row deleted.
     */
    public Matrix eliminateCol(int toDelete) {
-      int m = getRowDimension(), n = getColumnDimension();
+      // int m = getRowDimension(), n = getColumnDimension();  // 直接使用本类的m,n即可
       Matrix reduced = new Matrix(m, n);
       int [] cols = new int [n-1]; // array of cols which will not be eliminated
       int count = 0;
@@ -466,8 +483,8 @@ public class Matrix implements Serializable {
     *         that is not only zeros, -1 of there is no such row.
     */
    public int firstNonZeroRowIndex() {
-      int m = getRowDimension();
-      int n = getColumnDimension();
+      // int m = getRowDimension();  // 直接使用本类的m,n即可
+      // int n = getColumnDimension();
       int h = -1;
       
       for (int i = 0; i < m; i++) {
@@ -508,7 +525,7 @@ public class Matrix implements Serializable {
     */
    public int findNonMinimal() {
       int k = -1; // the non-minimal support column index
-      int m = getRowDimension(), n = getColumnDimension();
+      // int m = getRowDimension(), n = getColumnDimension();  // 直接使用本类的m,n即可
       
       Matrix x = new Matrix(m, 1); // column one, represents first col of comparison
       Matrix y = new Matrix(m, 1); // col two, represents rest columns of comparison
@@ -549,7 +566,7 @@ public class Matrix implements Serializable {
     */
    boolean hasNegativeElements() {
       boolean hasNegative = false;
-      int m = getRowDimension();
+      // int m = getRowDimension(); // 直接使用本类的m,n即可
       
       for (int i = 0; i < m ; i++){
          if (get(i, 0) < 0) {
@@ -567,7 +584,7 @@ public class Matrix implements Serializable {
     *         non-zero element of row h, -1 if there is no such column.
     */
    public int firstNonZeroElementIndex(int h) {
-      int n = getColumnDimension();
+      // int n = getColumnDimension();  // 直接使用本类的m,n即可
       int k = -1;
       
       for (int j = 0; j < n; j++) {
@@ -585,7 +602,7 @@ public class Matrix implements Serializable {
     *         of all but the first non-zero elements of row h.
     */
    public int[] findRemainingNZIndices(int h) {
-      int n = getColumnDimension();
+      // int n = getColumnDimension();  // 直接使用本类的m,n即可
       int[] k = new int[n];
       int count = 0; // increases as we add new indices in the array of ints
       
@@ -605,7 +622,7 @@ public class Matrix implements Serializable {
     *         elements of row h.
     */
    public int[] findRemainingNZCoef(int h) {
-      int n = getColumnDimension();
+      // int n = getColumnDimension();  // 直接使用本类的m,n即可
       int[] k = new int[n];
       int count = 0; // increases as we add new indices in the array of ints
       int anElement; // an element of the matrix
@@ -730,10 +747,11 @@ public class Matrix implements Serializable {
     * negative elements
     * @param rowNo row iside the Matrix to check for -ve elements
     * @return Integer array of indices of negative elements.
+    *         非零元素，代表+ve的index+1  (index=0~(n-1)，n is the number of columns)
     * @exception ArrayIndexOutOfBoundsException Submatrix indices
     */
    public int[] getNegativeIndices(int rowNo) {
-      int n = getColumnDimension(); // find the number of columns
+     // int n = getColumnDimension(); // find the number of columns  // 直接使用本类的m,n即可
       
       // create the single row submatrix for the required row
       try {
@@ -760,12 +778,13 @@ public class Matrix implements Serializable {
    /**
     * For row rowNo of the matrix received return the column indices of all the 
     * positive elements
-    * @param rowNo row iside the Matrix to check for +ve elements
+    * @param rowNo row inside the Matrix to check for +ve elements
     * @return The integer array of indices of all positive elements.
+    *         非零元素，代表+ve的index+1  (index=0~(n-1)，n is the number of columns)
     * @exception ArrayIndexOutOfBoundsException Submatrix indices
     */
    public int[] getPositiveIndices(int rowNo) {
-      int n = getColumnDimension(); // find the number of columns
+     // int n = getColumnDimension(); // find the number of columns  // 直接使用本类的m,n即可
       
       // create the single row submatrix for the required row
       try {
@@ -794,8 +813,8 @@ public class Matrix implements Serializable {
     * @return true if all zeros, false otherwise
     */
    public boolean isZeroMatrix() {
-      int m = getRowDimension();
-      int n = getColumnDimension();
+     // int m = getRowDimension();   // 直接使用本类的m,n即可
+     // int n = getColumnDimension(); // 直接使用本类的m,n即可
 
       for (int i = 0; i < m; i++) {
          for (int j = 0; j < n; j++) {
@@ -849,7 +868,7 @@ public class Matrix implements Serializable {
       // k is column index of coefficient of col to add
       // chj is coefficient of col to add
       int chj = 0; // coefficient of column to add to
-      int m = getRowDimension();
+      // int m = getRowDimension(); // 直接使用本类的m,n即可
       
       for (int i = 0; i < j.length; i++){
          if (j[i] != 0){
@@ -894,8 +913,8 @@ public class Matrix implements Serializable {
     * @return     Row index (starting from 0 for 1st row) of the first row from top that is has a negative element, -1 of there is no such row.
     */
    public int rowWithNegativeElement() {
-      int m = getRowDimension();
-      int n = getColumnDimension();
+      // int m = getRowDimension();   // 直接使用本类的m,n即可
+      // int n = getColumnDimension(); // 直接使用本类的m,n即可
       int h = -1;
       
       for (int i = 0; i < m; i++) {
@@ -1373,6 +1392,30 @@ public class Matrix implements Serializable {
          A[place][j] = 0;
       }
    }
+   
+	/**
+	 * used to display intermiadiate results for checking
+	 *
+	 * @param a
+	 *            The array to print.
+	 */
+	public void printArray(int[] a) {
+		int n = a.length;
+
+		for (int i = 0; i < n; i++)
+			System.out.print(a[i] + " ");
+		System.out.println();
+	}
+
+	/**
+	 * Shorten spelling of print.
+	 * 
+	 * @param s
+	 *            The string to print.
+	 */
+	private void print(String s) {
+		System.out.print(s);
+	}
    
    public static void main(String[] args) {
 	   //int a[] = new int[6];
