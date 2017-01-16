@@ -82,6 +82,10 @@ public class PTNetGraphComponentEdit extends PTNetGraphComponent {
                    labelLeftAction, labelRightAction, labelTopAction, labelBottomAction,
                    undoHistoryAction, redoHistoryAction;
     
+    public PTNetGraphComponentEdit() {
+    	
+    }
+    
 	public PTNetGraphComponentEdit(PTNet petriNet) throws ParameterException {
 		super(petriNet);
 		
@@ -204,7 +208,7 @@ public class PTNetGraphComponentEdit extends PTNetGraphComponent {
 	 * 按键助记符是Alt的组合键
 	 * undo,redo快捷按键（CTRL-Z/CTRL-Y）在addBindings()中定义
 	 */
-	private void createAction() {
+	protected void createAction() {
 
 		// 图的朝向
 		northAction = new OrientationAction("North", "图的朝向: North", new Integer(keyCode.get("north")));
@@ -252,7 +256,7 @@ public class PTNetGraphComponentEdit extends PTNetGraphComponent {
 	 * undo,redo快捷按键（CTRL-Z/CTRL-Y）在addBindings()中定义
 	 * toolBar和menu共用的动作在这里生成,按键助记符是Alt的组合键,在createAction()中定义
 	 */
-    private void addBindings() {
+    protected void addBindings() {
     	// The component has the keyboard focus
     	//InputMap inputMap = getInputMap();  // 无效
     	
@@ -417,7 +421,7 @@ public class PTNetGraphComponentEdit extends PTNetGraphComponent {
 	}
 	
 	/** Keeps the selection in sync with the command history */
-	private mxIEventListener undoHandler = new mxIEventListener()
+	protected mxIEventListener undoHandler = new mxIEventListener()
 	{
 		public void invoke(Object source, mxEventObject evt)
 		{

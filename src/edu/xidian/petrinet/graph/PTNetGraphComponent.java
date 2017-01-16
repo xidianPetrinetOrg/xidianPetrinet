@@ -87,6 +87,10 @@ public class PTNetGraphComponent  extends JPanel {
 	/** Graph布局朝向 */
 	protected int layoutOrientation = SwingConstants.NORTH;	 
 	
+	public PTNetGraphComponent() {
+		
+	}
+	
 	/**
 	 * 构造PTNet表示的图形元素
 	 * @param petriNet  PTNet
