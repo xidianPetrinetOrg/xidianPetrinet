@@ -158,7 +158,7 @@ public class Matrix implements Serializable {
     * of the algorithm. 满足算法的基数条件。基数=1，表示存在行，满足条件：仅有一个+ve或-ve
     * @return True if the matrix satisfies the condition and linear combination 
     *              of columns followed by column elimination is required.<br>
-    *         >=0 存在行，满足条件：仅有一个+ve或-ve,返回该行的index<br>
+    *         >=0 满足算法的基数条件。基数=1：存在行，满足条件：仅有一个+ve或-ve,返回该行的index<br>
     *         <0 没有这样的行
     */
    public int cardinalityCondition(){
@@ -288,14 +288,18 @@ public class Matrix implements Serializable {
    
    /**
     * Find the comlumn indices to be changed by linear combination.
-    * @return An array of integers, these are the indices increased by 1 each.
+    * @return An array of integers, these are the indices increased by 1 each.<br>
+    * 存在行，满足算法的基数条件，cardinality ==1; 
+    * 如果仅有一个+ve， 返回pMinus[],每个非零元素的值是-ve元素的index+1
+    * 如果仅有一个-ve， 返回pPlus[],每个非零元素的值是+ve元素的index+1
+    * 否则，不满足算法基数条件，返回null
     */
    public int[] colsToUpdate(){
       int js[] = null; // An array of integers with the comlumn indices to be 
       // changed by linear combination.
       //the col index of cardinality == 1 element
       
-      int pPlusCard = 0, pMinusCard = 0, countpPlus = 0, countpMinus = 0;
+      int countpPlus = 0, countpMinus = 0;
       int[] pPlus, pMinus; // arrays containing the indices of +ve and -ve
       // int m = getRowDimension();  // 直接使用本类的m,n即可
       // int n = getColumnDimension(); // 直接使用本类的m,n即可
@@ -305,9 +309,6 @@ public class Matrix implements Serializable {
          countpMinus = 0;
          pPlus = getPositiveIndices(i); // get +ve indices of ith row
          pMinus = getNegativeIndices(i); // get -ve indices of ith row
-         
-         //print("colsToUpdate(), pPlus: " + i + " rows,");
-         //printArray(pPlus);
          
          for (int j = 0; j < n; j++){
             if (pPlus[j] != 0) { // if there is nonzero element count it
@@ -320,8 +321,6 @@ public class Matrix implements Serializable {
                countpMinus++;
             }
          }
-         
-         //print("\n" + "countpPlus = " + countpPlus + ",countpMinus = " + countpMinus + "\n");
          
          // if pPlus has cardinality ==1 return all the elements in pMinus reduced by 1 each
          if (countpPlus == 1) {
@@ -527,6 +526,7 @@ public class Matrix implements Serializable {
       int k = -1; // the non-minimal support column index
       // int m = getRowDimension(), n = getColumnDimension();  // 直接使用本类的m,n即可
       
+      // x,y,z不用初始化，仅说明即可，例如：Matrix x; 因为以下循环语句中会给它赋值.
       Matrix x = new Matrix(m, 1); // column one, represents first col of comparison
       Matrix y = new Matrix(m, 1); // col two, represents rest columns of comparison
       Matrix z = new Matrix(m, 1); // difference column 1 - column 2
@@ -870,11 +870,11 @@ public class Matrix implements Serializable {
       int chj = 0; // coefficient of column to add to
       // int m = getRowDimension(); // 直接使用本类的m,n即可
       
-      for (int i = 0; i < j.length; i++){
-         if (j[i] != 0){
+      for (int i = 0; i < j.length; i++){  // 列
+         if (j[i] != 0){  // 非0元素，才改变
             chj = jC[i];
             // System.out.print("\nchk = " + chk + "\n");
-            for (int w = 0; w < m; w++) {
+            for (int w = 0; w < m; w++) { // 行
                set(w, j[i]-1, chj*get(w, k)+chk*get(w, j[i]-1));
             }
          }
@@ -894,7 +894,8 @@ public class Matrix implements Serializable {
       // k is column index of coefficient of col to add
       // a is array of coefficients of col to add
       //int chk = 0; // coefficient of column to add to
-      int m = getRowDimension(), n = j.length;
+      // int m = getRowDimension(); // 直接使用本类的m,n即可
+      int n = j.length;
       
       for (int i = 0; i < n; i++){
          if (j[i] != 0){

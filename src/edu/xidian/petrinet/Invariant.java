@@ -99,10 +99,17 @@ public class Invariant {
 	        */
 	    	
 	    	/***************************************************
-	    	 * Initialisation: C: m*n关联矩阵， B: n*n单位阵 
-	    	 * for (i=0;i<m;i++) // 遍历C各行
-	    	 *   append列（该列是各行经适当线性组合，使C的第i行为的和0，可以消除该行）
-	    	 *   delete
+	    	 * Initialisation: C = A : m*n关联矩阵， B: n*n单位阵 , 
+	    	 * the matrix A: 关联矩阵, 本函数求T-Invariants;  若是关联矩阵的转置，则本函数求P-Invariants
+	    	 * m: place number; n: transition number  
+	    	 * for (i=0;i<m;i++) // 遍历C各行，C非全零
+	    	 * {
+	    	 *   D = [C]
+	    	 *       [B]
+	    	 *   Append to the matrix D every columns resulting from positive linear combinations of column pairs in D that annihilate row i of C.                                                                            
+	    	 *   Eliminate from D the columns in which the i-th row of C is non null.
+	    	 * }
+	    	 * C is all zeros
 	    	 ***************************************************/
 	    	
 	    	/** 求列向量对应的不变式。 */
@@ -126,10 +133,10 @@ public class Invariant {
 	//--------------------------------------------------------------------------------------
 	        // PHASE 1:
 	//--------------------------------------------------------------------------------------
-	        while(!(c.isZeroMatrix()))
+	        while(!(c.isZeroMatrix())) // 当c非全零时
 	        {
-	        	print("c.checkCase11() = " + c.checkCase11());
-	            if(c.checkCase11())
+	        	print("c.checkCase11() = " + c.checkCase11());  // false
+	            if(c.checkCase11())  // c是全0元素，本条件永远不会被执行
 	            {
 	                System.out.println("ok,Case11()");
 	            	// check each row (case 1.1)
@@ -137,11 +144,8 @@ public class Invariant {
 	                {
 	                    pPlus = c.getPositiveIndices(i); // get +ve indices of ith row
 	                    pMinus = c.getNegativeIndices(i); // get -ve indices of ith row
-	                    print(i+" pPlus=");
-	                    printArray(pPlus);
-	                    print(i+" pMinus=");
-	                    printArray(pMinus);
 	                    
+	                    // 此时，二者都应该是空的
 	                    if(isEmptySet(pPlus) || isEmptySet(pMinus))
 	                    { // case-action 1.1.a
 	                        // this has to be done for all elements in the union pPlus U pMinus
@@ -163,7 +167,7 @@ public class Invariant {
 	                    resetArray(pMinus);
 	                }
 	            }
-	            else if(c.cardinalityCondition() >= 0) // >=0: 某行有一个+ve或-ve
+	            else if(c.cardinalityCondition() >= 0) // >=0,满足算法的基数条件。基数=1：存在行，满足条件：仅有一个+ve或-ve,返回该行的index<br>x
 	            {
 	            	print("c.cardinalityCondition() = " + c.cardinalityCondition());
 	            	
@@ -173,26 +177,27 @@ public class Invariant {
 	                    // do a linear combination of the appropriate columns and eliminate the appropriate column.
 	                    int cardRow = -1; // the row index where cardinality == 1
 	                    cardRow = c.cardinalityCondition();  // +ve或-ve的行index
+	                    
 	                    // get the column index of the column to be eliminated
-	                    int k = c.cardinalityOne();
+	                    int k = c.cardinalityOne();  // 列index，满足算法的基数条件。基数=1，表示存在行，满足条件：仅有一个+ve或-ve,返回该列的index
 	                    
-	                    System.out.println("cardRow: " + cardRow);
-	                    System.out.println("Column index to be eliminated: " + k );
+	                    System.out.println("仅有一个+ve或-ve的行index: " + cardRow);
+	                    System.out.println("仅有一个+ve或-ve的列index:  " + k + "线性组合该列，组合结束删除此列. " );
 	                    
-	                    if(k == -1)
+	                    if(k == -1)  // 一定不会发生
 	                    {
 	                        System.out.println("Error");
 	                    }
 
 	                    // get the comlumn indices to be changed by linear combination
-	                    int j[] = c.colsToUpdate();
+	                    int j[] = c.colsToUpdate(); // 存在一个+ve,返回所有-ve；反之，存在一个-ve,返回所有+ve；
 
 	                    // update columns with linear combinations in matrices C and B
 	                    // first retrieve the coefficients
 	                    int[] jCoef = new int[n];
 	                    for(int i = 0; i < j.length; i++)
 	                    {
-	                        if(j[i] != 0)
+	                        if(j[i] != 0) // 所有+ve或-ve
 	                        {
 	                            jCoef[i] = Math.abs(c.get(cardRow, (j[i] - 1)));
 	                        }
@@ -231,10 +236,17 @@ public class Invariant {
 
 	                    // find first non-zero element at column k, chk
 	                    int chk = c.get(h, k);
+	                    
+	                    print("第一个非零元素[" + h + "," + k + "]=" + chk);
+	                    print("该元素与同行的其他列元素线性组合。");
 
 	                    // find all the other indices of non-zero elements in that row chj[]
-	                    int[] chj = new int[n - 1];
+	                    //int[] chj = new int[n - 1];  // 在findRemainingNZIndices函数中已经分配了内存，这里不应该再分配。
+	                    int[] chj;
 	                    chj = c.findRemainingNZIndices(h);
+	                    
+	                    print("other non-zero elements:");
+	                    printArray(chj);
 
 	                    while(!(isEmptySet(chj)))
 	                    {
@@ -245,11 +257,19 @@ public class Invariant {
 
 	                        // find all the corresponding elements in that row (coefficients jCoef[])
 	                        int[] jCoef = c.findRemainingNZCoef(h);
+	                        
+	                        print("jCoef:");
+	                        printArray(jCoef);
 
 	                        // adjust linear combination coefficients according to sign
 	                        int[] alpha, beta; // adjusted coefficients for kth and remaining columns respectively
 	                        alpha = alphaCoef(chk, jCoef);
 	                        beta = betaCoef(chk, jCoef.length);
+	                        
+	                        print("alpha:");
+	                        printArray(alpha);
+	                        print("beta：");
+	                        printArray(beta);
 
 	                        // linearly combine kth column, coefficient alpha, to jth columns, coefficients beta
 	                        c.linearlyCombine(k, alpha, chj, beta);
@@ -258,6 +278,10 @@ public class Invariant {
 	                        // delete kth column
 	                        c = c.eliminateCol(k);
 	                        B = B.eliminateCol(k);
+	                        
+	                        print("删除第" + k + "列后的C，B");
+	                        c.print(4, 0);
+	    	                B.print(4,0);
 
 	                        chj = c.findRemainingNZIndices(h);
 	                    }
@@ -268,10 +292,15 @@ public class Invariant {
 	            }
 	        }
 	        System.out.println("end of phase one");
+	        print("now B contains a pseudodiagonal positive basis of Ker C");
+	        B.print(2, 0);
 	        // END OF PHASE ONE, now B contains a pseudodiagonal positive basis of Ker C
 	//--------------------------------------------------------------------------------------
 	        // PHASE 2:
 	//--------------------------------------------------------------------------------------
+	        // h = B中的-ve元素所在的行，把B中的-ve元素，线性组合，加到其余列，消去-ve所在的列。
+	        // h行的+ve[],-ve[], B append  col: +ve[j]*(-ve[k]) + (-ve[k])*(+ve[j]), 总共增加的列数是(+ve,-ve)的配对数
+	        // 消去所有-ve所在的列
 	        // h is -1 at this point, make it equal to the row index that has a -ve element.
 	        // rowWithNegativeElement with return -1 if there is no such row, and we exit the loop.
 	        int h;
