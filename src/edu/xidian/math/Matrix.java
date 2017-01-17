@@ -41,14 +41,14 @@ public class Matrix implements Serializable {
     * Array for internal storage of elements.
     * @serial internal array storage.
     */
-   private int[][] A;
+   protected int[][] A;
    
    /**
     * Row and column dimensions.
     * @serial row dimension.
     * @serial column dimension.
     */
-   private int m, n;
+   protected int m, n;
    
    /** Used to determine whether the matrixes have been modified */
    public boolean matrixChanged;
@@ -1414,7 +1414,7 @@ public class Matrix implements Serializable {
 	 * @param s
 	 *            The string to print.
 	 */
-	private void print(String s) {
+	public void print(String s) {
 		System.out.print(s);
 	}
    
