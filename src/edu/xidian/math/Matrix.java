@@ -1063,7 +1063,7 @@ public class Matrix implements Serializable {
     * @param b    The second integer.
     * @return     The gcd of the column
     */
-   private int gcd2(int a, int b) {
+   public int gcd2(int a, int b) {
       int gcd;
       a = Math.abs(a);
       b = Math.abs(b);
