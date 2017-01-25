@@ -31,6 +31,7 @@ public class Invariant {
 	    {
 	        Date start_time = new Date(); // start timer for program execution
 	        
+	        // Li，图2.2
 	        int array[][] = {{0,0,1,0,0,0,-1,0,1},
 	        		         {1,-1,0,0,0,0,0,0,0},
 	        		         {0,1,-1,0,0,0,0,0,0},

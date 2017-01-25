@@ -54,6 +54,7 @@ public class InvariantMatrixTest {
 	@Ignore("testCardinalityOneIntArray()")
 	@Test
 	public void testCardinalityOneIntArray() {
+		System.out.println("testCardinalityOneIntArray()");
 		int incidence[][] = {
     		    {-1,  0,  0,  0,  0,  0,  0,  1,  0},
     		    { 1, -1,  0,  0,  0,  0,  0,  0,  0},
@@ -129,6 +130,7 @@ public class InvariantMatrixTest {
 	@Ignore
 	@Test
 	public void testLinearlyCombine() {
+		System.out.println("testLinearlyCombine()");
 		int incidence[][] = {
     		    {-1,  0, -2,  0},
     		    {-1,  1,  2,  0},
@@ -164,9 +166,10 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#eliminateRow(int toDelete)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testEliminateRow() {
+		System.out.println("testEliminateRow()");
 		int incidence[][] = {
     		    {-1,  0, -2,  0},
     		    {-1,  1,  2,  0},
@@ -193,14 +196,216 @@ public class InvariantMatrixTest {
 		m1.print(4, 0);
 		assertEquals(m1.getRowDimension(),2);
 	}
-
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#hasNegativeElements(int[])}.
+	 */
+	@Ignore
+	@Test
+	public void testHasNegativeElements() {
+		System.out.println("testHasNegativeElements()");
+		int incidence[][] = {
+    		    { 1,  0,  2,  0},
+    		    { 1,  1,  2,  0},
+    		    { 1,  0,  1,  0},
+    		    { -1,  1,  1,  0},
+    		    { 2,  3,  4,  -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		int a[] = new int[2];
+		assertTrue(m.hasNegativeElements(a));
+		assertEquals(a[0],3);
+		assertEquals(a[1],0);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#gcdRow(int row)}.
+	 */
+	@Ignore
+	@Test
+	public void testGcdRow() {
+		System.out.println("testGcdRow()");
+		int incidence[][] = {
+    		    { 4,  0,  2,  0},
+    		    { 1,  1,  2,  0},
+    		    { 1,  0,  1,  0},
+    		    { -1,  1,  1,  0},
+    		    { 20,  30,  40,  -50}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		assertEquals(m.gcdRow(0), 2);
+		m.print("gcd="+m.gcdRow(4));
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#allNegativeOrZeroRow()}.
+	 */
+	@Ignore
+	@Test
+	public void testAllNegativeOrZeroRow() {
+		System.out.println("testAllNegativeOrZeroRow()");
+		int incidence[][] = {
+    		    { 1,  0,  -2,  0},
+    		    { 1,  1,  2,  0},
+    		    { 1,  0,  1,  0},
+    		    { -1,  0,  -4,  -2},
+    		    { 0,  0,  -4,  -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		while(true) {
+		  int row = m.allNegativeOrZeroRow();
+		  if (row == -1) break;
+		  for (int j = 0; j < m.getColumnDimension(); j++)
+		    if (m.get(row, j) < 0) m.set(row, j, Math.abs(m.get(row, j)));
+		  m.print(4,0);
+		}
+		//assertEquals(a,-1);
+	}
+	
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
 	 */
 	@Ignore
 	@Test
-	public void testInvariants() {
-		fail("Not yet implemented");
+	public void testInvariants1() {
+		//fail("Not yet implemented");
+		System.out.println("testInvariants1()");
+		 // Li，图2.2
+		int incidence[][] = {
+  		        /** t1  t2  t3  t4  t5  t6  t7  t8  t9 **/
+       /** p1 */  { 0,  0,  1,  0,  0,  0, -1,  0,  1},
+       /** p2 */  { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+       /** p3 */  { 0,  1, -1,  0,  0,  0,  0,  0,  0},
+       /** p4 */  { 0,  0,  0, -1,  0,  1,  0,  0,  0},
+       /** p5 */  { 0,  0,  0,  1, -1,  0,  0,  0,  0},
+       /** p6 */  { 0,  0,  0,  0,  1, -1,  0,  0,  0},
+       /** p7 */  {-1,  1,  0,  0, -1,  1,  0,  0,  0},
+       /** p8 */  { 0, -1,  1, -1,  1,  0,  0,  0,  0},
+       /** p9 */  {-1,  0,  0,  0,  0,  0,  1, -1,  0},
+       /** p10*/  { 0,  0,  0,  0,  0,  0,  0,  1, -1},
+       /** p11*/  { 0,  0,  0,  0,  0,  0,  0, -1,  1},
+       /** p12*/  { 1,  0,  0,  0,  0,  0, -1,  1,  0}};
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    // Compute P-Invariants
+        InvariantMatrix.invariants(invariantM);
+        /***
+          p1    p2    p3    p4    p5    p6    p7    p8    p9   p10   p11   p12
+          1     1     1     0     0     0     0     0     1     1     0     0  (1)一致
+          0     0     0     1     1     1     0     0     0     0     0     0  (2)一致
+          0     1     0     0     0     1     1     0     0     0     0     0  (3)一致
+          0     0     1     0     1     0     0     1     0     0     0     0   (4) 书没有
+          0     0     0     0     0     0     0     0     0     1     1     0   (5) 书没有
+          0     0     0     0     0     0     0     0     1     0     0     1   (6) 书没有
+                            1     1     1                -1                -1    (2)-(6)一致
+         */
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
+	 */
+	@Ignore
+	@Test
+	public void testInvariants2() {
+		System.out.println("testInvariants2()");
+		 // Li，图2.2
+        int incidence[][] = {
+        		      /** t1  t2  t3  t4  t5  t6  t7  t8  t9 **/
+             /** p1 */  { 0,  0,  1,  0,  0,  0, -1,  0,  1},
+             /** p2 */  { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+             /** p3 */  { 0,  1, -1,  0,  0,  0,  0,  0,  0},
+             /** p4 */  { 0,  0,  0, -1,  0,  1,  0,  0,  0},
+             /** p5 */  { 0,  0,  0,  1, -1,  0,  0,  0,  0},
+             /** p6 */  { 0,  0,  0,  0,  1, -1,  0,  0,  0},
+             /** p7 */	{-1,  1,  0,  0, -1,  1,  0,  0,  0},
+             /** p8 */	{ 0, -1,  1, -1,  1,  0,  0,  0,  0},
+             /** p9 */	{-1,  0,  0,  0,  0,  0,  1, -1,  0},
+             /** p10*/	{ 0,  0,  0,  0,  0,  0,  0,  1, -1},
+             /** p11*/	{ 0,  0,  0,  0,  0,  0,  0, -1,  1},
+             /** p12*/  { 1,  0,  0,  0,  0,  0, -1,  1,  0}};
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    // Compute T-Invariants
+        InvariantMatrix.invariants(invariantM.transpose());
+       /**
+         t1        t2        t3        t4        t5        t6        t7        t8        t9
+         1         1         1         0         0         0         1         0         0     一致
+         0         0         0         1         1         1         0         0         0     一致
+         0         0         0         0         0         0         1         1         1     一致
+        */
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
+	 */
+	@Ignore
+	@Test
+	public void testInvariants3() {
+		System.out.println("testInvariants3()");
+		 // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
+        int incidence[][] = {
+        		                 /** t1  t2  t3  t4  t5  t6  t7  t8  t9  t10 **/
+        		          /** p1 */ { 1,  0,  0,  0, -1,  0,  0,  0,  0,  0},
+        		          /** p2 */ { 0,  0,  0, -1,  1,  0,  0,  0,  0,  0},
+        		          /** p3 */ { 1,  0,  0,  0,  0, -1,  0,  0,  0,  0},
+        		          /** p4 */ {-1,  0,  0,  1,  0,  0,  0,  0,  0,  0},
+        		          /** p5 */ {-1,  0,  0,  0,  0,  0,  1,  0,  0,  0},
+        		          /** p6 */ { 0,  1,  0,  0,  0,  0, -1,  0,  0,  0},
+        		          /** p7 */ { 0, -1,  0,  0,  0,  0,  0,  0,  1,  0},
+        		          /** p8 */ { 0,  1,  0,  0,  0,  0,  0, -1,  0,  0},
+        		          /** p9 */ { 0,  0, -1,  0,  0,  0,  0,  1,  0,  0},
+        		          /** p10*/ { 0,  0,  1,  0,  0,  0,  0,  0, -1,  0},
+        		          /** p11*/ { 0,  0,  1,  0,  0,  0,  0,  0,  0, -1},
+        		          /** p12*/ { 0,  0,  0,  0,  0,  0,  0,  0, -1,  1},
+        		          /** p13*/ { 0,  0,  0, -1,  0,  0,  0,  0,  0,  1},
+        		          /** p14*/ { 0, -1,  0,  0,  0,  1,  0,  0,  0,  0}
+        		         };
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    // Compute P-Invariants
+        InvariantMatrix.invariants(invariantM);
+        /**
+           p1    p2    p3    p4    p5    p6    p7    p8    p9    p10  p11   p12   p13   p14
+           1     1     0     1     0     0     0     0     0     0     0     0     0     0   一致
+           0     0     1     0     1     1     0     0     0     0     0     0     0     1   一致
+           0     0     0     0     0     0     1     1     1     1     0     0     0     0   一致
+           0     0     0     0     0     0     1     1     1     0     1     1     0     0   一致
+           0     0     1     1     0     0     0     1     1     0     1     0     1     1   一致
+         */
+     
 	}
 
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
+	 */
+	//@Ignore
+	@Test
+	public void testInvariants4() {
+		System.out.println("testInvariants4()");
+		 // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
+        int incidence[][] = {
+        		                 /** t1  t2  t3  **/
+        		          /** p11*/ { 1,  -1,   0 },
+        		          /** p12*/ { 1,  -1,   0 },
+        		          /** p13*/ { 1,  -1,   0 },
+        		          /** p21*/ { 0,   1,  -1 },
+        		          /** p22*/ { 0,   1,  -1 },
+        		          /** p23*/ { 0,   1,  -1 },
+        		          /** p31*/ {-1,   0,   1 },
+        		          /** p32*/ {-1,   0,   1 },
+        		          /** p33*/ {-1,   0,   1 }
+        		         };
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    // Compute P-Invariants
+        InvariantMatrix.invariants(invariantM);
+        /**
+           p1    p2    p3    p4    p5    p6    p7    p8    p9    p10  p11   p12   p13   p14
+           1     1     0     1     0     0     0     0     0     0     0     0     0     0   一致
+           0     0     1     0     1     1     0     0     0     0     0     0     0     1   一致
+           0     0     0     0     0     0     1     1     1     1     0     0     0     0   一致
+           0     0     0     0     0     0     1     1     1     0     1     1     0     0   一致
+           0     0     1     1     0     0     0     1     1     0     1     0     1     1   一致
+         */
+     
+	}
 }
