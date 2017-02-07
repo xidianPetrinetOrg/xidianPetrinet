@@ -198,25 +198,27 @@ public class InvariantMatrixTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.math.InvariantMatrix#hasNegativeElements(int[])}.
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#negativeToZero(int col)}.
 	 */
 	@Ignore
 	@Test
-	public void testHasNegativeElements() {
-		System.out.println("testHasNegativeElements()");
+	public void testNegativeToZero() {
+		System.out.println("testNegativeToZero()");
 		int incidence[][] = {
-    		    { 1,  0,  2,  0},
+    		    { -21,  0,  2,  0},
     		    { 1,  1,  2,  0},
-    		    { 1,  0,  1,  0},
+    		    { 1,  0,  -1,  0},
     		    { -1,  1,  1,  0},
     		    { 2,  3,  4,  -5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
-		int a[] = new int[2];
-		assertTrue(m.hasNegativeElements(a));
-		assertEquals(a[0],3);
-		assertEquals(a[1],0);
+		for(int i=0;i<m.getColumnDimension();i++) {
+		   m.negativeToZero(i);
+		}
+		assertEquals(incidence[0][0],0);
+		assertEquals(incidence[0][3],0);
+		m.print(4,0);
 	}
 	
 	/**
@@ -344,6 +346,7 @@ public class InvariantMatrixTest {
 	public void testInvariants3() {
 		System.out.println("testInvariants3()");
 		 // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
+		// Figure 1
         int incidence[][] = {
         		                 /** t1  t2  t3  t4  t5  t6  t7  t8  t9  t10 **/
         		          /** p1 */ { 1,  0,  0,  0, -1,  0,  0,  0,  0,  0},
@@ -378,11 +381,12 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testInvariants4() {
 		System.out.println("testInvariants4()");
 		 // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
+		 // Figure 3
         int incidence[][] = {
         		                 /** t1  t2  t3  **/
         		          /** p11*/ { 1,  -1,   0 },
@@ -399,13 +403,114 @@ public class InvariantMatrixTest {
 	    // Compute P-Invariants
         InvariantMatrix.invariants(invariantM);
         /**
-           p1    p2    p3    p4    p5    p6    p7    p8    p9    p10  p11   p12   p13   p14
-           1     1     0     1     0     0     0     0     0     0     0     0     0     0   一致
-           0     0     1     0     1     1     0     0     0     0     0     0     0     1   一致
-           0     0     0     0     0     0     1     1     1     1     0     0     0     0   一致
-           0     0     0     0     0     0     1     1     1     0     1     1     0     0   一致
-           0     0     1     1     0     0     0     1     1     0     1     0     1     1   一致
+            1    -1     0     0     0     0     0     0     0
+     		1     0    -1     0     0     0     0     0     0
+            0     0     0     1    -1     0     0     0     0
+     		0     0     0     1     0    -1     0     0     0
+     		1     0     0     1     0     0     1     0     0
+     		1     0     0     1     0     0     0     1     0
+     		1     0     0     1     0     0     0     0     1 
          */
-     
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
+	 */
+	@Ignore
+	@Test
+	public void testInvariants5() {
+		System.out.println("testInvariants5()");
+		// PIPEv4.3.0  5 place * 4 transition
+        int incidence[][] = {
+        		                 /**  t0  t1  t2  t3  **/
+        		          /** p0 */ { -1,  1,  0,  0 },
+        		          /** p1 */ {  1, -1,  0,  0 },
+        		          /** p2 */ { -1,  1, -1,  1 },
+        		          /** p3 */ {  0,  0, -1,  1 },
+        		          /** p4 */ {  0,  0,  1, -1 }
+        		         };
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    
+	    // Compute P-Invariants
+	    invariantM.print("Compute P-Invariants\n");
+        InvariantMatrix.invariants(invariantM);
+        /** p0    p1    p2    p3   p4  // 原文档：Invariant Analysis.htm
+         	1     1     0     0     0  // M(p0)+M(p1) = 5
+     		0     1     1     0     1  // M(p1)+M(p2)+3M(p4) = 3
+     		0     0     0     1     1  // M(p3)+M(p4) = 2
+         */
+        
+        // Compute T-Invariants
+        invariantM.print("Compute T-Invariants\n");
+        InvariantMatrix.invariants(invariantM.transpose());
+        /**t0     t1    t2    t3  // 原文档：Invariant Analysis.htm
+            1     1     0     0   // 1 1 0 0
+     		0     0     1     1   // 0 0 3 3
+         */
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
+	 */
+	@Ignore
+	@Test
+	public void testInvariants6() {
+		System.out.println("testInvariants6()");
+		// 袁崇义p52，
+        int incidence[][] = {
+        		                 /**  t1  t2  t3  t4  **/
+        		          /** s1 */ { -1,  1,  0,  0 },
+        		          /** s2 */ {  1, -1, -1,  1 },
+        		          /** s3 */ {  0,  0,  1, -1 }
+        		         };
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    
+	    // Compute P-Invariants
+	    invariantM.print("Compute P-Invariants\n");
+        InvariantMatrix.invariants(invariantM);
+        /** s1    s2    s3
+         	1     1     1
+         */
+        
+        // Compute T-Invariants
+        invariantM.print("Compute T-Invariants\n");
+        InvariantMatrix.invariants(invariantM.transpose());
+        /**t1     t2    t3    t4
+            1     1     0     0
+     		0     0     1     1
+         */
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
+	 */
+	//@Ignore
+	@Test
+	public void testInvariants7() {
+		System.out.println("testInvariants7()");
+		// 袁崇义p52，
+        int incidence[][] = {
+        		                 /**  t1  t2  t3 **/
+        		          /** s1 */ {  1, -1,  0 },
+        		          /** s2 */ { -1,  1,  0 },
+        		          /** s3 */ {  0,  1, -1 },
+        		          /** s4 */ {  0, -1,  1 }
+        		         };
+	    InvariantMatrix invariantM = new InvariantMatrix(incidence);
+	    
+	    // Compute P-Invariants
+	    invariantM.print("Compute P-Invariants\n");
+        InvariantMatrix.invariants(invariantM);
+        /** s1    s2    s3    s4
+         	1     1     0     0
+     		0     0     1     1
+         */
+        
+        // Compute T-Invariants
+        invariantM.print("Compute T-Invariants\n");
+        InvariantMatrix.invariants(invariantM.transpose());
+        /**t1     t2    t3
+            1     1     1
+         */
 	}
 }

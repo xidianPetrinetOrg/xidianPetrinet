@@ -143,24 +143,38 @@ public class InvariantMatrix extends Matrix {
 	}
 	
 	/**
-	 * Has negative elements.
-	 * @param a 负元素所在的行、列index,分别在a[0]和a[1]中
-	 * @return True or false.
+	 * Has negative element in the column.
+	 * @param column
+	 * @return 负元素所在行index
+	 *         无负元素，返回-1
 	 */
-	boolean hasNegativeElements(int a[]) {
-		for (int i = 0; i < m; i++) {
-			for(int j = 0; j < n; j++) {
-				if (get(i, j) < 0) {
-					a[0] = i; a[1] = j;
-					return true;
-				}
-			}
+	int hasNegativeElementCol(int col) {
+		for(int i = 0; i < m; i++) {
+			if (get(i, col) < 0) return i;
 		}
-		return false;
+		return -1;
 	}
 	
 	/**
-	 * all elements is negative or 0 the row.
+	 * 通过与正元素所在行的线性组合，置本列负元素为0
+	 * @param col
+	 */
+	public void negativeToZero(int col) {
+		int positive,negative;
+		// 找本列的正元素的行，此行与负元素所在的行，线性组合，置负元素为0
+		for(positive = 0; positive < m; positive++) {
+			if (get(positive,col) > 0) break;
+		}
+		if (positive == m) return; // 没有正元素，不能通过线性组合置负元素为0
+		while (true) {
+			negative = hasNegativeElementCol(col);
+			if (negative == -1) break;
+			linearlyCombine(positive,negative,col);
+		}
+	}
+	
+	/**
+	 * all elements of the row is negative or 0.
 	 * @return 行index，否则返回-1.
 	 */
 	int allNegativeOrZeroRow() {
@@ -174,7 +188,6 @@ public class InvariantMatrix extends Matrix {
 		}
 		return -1;
 	}
-
 
 	/**
      * Transform a matrix to obtain the minimal generating set of vectors.
@@ -249,6 +262,7 @@ public class InvariantMatrix extends Matrix {
 			return null;
 		}
 
+		B.print("规范化： matrix B");
 		// 规范化B
 		// 负元素或0组成的行，取正，即负行取正
 		int b_cols = B.getColumnDimension();
@@ -264,19 +278,9 @@ public class InvariantMatrix extends Matrix {
 		B.print("matrix B,负行取正：");
 		B.print(4, 0);
 
-		// 负元素置0,有不能消除的情况,如：
-		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
-		// Figure 3
-		int negative[] = new int[2];
-		while (true) {
-			boolean b = B.hasNegativeElements(negative);
-			if (!b) break;
-			for (int i = 0; i < m; i++) {
-				if (B.get(i, negative[1]) > 0) {
-					B.linearlyCombine(i, negative[0], negative[1]);
-					break;
-				}
-			}
+		// 通过与正元素行的线性组合，负元素置0
+		for(int col = 0; col < b_cols; col++) {
+			B.negativeToZero(col);
 		}
 		B.print("matrix B,负元素置0：");
 		B.print(4, 0);

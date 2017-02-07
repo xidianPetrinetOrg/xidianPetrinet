@@ -45,7 +45,7 @@ public class Invariant {
 	        		         {0,0,0,0,0,0,0,-1,1},
 	                         {1,0,0,0,0,0,-1,1,0}};
 	        
-	        // 5 place * 4 transition
+	        // PIPEv4.3.0  5 place * 4 transition
 	        int array1[][] = {{-1,1,0,0},{1,-1,0,0},{-1,1,-1,1},{0,0,-1,1},{0,0,1,-1}};
 	        
 	        // Metabolites
