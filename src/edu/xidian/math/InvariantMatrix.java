@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class InvariantMatrix extends Matrix {
@@ -70,8 +71,8 @@ public class InvariantMatrix extends Matrix {
 		// 查找顺序：先列后行，从左到右，自上而下
 		for (int j = 0; j < n; j++) { // 列
 			for (int i = 0; i < m; i++) {  // 行
-				//if (A[i][j] != 0) {
-				if (A[i][j] > 0) {
+				if (A[i][j] != 0) { // 非0元素
+				//if (A[i][j] > 0) { // 正数
 					a[0] = i; a[1] = j;
 					return 0;
 				}
@@ -191,16 +192,16 @@ public class InvariantMatrix extends Matrix {
 
 	/**
      * Transform a matrix to obtain the minimal generating set of vectors.
-     * Initialisation: C = A; D: m*m单位阵 , 
+     * Initialisation: C = A; B: m*m单位阵 , 
 	 * the matrix A: m*n关联矩阵, 本函数求P-Invariants;  若是关联矩阵的转置，则本函数求T-Invariants
 	 * m: place number; n: transition number  
-	 * for (j=0;j<n;i++) // 遍历C各列，C非全零
+	 * for (j=0;j<n;i++) // 遍历C各列，C非全零；启发式选择去掉的列（heuristics for selecting the columns to annul）
 	 * {  
-	 *   Append to the matrix B = [C:D] every rows resulting from positive linear combinations of row pairs in B that annihilate column j of C.                                                                            
-	 *   Eliminate from B the rows in which the j-th row of C is non-zero.
+	 *   Append to the matrix D = [C:B] every rows resulting from positive linear combinations of row pairs in B that annihilate column j of C.                                                                            
+	 *   Eliminate from D the rows in which the j-th row of C is non-zero.
 	 * }
-	 * B is all zeros
-	 * D denotes the invariance matrix.
+	 * C is all zeros
+	 * B denotes the invariance matrix.
      * @return A matrix containing the invariant vectors.
      */
 	public static Matrix invariants(InvariantMatrix C) {
@@ -220,10 +221,9 @@ public class InvariantMatrix extends Matrix {
 			int element = C.get(a[0], a[1]); // 唯一的+ve或-ve
 			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
 			for (int i = 0; i < m; i++) {
-				if (C.get(i, a[1]) == 0)
-					continue;
-				if (a[0] == i)
-					continue;
+				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
+				if (C.get(i, a[1]) == 0) continue; // 不与0元素所在的行线性组合
+				
 				Coefficient = C.linearlyCombine(a[0], i, a[1]);
 				B.linearlyCombine(a[0], i, Coefficient);
 			}
@@ -234,15 +234,18 @@ public class InvariantMatrix extends Matrix {
 			print(C,B,4,0);
 		}
 		
+		//////////////////////////////////////////////////////////////////
 		// 第一个非0元素所在的行，线性组合到其它行，消除此行
 		while (C.firstNonZeroElementIndex(a) == 0) {
 			int element = C.get(a[0], a[1]); // 第一个非0元素
 			// 线性组合
 			for (int i = 0; i < m; i++) {
-				if (C.get(i, a[1]) == 0)
-					continue;
-				if (a[0] == i)
-					continue;
+				if (a[0] == i) continue;  // 不与非0元素所在的行线性组合
+				if (C.get(i, a[1]) == 0) continue; // 不与0元素线性组合
+				
+				// 同号，也得线性组合，否则，会丢失应有的不变式
+				//if (C.get(i, a[1])*element > 0) continue; // 不与同号元素线性组合
+				
 				Coefficient = C.linearlyCombine(a[0], i, a[1]);
 				B.linearlyCombine(a[0], i, Coefficient);
 			}
@@ -252,7 +255,7 @@ public class InvariantMatrix extends Matrix {
 			C.print("第一个非0元素的行列，值：" + a[0] + "," + a[1] + "," + element);
 			print(C,B,4,0);
 		}
-
+		
 		C.print("C应该是全0" );
 		print(C,B,4,0);
 		
@@ -346,6 +349,53 @@ public class InvariantMatrix extends Matrix {
     	   }
        }
        return gcd; // this should never be zero
+    }
+    
+    /**
+     * Append a row vector to the bottom of this matrix.
+     * @param row vector for append.
+     * @return The matrix with the row vector appended to the bottom.
+     * @exception ArrayIndexOutOfBoundsException Submatrix indices
+     */
+    public InvariantMatrix appendRow(int row[]) {
+    	InvariantMatrix r = new InvariantMatrix(m+1, n);  // 扩充一行
+       // the extended matrix
+       r.setMatrix(0, m-1, 0, n-1, this);
+       
+       try {         
+          for (int j = 0; j < n; j++){
+             r.A[m][j] = row[j];
+          }
+       } catch(ArrayIndexOutOfBoundsException e) {
+          throw new ArrayIndexOutOfBoundsException("Row indices incompatible");
+       }
+       return r;
+    }
+    
+    /** 
+     * 计算特定列中的所有+ve索引的列表
+     * @param columnIndex 列index
+     * @return 参数表示的列中所有+ve索引的列表
+     */
+    public ArrayList<Integer> getPositiveList(int columnIndex) {
+    	ArrayList<Integer> positive = new ArrayList<Integer>();
+    	for(int i = 0; i < m; i++) {
+    		if(A[i][columnIndex] > 0) positive.add(i);	
+    	}
+    	return positive;
+    }
+    
+    /** 
+     * 计算特定列中的所有-ve索引的列表
+     * @param columnIndex 列index
+     * @return 参数表示的列中所有-ve索引的列表
+     */
+    public ArrayList<Integer> getNegativeList(int columnIndex) {
+    	ArrayList<Integer> negative = new ArrayList<Integer>();
+    	for(int i = 0; i < m; i++) {
+    		if(A[i][columnIndex] < 0) negative.add(i);	
+    	}
+    	return negative;
     }
     
     /**

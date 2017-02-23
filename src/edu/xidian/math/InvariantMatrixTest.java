@@ -5,6 +5,7 @@ package edu.xidian.math;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.After;
@@ -13,6 +14,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import de.invation.code.toval.misc.ArrayUtils;
+import de.invation.code.toval.misc.CollectionUtils;
+import jdk.nashorn.internal.ir.LiteralNode.ArrayLiteralNode.ArrayUnit;
 
 /**
  * @author Administrator
@@ -268,6 +273,94 @@ public class InvariantMatrixTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#appendRow(int[])}.
+	 */
+	@Ignore
+	@Test
+	public void testAppendRow() {
+		System.out.println("testAppendRow()");
+		int incidence[][] = {
+    		    { 1,  0,  -2,  0},
+    		    { 1,  1,  2,  0},
+    		    { 1,  0,  1,  0},
+    		    { -1,  0,  -4,  -2},
+    		    { 0,  0,  -4,  -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		
+		m.print("append1:");
+		int row[] = {1,2,3,4};
+		InvariantMatrix a = m.appendRow(row);
+		a.print(4,0);
+		assertEquals(a.m,6); // a.m 为何能在此访问?  因为与原类在同一包package edu.xidian.math;
+		assertEquals(a.getRowDimension(),6);
+		
+		m.print("append2:");
+		int row1[] = {1,2,3,4};
+		InvariantMatrix b = a.appendRow(row1);
+		b.print(4,0);
+		assertEquals(b.m,7);
+		assertEquals(b.getRowDimension(),7);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#getPositiveList(int)}.
+	 */
+	@Ignore
+	@Test
+	public void testGetPostiveList() {
+		System.out.println("testGetPostiveList()");
+		int incidence[][] = {
+    		    { 1,  0,  -2,  0},
+    		    { 1,  1,  2,  0},
+    		    { 1,  0,  1,  0},
+    		    { -1,  0,  -4,  -2},
+    		    { 0,  0,  -4,  -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+
+		ArrayList<Integer> positive = m.getPositiveList(2);
+		assertEquals(positive.size(),2);
+		int a[] = {1,2};
+		int b[] = new int[positive.size()];
+		for (int i=0;i<b.length;i++) {
+			b[i] = positive.get(i);
+		}
+		assertArrayEquals(a, b);
+		m.print(positive.toString()+"\n");
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#getgetNegativeList(int)}.
+	 */
+	//@Ignore
+	@Test
+	public void testGetNegativeList() {
+		System.out.println("testGetNegativeList()");
+		int incidence[][] = {
+    		    { 1,  0,  -2,  0},
+    		    { 1,  1,  2,  0},
+    		    { 1,  0,  1,  0},
+    		    { -1,  0,  -4,  -2},
+    		    { 0,  0,  -4,  -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+
+		ArrayList<Integer> positive = m.getNegativeList(2);
+		assertEquals(positive.size(),3);
+		int a[] = {0,3,4};
+		int b[] = new int[positive.size()];
+		for (int i=0;i<b.length;i++) {
+			b[i] = positive.get(i);
+		}
+		assertArrayEquals(a, b);
+		m.print(positive.toString()+"\n");
+	}
+	
+	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
 	 */
 	@Ignore
@@ -403,13 +496,10 @@ public class InvariantMatrixTest {
 	    // Compute P-Invariants
         InvariantMatrix.invariants(invariantM);
         /**
-            1    -1     0     0     0     0     0     0     0
-     		1     0    -1     0     0     0     0     0     0
-            0     0     0     1    -1     0     0     0     0
-     		0     0     0     1     0    -1     0     0     0
-     		1     0     0     1     0     0     1     0     0
-     		1     0     0     1     0     0     0     1     0
-     		1     0     0     1     0     0     0     0     1 
+           1     0     0     1     0     0     1     0     0
+           1     0     0     1     0     0     0     1     0
+           1     0     0     1     0     0     0     0     1
+
          */
 	}
 	
@@ -484,7 +574,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#invariants(edu.xidian.math.Matrix)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testInvariants7() {
 		System.out.println("testInvariants7()");
