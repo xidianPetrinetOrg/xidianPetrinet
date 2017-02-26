@@ -130,6 +130,82 @@ public class InvariantMatrixTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#cardinalityOne1(int[])}.
+	 */
+	//@Ignore("testCardinalityOne1IntArray()")
+	@Test
+	public void testCardinalityOne1IntArray() {
+		System.out.println("testCardinalityOne1IntArray()");
+		int incidence[][] = {
+    		    {-1,  0,  0,  0,  0,  0,  0,  1,  0},
+    		    { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+    		    { 1,  0, -1,  0,  0,  0,  0,  0,  0},
+    		    { 0,  0,  1,  1, -1, -1,  0,  0,  0},
+    		    {-2,  1,  0, -1,  1,  0, -1,  0,  0},
+    		    { 0,  0,  0,  0,  0,  0,  1,  0, -1},
+    		    { 0,  1,  1,  0,  0,-29,  1,  0,  0},
+    		    { 0, -1, -1,  0,  0, 29, -1,  0,  0}
+        };
+    
+        Matrix invariantM = new Matrix(incidence);           
+        //InvariantMatrix m = new InvariantMatrix(invariantM.transpose());
+        InvariantMatrix m = new InvariantMatrix(invariantM);
+        m.print("incidence:");
+        m.print(4, 0);
+       
+        int a[] = {-1,-2,-3};
+        int r = m.cardinalityOne1(a);
+        System.out.println("r="+r+","+a[0]+","+a[1]+","+a[2]);
+        assertEquals(r,0);
+        int[] expecteds = {3,4,3};
+        assertArrayEquals(expecteds, a);
+        
+        ////////////////////////////////////////////////////////////////
+		int incidence1[][] = {
+    		    {-1,  0,  0,  0},
+    		    { 1, -1,  0,  0},
+    		    { 1,  1, -1,  0},
+    		    { 0, -1,  1,  1},
+        };
+    
+        invariantM = new Matrix(incidence1);           
+        m = new InvariantMatrix(invariantM);      
+        r = m.cardinalityOne1(a);
+        System.out.println("r="+r+","+a[0]+","+a[1]+","+a[2]);
+        assertEquals(r,0);
+        expecteds[0] = 3; expecteds[1] = 2; expecteds[2] = 2;
+        assertArrayEquals(expecteds, a);
+        
+		int incidence2[][] = {
+    		    {-1,  0,  0,  0},
+    		    {-1, -1,  0,  0},
+    		    { 1,  0, -1,  0},
+    		    { 1,  1,  1,  1},
+        };
+    
+        invariantM = new Matrix(incidence2);           
+        m = new InvariantMatrix(invariantM);      
+        r = m.cardinalityOne1(a);
+        System.out.println("r="+r+","+a[0]+","+a[1]+","+a[2]);
+        assertEquals(r,0);
+        expecteds[0] = 3; expecteds[1] = 1; expecteds[2] = 1;
+        assertArrayEquals(expecteds, a);
+        
+		int incidence3[][] = {
+    		    {-1,  0, -2,  0},
+    		    {-1,  1,  2,  0},
+    		    { 1,  0, -1,  0},
+    		    { 1,  1,  1,  0},
+        };
+    
+        invariantM = new Matrix(incidence3);           
+        m = new InvariantMatrix(invariantM);      
+        r = m.cardinalityOne1(a);
+        System.out.println("r="+r);
+        assertEquals(r,-1);  // 未找到
+	}
+	
+	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#linearlyCombine(int i,int k,int j)}.
 	 */
 	@Ignore
@@ -210,11 +286,11 @@ public class InvariantMatrixTest {
 	public void testNegativeToZero() {
 		System.out.println("testNegativeToZero()");
 		int incidence[][] = {
-    		    { -21,  0,  2,  0},
-    		    { 1,  1,  2,  0},
-    		    { 1,  0,  -1,  0},
+    		    {-21,  0,  2,  0},
+    		    {  1,  1,  2,  0},
+    		    {  1,  0, -1,  0},
     		    { -1,  1,  1,  0},
-    		    { 2,  3,  4,  -5}
+    		    {  2,  3,  4, -5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
@@ -237,8 +313,8 @@ public class InvariantMatrixTest {
     		    { 4,  0,  2,  0},
     		    { 1,  1,  2,  0},
     		    { 1,  0,  1,  0},
-    		    { -1,  1,  1,  0},
-    		    { 20,  30,  40,  -50}
+    		    {-1,  1,  1,  0},
+    		    {20, 30, 40,-50}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
@@ -254,11 +330,11 @@ public class InvariantMatrixTest {
 	public void testAllNegativeOrZeroRow() {
 		System.out.println("testAllNegativeOrZeroRow()");
 		int incidence[][] = {
-    		    { 1,  0,  -2,  0},
+    		    { 1,  0, -2,  0},
     		    { 1,  1,  2,  0},
     		    { 1,  0,  1,  0},
-    		    { -1,  0,  -4,  -2},
-    		    { 0,  0,  -4,  -5}
+    		    {-1,  0, -4, -2},
+    		    { 0,  0, -4, -5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
@@ -280,11 +356,11 @@ public class InvariantMatrixTest {
 	public void testAppendRow() {
 		System.out.println("testAppendRow()");
 		int incidence[][] = {
-    		    { 1,  0,  -2,  0},
+    		    { 1,  0, -2,  0},
     		    { 1,  1,  2,  0},
     		    { 1,  0,  1,  0},
-    		    { -1,  0,  -4,  -2},
-    		    { 0,  0,  -4,  -5}
+    		    {-1,  0, -4, -2},
+    		    { 0,  0, -4, -5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
@@ -293,7 +369,7 @@ public class InvariantMatrixTest {
 		int row[] = {1,2,3,4};
 		InvariantMatrix a = m.appendRow(row);
 		a.print(4,0);
-		assertEquals(a.m,6); // a.m 为何能在此访问?  因为与原类在同一包package edu.xidian.math;
+		assertEquals(a.m,6); // proteted成员a.m为何能在此访问?  因为与原类在同一包package edu.xidian.math;
 		assertEquals(a.getRowDimension(),6);
 		
 		m.print("append2:");
@@ -307,29 +383,25 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#getPositiveList(int)}.
 	 */
-	@Ignore
+	//@Ignore
 	@Test
 	public void testGetPostiveList() {
 		System.out.println("testGetPostiveList()");
 		int incidence[][] = {
-    		    { 1,  0,  -2,  0},
-    		    { 1,  1,  2,  0},
-    		    { 1,  0,  1,  0},
-    		    { -1,  0,  -4,  -2},
-    		    { 0,  0,  -4,  -5}
+    		    {  1,  0, -2,  0},
+    		    {  1,  1,  2,  0},
+    		    {  1,  0,  1,  0},
+    		    { -1,  0, -4, -2},
+    		    {  0,  0, -4, -5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
 
-		ArrayList<Integer> positive = m.getPositiveList(2);
-		assertEquals(positive.size(),2);
-		int a[] = {1,2};
-		int b[] = new int[positive.size()];
-		for (int i=0;i<b.length;i++) {
-			b[i] = positive.get(i);
-		}
-		assertArrayEquals(a, b);
-		m.print(positive.toString()+"\n");
+		ArrayList<Integer> positives = m.getPositiveList(2);
+		assertEquals(positives.size(),2);
+		Object positiveExpecteds[] = {1,2};
+		assertArrayEquals(positiveExpecteds, positives.toArray());
+		m.print(positives+"\n");
 	}
 	
 	/**
@@ -340,24 +412,55 @@ public class InvariantMatrixTest {
 	public void testGetNegativeList() {
 		System.out.println("testGetNegativeList()");
 		int incidence[][] = {
-    		    { 1,  0,  -2,  0},
-    		    { 1,  1,  2,  0},
-    		    { 1,  0,  1,  0},
-    		    { -1,  0,  -4,  -2},
-    		    { 0,  0,  -4,  -5}
+    		    {  1,  0, -2,  0},
+    		    {  1,  1,  2,  0},
+    		    {  1,  0,  1,  0},
+    		    { -1,  0, -4, -2},
+    		    {  0,  0, -4, -5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
 
-		ArrayList<Integer> positive = m.getNegativeList(2);
-		assertEquals(positive.size(),3);
-		int a[] = {0,3,4};
-		int b[] = new int[positive.size()];
-		for (int i=0;i<b.length;i++) {
-			b[i] = positive.get(i);
-		}
-		assertArrayEquals(a, b);
-		m.print(positive.toString()+"\n");
+		ArrayList<Integer> negatives = m.getNegativeList(2);
+		assertEquals(negatives.size(),3);
+		Object negativeExpecteds[] = {0,3,4};
+		assertArrayEquals(negativeExpecteds, negatives.toArray());
+		m.print(negatives+"\n");
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#positiveNegativeList(ArrayList, ArrayList, int)}.
+	 */
+	//@Ignore
+	@Test
+	public void testPositiveNegativeList() {
+		System.out.println("testPositiveNegativeList()");
+		int incidence[][] = {
+    		    {  1,  0, -2,  0},
+    		    {  1,  1,  2,  0},
+    		    {  1,  0,  1,  0},
+    		    { -1,  0, -4, -2},
+    		    {  0,  0, -4, -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+
+		ArrayList<Integer> positives = new ArrayList<>();
+		ArrayList<Integer> negatives = new ArrayList<>();
+		m.positiveNegativeList(positives, negatives, 2);
+		
+		// +ve
+		assertEquals(positives.size(),2);
+		Object positiveExpecteds[] = {1,2};
+		assertArrayEquals(positiveExpecteds, positives.toArray());
+		
+		// -ve
+		assertEquals(negatives.size(),3);
+		Object negativeExpecteds[] = {0,3,4};
+		assertArrayEquals(negativeExpecteds, negatives.toArray());
+		
+		m.print("positives:"+positives+"\n");
+		m.print("negatives"+negatives+"\n");
 	}
 	
 	/**

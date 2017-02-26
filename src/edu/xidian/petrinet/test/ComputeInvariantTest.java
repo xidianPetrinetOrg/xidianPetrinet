@@ -2,10 +2,13 @@ package edu.xidian.petrinet.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.xidian.math.InvariantMatrix;
@@ -39,6 +42,9 @@ public class ComputeInvariantTest {
 	   		          /** p14*/ { 0, -1,  0,  0,  0,  1,  0,  0,  0,  0}
 	   		         };
 	   InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   incidenceM.print("incidence:");
+	   incidenceM.print(4, 0);
+	   
 	   computeInvariant = new ComputeInvariant(incidenceM);
 	   System.out.println("经典，Figure 1， P-Invariants:");
 	   // Compute P-Invariants
@@ -55,7 +61,7 @@ public class ComputeInvariantTest {
    /**
     * 经典 Figure 3
     */
-   void SetUp2() {
+   void setUp2() {
 	   // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 	   // Figure 3
        int incidence[][] = {
@@ -72,6 +78,9 @@ public class ComputeInvariantTest {
        		         };
        
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    incidenceM.print("incidence:");
+		incidenceM.print(4, 0);
+		
 		computeInvariant = new ComputeInvariant(incidenceM);
 		System.out.println("经典，Figure 3， P-Invariants:");
        /**
@@ -81,20 +90,47 @@ public class ComputeInvariantTest {
 
         */
 	}
+   
+   /**
+    * Metabolites
+    */
+    void setUp3() {
+        // Metabolites
+        int incidence[][] = {
+        		    {-1,  0,  0,  0,  0,  0,  0,  1,  0},
+        		    { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+        		    { 1,  0, -1,  0,  0,  0,  0,  0,  0},
+        		    { 0,  0,  1,  1, -1, -1,  0,  0,  0},
+        		    { 0,  1,  0, -1,  1,  0, -1,  0,  0},
+        		    { 0,  0,  0,  0,  0,  0,  1,  0, -1},
+        		    { 0,  1,  1,  0,  0,-29,  1,  0,  0},
+        		    { 0, -1, -1,  0,  0, 29, -1,  0,  0}
+        };
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        incidenceM.print("incidence:");
+ 	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM.transpose());
+		System.out.println("Metabolites,T-Invariants:");
+    }
 	
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		System.out.println("setUpBeforeClass()");
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+		System.out.println("tearDownAfterClass()");
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		//setUp1();  // 经典 Figure 1
-		SetUp2();    // 经典 Figure 3
+		System.out.println("setUp()====");
+		//setUp1();  // 经典 Figure 1, P-Invariants
+		setUp2();  // 经典 Figure 3, P-Invariants
+		//setUp3();  // Metabolites, T-Invariants
 	}
 
 	@After
@@ -104,7 +140,7 @@ public class ComputeInvariantTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#compute1()}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testCompute1() {
 		//fail("Not yet implemented");
@@ -115,12 +151,71 @@ public class ComputeInvariantTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#compute2()}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testCompute2() {
 		//fail("Not yet implemented");
 		System.out.println("testCompute2()");
+		System.out.println("compute1()");
+		computeInvariant.compute1();
+		System.out.println("compute2()");
 		computeInvariant.compute2();
 	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#compute3()}.
+	 */
+	//@Ignore
+	@Test
+	public void testCompute3() {
+		//fail("Not yet implemented");
+		System.out.println("testCompute3()");
+		System.out.println("compute1()");
+		computeInvariant.compute1();
+		System.out.println("compute2()");
+		computeInvariant.compute2();
+		System.out.println("compute3()");
+		computeInvariant.compute3();
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 */
+	//@Ignore
+	@Test
+	public void testAnnelCol() {
+		//fail("Not yet implemented");
+		System.out.println("testAnnelCol()");
+		int incidence[][] = {
+    		    { 1, -1,  0,  1},
+    		    {-1,  1,  1,  0},
+    		    { 1, -1, -1,  0},
+    		    {-1,  1, -1, -1},
+    		    {-1,  1,  1,  1},
+        };
+    
+       InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   incidenceM.print("incidence:");
+	   incidenceM.print(4, 0);
+	   ComputeInvariant computeInvariant = new ComputeInvariant(incidenceM);  
+	   
+	   ArrayList<Integer> positives = new ArrayList<>();
+	   ArrayList<Integer> negatives = new ArrayList<>();
+	   int col;
+	   col = computeInvariant.AnnelCol(positives, negatives);
+	   computeInvariant.print("col="+col+"\n");
+	   computeInvariant.print("positives="+positives+"\n");
+	   computeInvariant.print("negatives="+negatives+"\n");  
+	   
+	   assertEquals(positives.size(),1);
+	   assertEquals(negatives.size(),2); 
+	   
+	   Object positiveExpecteds[] = {2};
+	   assertArrayEquals(positiveExpecteds, positives.toArray());
+	   
+	   Object negativeExpecteds[] = {1,3};
+	   assertArrayEquals(negativeExpecteds, negatives.toArray());
+	}
 
+	
 }

@@ -1,11 +1,8 @@
 package edu.xidian.math;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -56,8 +53,36 @@ public class InvariantMatrix extends Matrix {
 				if (sign1 == 1 && row1 == -1) { row1 = i; col1 = j; }
 				if (sign2 == 1 && row2 == -1) { row2 = i; col2 = j; }
 			}
-			if (sign1 == 1) { a[0] = row1; a[1] = col1; return 0; } // 符合基数条件
-			if (sign2 == 1) { a[0] = row2; a[1] = col2; return 0; } // 符合基数条件
+			if (sign1 == 1) { a[0] = row1; a[1] = col1; return 0; } // 符合基数条件,仅有一个+ve或-ve
+			if (sign2 == 1) { a[0] = row2; a[1] = col2; return 0; } // 符合基数条件,仅有一个+ve或-ve
+		}
+		return -1; // 不符合基数条件
+	}
+	
+	/**
+	 * 满足算法的基数条件。基数cardinality=1，表示存在列，满足条件：仅有一个+ve[和]一个-ve<br>
+	 * 查找顺序：先列后行，从左到右，自上而下,先+ve,后-ve
+	 * @param a 符合条件的行和列Index，+ve行Index：a[0], -ve行Index：a[1], 列Index：a[2]
+	 * @return 找到符合条件的列，返回0; 否则，返回-1。
+	 */
+	public int cardinalityOne1(int a[]) {
+		int sign1,sign2; // +ve,-ve number
+		int row1,row2,col; // 唯一+ve和-ve的行号和列号
+		// 查找顺序：先列后行，从左到右，自上而下
+		for (int j = 0; j < n; j++) { // 列
+			sign1 = 0; sign2 = 0;
+			row1 = -1; row2 = -1; col = -1;
+			for (int i = 0; i < m; i++) {  // 行
+				if (A[i][j] == 0) continue;
+				if (A[i][j] > 0) sign1++;
+				else sign2++;
+				if (sign1 == 1 && row1 == -1) { row1 = i; col = j; }
+				if (sign2 == 1 && row2 == -1) { row2 = i; }
+			}
+			if (sign1 == 1 && sign2 == 1) { // 符合基数条件, 仅有一个+ve和一个-ve
+				a[0] = row1; a[1] = row2; a[2] = col; 
+				return 0;
+			} 
 		}
 		return -1; // 不符合基数条件
 	}
@@ -89,11 +114,11 @@ public class InvariantMatrix extends Matrix {
 	 * @param k  add i-th row to k-th row
 	 *            
 	 * @param j  Column index to be add, for new element A[k][j] = 0
-	 * @return a[0],a[1] is adjusted coefficients for i-th and k-th rows
+	 * @return Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows
 	 */
 	public int[] linearlyCombine(int i, int k, int j) {
 		int iRowCoefficient, kRowCoefficient,gcd;
-		int a[] = new int[2];
+		int Coefficient[] = new int[2];
 		iRowCoefficient = Math.abs(A[k][j]);
 		kRowCoefficient = Math.abs(A[i][j]);
 		gcd = gcd2(iRowCoefficient,kRowCoefficient);
@@ -103,9 +128,9 @@ public class InvariantMatrix extends Matrix {
 		for(int col = 0; col < n; col++) {
 		   A[k][col] = iRowCoefficient*A[i][col] + kRowCoefficient*A[k][col];
 		}
-		a[0] = iRowCoefficient; a[1] = kRowCoefficient;
+		Coefficient[0] = iRowCoefficient; Coefficient[1] = kRowCoefficient;
 		//print("c=" + iRowCoefficient +","+kRowCoefficient + "\n");
-		return a;
+		return Coefficient;
 	}
 	
 	/**
@@ -113,12 +138,56 @@ public class InvariantMatrix extends Matrix {
 	 * 
 	 * @param i
 	 * @param k
-	 * @param a a[0],a[1] is adjusted coefficients for i-th and k-th rows.
+	 * @param Coefficient Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows.
 	 */
-	public void linearlyCombine(int i, int k, int a[]) {
+	public void linearlyCombine(int i, int k, int Coefficient[]) {
 		for(int col = 0; col < n; col++) {
-			A[k][col] = a[0]*A[i][col] + a[1]*A[k][col];
+			A[k][col] = Coefficient[0]*A[i][col] + Coefficient[1]*A[k][col];
 		}
+	}
+	
+	/**
+	 * append the row of linear combination of i-th row and k-th row
+	 * @param i  
+	 * @param k  add i-th row to k-th row       
+	 * @param j  Column index to be combination, j-th element of append row = 0
+	 * @param Coefficient Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows
+	 * @return matrix of appended row
+	 */
+	public InvariantMatrix AppendRowLinearlyCombine(int i, int k, int j, int Coefficient[]) {
+		int iRowCoefficient, kRowCoefficient,gcd;
+		
+		iRowCoefficient = Math.abs(A[k][j]);
+		kRowCoefficient = Math.abs(A[i][j]);
+		gcd = gcd2(iRowCoefficient,kRowCoefficient);
+		iRowCoefficient /= gcd;
+	    kRowCoefficient /= gcd;
+	    if (A[i][j]*A[k][j] > 0) kRowCoefficient = -kRowCoefficient;    
+	    Coefficient[0] = iRowCoefficient; Coefficient[1] = kRowCoefficient;
+	    
+	    // append row of liearlyCombine result
+	    int row[] = new int[n];
+		for(int col = 0; col < n; col++) {
+		   row[col] = iRowCoefficient*A[i][col] + kRowCoefficient*A[k][col];
+		}
+		
+		return appendRow(row);
+	}
+	
+	/**
+	 * append the row of linear combination of i-th row and k-th row 
+	 * 
+	 * @param i
+	 * @param k
+	 * @param Coefficient Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows.
+	 * @return matrix of appended row
+	 */
+	public InvariantMatrix AppendRowLinearlyCombine(int i, int k, int Coefficient[]) {
+		int row[] = new int[n];
+		for(int col = 0; col < n; col++) {
+			row[col] = Coefficient[0]*A[i][col] + Coefficient[1]*A[k][col];
+		}
+		return appendRow(row);
 	}
 	
 	/**
@@ -358,7 +427,7 @@ public class InvariantMatrix extends Matrix {
      * @exception ArrayIndexOutOfBoundsException Submatrix indices
      */
     public InvariantMatrix appendRow(int row[]) {
-    	InvariantMatrix r = new InvariantMatrix(m+1, n);  // 扩充一行
+       InvariantMatrix r = new InvariantMatrix(m+1, n);  // 扩充一行
        // the extended matrix
        r.setMatrix(0, m-1, 0, n-1, this);
        
@@ -396,6 +465,22 @@ public class InvariantMatrix extends Matrix {
     		if(A[i][columnIndex] < 0) negative.add(i);	
     	}
     	return negative;
+    }
+    
+    /** 
+     * 计算特定列中的所有+ve/-ve索引的列表
+     * @param columnIndex 列index
+     * @return 参数表示的列中所有+ve和-ve索引的列表
+     * 调用举例：<br>
+	 * ArrayList<Integer> positives = new ArrayList<Integer>();
+	 * ArrayList<Integer> negatives = new ArrayList<Integer>();
+	 * positiveNegativeList(positives, negatives, columnIndex);
+     */
+    public void positiveNegativeList(ArrayList<Integer> positives,ArrayList<Integer> negatives,int columnIndex) {
+    	for(int i = 0; i < m; i++) {
+    		if(A[i][columnIndex] > 0) positives.add(i);
+    		else if(A[i][columnIndex] < 0) negatives.add(i);	
+    	}
     }
     
     /**
