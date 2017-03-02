@@ -247,7 +247,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#eliminateRow(int toDelete)}.
 	 */
-	@Ignore
+	//@Ignore
 	@Test
 	public void testEliminateRow() {
 		System.out.println("testEliminateRow()");
@@ -259,7 +259,7 @@ public class InvariantMatrixTest {
     		    { 2,  3,  4,  5}
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
-		m.print("Before Eliminate row 0:");
+		m.print("Before Eliminate row:");
 		m.print(4, 0);
 		
 		InvariantMatrix m1 = m.eliminateRow(0);
@@ -276,6 +276,39 @@ public class InvariantMatrixTest {
 		m1.print("After Eliminate row 1:");
 		m1.print(4, 0);
 		assertEquals(m1.getRowDimension(),2);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#eliminateRows(ArrayList)}.
+	 */
+	//@Ignore
+	@Test
+	public void testEliminateRows() {
+		System.out.println("testEliminateRows()");
+		int incidence[][] = {
+    		    {-1,  0, -2,  0},
+    		    {-1,  1,  2,  0},
+    		    { 1,  0, -1,  0},
+    		    { 1,  1,  1,  0},
+    		    { 2,  3,  4,  5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print("Before Eliminate rows:");
+		m.print(4, 0);
+		
+		ArrayList<Integer> rows = new ArrayList<>();
+		rows.add(0);rows.add(2);
+		InvariantMatrix m1 = m.eliminateRows(rows);
+		m1.print("After Eliminate row 0,2:");
+		m1.print(4, 0);
+		assertEquals(m.getRowDimension() - m1.getRowDimension(),2);
+		
+		rows.clear();
+		rows.add(1); rows.add(2);
+		m1 = m1.eliminateRows(rows);
+		m1.print("After Eliminate row 1,2:");
+		m1.print(4, 0);
+		assertEquals(m1.getRowDimension(),1);
 	}
 	
 	/**

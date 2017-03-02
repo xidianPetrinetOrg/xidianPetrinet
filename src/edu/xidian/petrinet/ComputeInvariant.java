@@ -57,8 +57,8 @@ public class ComputeInvariant {
      * Annul all columns k of U (A | Y) in which pk and vk = 1;
      */
 	public void compute1() {
-		print("Matrix A | Y");
-		InvariantMatrix.print(A,Y,4,0);
+		//print("Matrix A | Y");
+		//InvariantMatrix.print(A,Y,4,0);
 
 		int a[] = new int[3]; // a[0],a[1],a[2],唯一+ve行,唯一-ve行，列
 		int Coefficient[]; // 调整系数
@@ -81,8 +81,8 @@ public class ComputeInvariant {
      * Annul all columns k of U (A | Y) in which pk or vk = 1;
      */
 	public void compute2() {
-		print("Matrix A | Y");
-		InvariantMatrix.print(A,Y,4,0);
+		//print("Matrix A | Y");
+		//InvariantMatrix.print(A,Y,4,0);
 
 		int a[] = new int[2]; // a[0],a[1]唯一的+ve或-ve所在的行和列
 		int Coefficient[]; // 调整系数
@@ -110,23 +110,53 @@ public class ComputeInvariant {
 	
 	/** 
 	 * F(k) = pk*vk-(pk+vk)
-	 * 删除f(k)<0或pk*vk最小的列k
+	 * 删除F(k)<0或pk*vk最小的列k
 	 */
 	public void compute3() {
-		print("Matrix A | Y");
-		InvariantMatrix.print(A,Y,4,0);
+		//print("Matrix A | Y");
+		//InvariantMatrix.print(A,Y,4,0);
 		int Coefficient[] = new int[2]; // 调整系数
 		ArrayList<Integer> positives = new ArrayList<Integer>();
 		ArrayList<Integer> negatives = new ArrayList<Integer>();
 		int annelCol = AnnelCol(positives, negatives);
+		print("annelColumn:" + annelCol + "\n");
 		print("positives:" + positives + "\n");
 		print("negatives:" + negatives + "\n");
 		
-		for (int postiveRow : positives ) {
+		for (int positiveRow : positives ) {
 			for (int negativeRow : negatives) {
-				A = A.AppendRowLinearlyCombine(postiveRow, negativeRow, annelCol, Coefficient);
-				Y = Y.AppendRowLinearlyCombine(postiveRow, negativeRow, Coefficient);
+				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
+				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
 			}
+			InvariantMatrix.print(A,Y,4,0);
+		}
+		
+		// 删除annelCol列的非0行
+		positives.addAll(negatives);  // 并集
+		A = A.eliminateRows(positives);
+		Y = Y.eliminateRows(positives);
+		
+		InvariantMatrix.print(A,Y,4,0);
+	}
+	
+	public void compute() {
+		print("Matrix A | Y");
+		InvariantMatrix.print(A,Y,4,0);
+		while(!A.isZeroMatrix()) {
+			// Annul all columns k of U (A | Y) in which pk and vk = 1;
+			print("compute1()===\n");
+			compute1();
+			print("affter compute1() Matrix A | Y");
+			InvariantMatrix.print(A,Y,4,0);
+			// Annul all columns k of U (A | Y) in which pk or vk = 1;
+			print("compute2()===\n");
+			compute2();
+			print("affter compute2() Matrix A | Y");
+			InvariantMatrix.print(A,Y,4,0);
+			// F(k) = pk*vk-(pk+vk); 删除 F(k)<0或pk*vk最小的列k
+			print("compute3()===\n");
+			compute3();
+			print("affter compute3() Matrix A | Y");
 			InvariantMatrix.print(A,Y,4,0);
 		}
 	}
@@ -142,7 +172,7 @@ public class ComputeInvariant {
 	 * @return
 	 * 因此,有如下策略，选取要删除的列：<br>
 	 * （1）不产生新行的情况，即f(k) < 0, 返回将要删除的列index; <br>
-	 * （2）如果（1）不成立，选择pk*vk最小的,即生成的新行数最少,返回将要删除的列index; <br>
+	 * （2）如果（1）不成立，选择pk*vk最小的(pk或vk至少有1个大于0，即至少有一个正或负元素),即生成的新行数最少,返回将要删除的列index; <br>
 	 * <br>
 	 * 调用举例：<br>
 	 * ArrayList<Integer> positives = new ArrayList<Integer>();
@@ -164,10 +194,17 @@ public class ComputeInvariant {
 		}
 		
 		// 生成的新行数最少
-		int minValue = newRowsNum[0];
+		int minValue = -1;
 		int col = 0, minCol = 0;
 		for (int value : newRowsNum) {
-			if (value < minValue) {
+			// 初始化，要保证pk*vk>0
+			if (minValue == -1) {
+				if (value != 0) { minValue = value; minCol = col; }
+				col++;
+				continue;
+			}
+			
+			if (value != 0 && value < minValue ) {
 				minValue = value; 
 				minCol = col;
 			}

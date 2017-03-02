@@ -129,8 +129,8 @@ public class ComputeInvariantTest {
 	public void setUp() throws Exception {
 		System.out.println("setUp()====");
 		//setUp1();  // 经典 Figure 1, P-Invariants
-		setUp2();  // 经典 Figure 3, P-Invariants
-		//setUp3();  // Metabolites, T-Invariants
+		//setUp2();  // 经典 Figure 3, P-Invariants
+		setUp3();  // Metabolites, T-Invariants
 	}
 
 	@After
@@ -165,11 +165,12 @@ public class ComputeInvariantTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#compute3()}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testCompute3() {
 		//fail("Not yet implemented");
 		System.out.println("testCompute3()");
+		
 		System.out.println("compute1()");
 		computeInvariant.compute1();
 		System.out.println("compute2()");
@@ -179,20 +180,42 @@ public class ComputeInvariantTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#compute()}.
 	 */
 	//@Ignore
+	@Test
+	public void testCompute() {
+		//fail("Not yet implemented");
+		System.out.println("testCompute()");
+		
+		computeInvariant.compute();
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 */
+	@Ignore
 	@Test
 	public void testAnnelCol() {
 		//fail("Not yet implemented");
 		System.out.println("testAnnelCol()");
 		int incidence[][] = {
     		    { 1, -1,  0,  1},
-    		    {-1,  1,  1,  0},
+    		    {-1,  1,  1, -1},
     		    { 1, -1, -1,  0},
     		    {-1,  1, -1, -1},
     		    {-1,  1,  1,  1},
         };
+		/**
+		 * pk,vk:the number of positives and negatives in column k of A(k)
+		 * 选择列：pk*vk-(pk+vk) < 0  (1)
+		 * 或pk*vk最小                                              (2)
+		 * p0=2,v0=3, pk*vk-(pk+vk) = 2*3-(2+3) = 1
+		 * p1=3,v1=2, pk*vk-(pk+vk) = 3*2-(3+2) = 1
+		 * p2=2,v2=2, pk*vk-(pk+vk) = 2*2-(2+2) = 0  符合条件(2)
+		 * p3=2,v3=1, pk*vk-(pk+vk) = 2*2-(2+2) = 0
+		 * 选择第3(index)列，为待删除列
+		 */
     
        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	   incidenceM.print("incidence:");
@@ -203,19 +226,166 @@ public class ComputeInvariantTest {
 	   ArrayList<Integer> negatives = new ArrayList<>();
 	   int col;
 	   col = computeInvariant.AnnelCol(positives, negatives);
-	   computeInvariant.print("col="+col+"\n");
+	   computeInvariant.print("col="+col+"\n"); // k
 	   computeInvariant.print("positives="+positives+"\n");
 	   computeInvariant.print("negatives="+negatives+"\n");  
 	   
-	   assertEquals(positives.size(),1);
-	   assertEquals(negatives.size(),2); 
+	   assertEquals(col,2);
+	   assertEquals(positives.size(),2); // pk
+	   assertEquals(negatives.size(),2); // vk
 	   
-	   Object positiveExpecteds[] = {2};
+	   Object positiveExpecteds[] = {1,4};
 	   assertArrayEquals(positiveExpecteds, positives.toArray());
 	   
-	   Object negativeExpecteds[] = {1,3};
+	   Object negativeExpecteds[] = {2,3};
+	   assertArrayEquals(negativeExpecteds, negatives.toArray());
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 */
+	@Ignore
+	@Test
+	public void testAnnelCol1() {
+		//fail("Not yet implemented");
+		System.out.println("testAnnelCol1()");
+		int incidence[][] = {
+    		    { 1, -1,  0,  1},
+    		    {-1,  1,  1,  0},
+    		    { 1, -1, -1,  0},
+    		    {-1,  1, -1, -1},
+    		    {-1,  1,  1,  1},
+        };
+		/**
+		 * pk,vk:the number of positives and negatives in column k of A(k)
+		 * 选择列：pk*vk-(pk+vk) < 0  (1)
+		 * 或pk*vk最小                                              (2)
+		 * p0=2,v0=3, pk*vk-(pk+vk) = 2*3-(2+3) = 1
+		 * p1=3,v1=2, pk*vk-(pk+vk) = 3*2-(3+2) = 1
+		 * p2=2,v2=2, pk*vk-(pk+vk) = 2*2-(2+2) = 0
+		 * p3=2,v3=1, pk*vk-(pk+vk) = 2*1-(2+1) = -1 符合条件(1)
+		 * 选择第3(index)列，为待删除列
+		 */
+    
+       InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   incidenceM.print("incidence:");
+	   incidenceM.print(4, 0);
+	   ComputeInvariant computeInvariant = new ComputeInvariant(incidenceM);  
+	   
+	   ArrayList<Integer> positives = new ArrayList<>();
+	   ArrayList<Integer> negatives = new ArrayList<>();
+	   int col;
+	   col = computeInvariant.AnnelCol(positives, negatives);
+	   computeInvariant.print("col="+col+"\n");  // k
+	   computeInvariant.print("positives="+positives+"\n");
+	   computeInvariant.print("negatives="+negatives+"\n");  
+	   
+	   assertEquals(col,3);
+	   assertEquals(positives.size(),2);  // pk
+	   assertEquals(negatives.size(),1);  // vk
+	   
+	   Object positiveExpecteds[] = {0,4};
+	   assertArrayEquals(positiveExpecteds, positives.toArray());
+	   
+	   Object negativeExpecteds[] = {3};
 	   assertArrayEquals(negativeExpecteds, negatives.toArray());
 	}
 
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 */
+	@Ignore
+	@Test
+	public void testAnnelCol2() {
+		//fail("Not yet implemented");
+		System.out.println("testAnnelCol2()");
+		int incidence[][] = {
+    		    { 0,  1, -1},
+    		    { 0,  1,  1},
+    		    { 0, -1, -1},
+    		    { 0, -1,  1},
+    		    { 0, -1,  1}
+        };
+		/**
+		 * pk,vk:the number of positives and negatives in column k of A(k)
+		 * 选择列：pk*vk-(pk+vk) < 0  (1)
+		 * 或pk*vk最小                                              (2)  pk或vk至少有1个大于0，即至少有一个正或负元素
+		 * p0=2,v0=3, pk*vk-(pk+vk) = 0
+		 * p1=3,v1=2, pk*vk-(pk+vk) = 2*3-(2+3) = 1  符合条件(1)
+		 * p2=2,v2=2, pk*vk-(pk+vk) = 3*2-(3+2) = 1
+		 * 选择第3(index)列，为待删除列
+		 */
+    
+       InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   incidenceM.print("incidence:");
+	   incidenceM.print(4, 0);
+	   ComputeInvariant computeInvariant = new ComputeInvariant(incidenceM);  
+	   
+	   ArrayList<Integer> positives = new ArrayList<>();
+	   ArrayList<Integer> negatives = new ArrayList<>();
+	   int col;
+	   col = computeInvariant.AnnelCol(positives, negatives);
+	   computeInvariant.print("col="+col+"\n");  // k
+	   computeInvariant.print("positives="+positives+"\n");
+	   computeInvariant.print("negatives="+negatives+"\n");  
+	   
+	   assertEquals(col,1);
+	   assertEquals(positives.size(),2);  // pk
+	   assertEquals(negatives.size(),3);  // vk
+	   
+	   Object positiveExpecteds[] = {0,1};
+	   assertArrayEquals(positiveExpecteds, positives.toArray());
+	   
+	   Object negativeExpecteds[] = {2,3,4};
+	   assertArrayEquals(negativeExpecteds, negatives.toArray());
+	}
 	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 */
+	@Ignore
+	@Test
+	public void testAnnelCol3() {
+		//fail("Not yet implemented");
+		System.out.println("testAnnelCol3()");
+		int incidence[][] = {
+    		    { 1, 0, -1},
+    		    { 1, 0,  1},
+    		    {-1, 0, -1},
+    		    {-1, 0,  1},
+    		    {-1, 0,  1}
+        };
+		/**
+		 * pk,vk:the number of positives and negatives in column k of A(k)
+		 * 选择列：pk*vk-(pk+vk) < 0  (1)
+		 * 或pk*vk最小                                              (2)  pk或vk至少有1个大于0，即至少有一个正或负元素
+		 * p0=2,v0=3, pk*vk-(pk+vk) = 0
+		 * p1=3,v1=2, pk*vk-(pk+vk) = 2*3-(2+3) = 1  符合条件(1)
+		 * p2=2,v2=2, pk*vk-(pk+vk) = 3*2-(3+2) = 1
+		 * 选择第3(index)列，为待删除列
+		 */
+    
+       InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   incidenceM.print("incidence:");
+	   incidenceM.print(4, 0);
+	   ComputeInvariant computeInvariant = new ComputeInvariant(incidenceM);  
+	   
+	   ArrayList<Integer> positives = new ArrayList<>();
+	   ArrayList<Integer> negatives = new ArrayList<>();
+	   int col;
+	   col = computeInvariant.AnnelCol(positives, negatives);
+	   computeInvariant.print("col="+col+"\n");  // k
+	   computeInvariant.print("positives="+positives+"\n");
+	   computeInvariant.print("negatives="+negatives+"\n");  
+	   
+	   assertEquals(col,0);
+	   assertEquals(positives.size(),2);  // pk
+	   assertEquals(negatives.size(),3);  // vk
+	   
+	   Object positiveExpecteds[] = {0,1};
+	   assertArrayEquals(positiveExpecteds, positives.toArray());
+	   
+	   Object negativeExpecteds[] = {2,3,4};
+	   assertArrayEquals(negativeExpecteds, negatives.toArray());
+	}
 }

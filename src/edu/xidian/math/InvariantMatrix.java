@@ -193,21 +193,37 @@ public class InvariantMatrix extends Matrix {
 	/**
 	 * Eliminate a row from the matrix, the row index is toDelete
 	 * 
-	 * @param toDelete
-	 *            The column number to delete.
+	 * @param toDelete The column index to delete.
 	 * @return The matrix with the required row deleted.
 	 */
 	public InvariantMatrix eliminateRow(int toDelete) {
 		int ii = 0;
 		InvariantMatrix reduced = new InvariantMatrix(m-1, n);
-		for(int i = 0; i < m; i++,ii++) {
-			if (i == toDelete ) {
-				i++;
-				if (i == m) break;  // 最后一行是删除行
-			}
+		for(int i = 0; i < m; i++) {
+			if (i == toDelete ) continue;
 			for(int j = 0; j < n; j++) {
 				reduced.set(ii, j, A[i][j]);
 			}
+			ii++;
+		}
+		return reduced;
+	}
+	
+	/**
+	 * Eliminate rows from the matrix, the row indexes is toDelete
+	 * 
+	 * @param toDeletes The column indexes to delete.
+	 * @return The matrix with the required rows deleted.
+	 */
+	public InvariantMatrix eliminateRows(ArrayList<Integer> toDeletes) {
+		int ii = 0;
+		InvariantMatrix reduced = new InvariantMatrix(m-toDeletes.size(), n);
+		for(int i = 0; i < m; i++) {
+			if (toDeletes.contains(i)) continue;
+			for(int j = 0; j < n; j++) {
+				reduced.set(ii, j, A[i][j]);
+			}
+			ii++;
 		}
 		return reduced;
 	}
