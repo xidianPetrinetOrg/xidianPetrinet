@@ -73,7 +73,7 @@ public class ComputeInvariant {
 			Y = Y.eliminateRow(a[0]);
 		
 			print("唯一的+ve行,唯一的-ve的行,列：" + a[0] + "," + a[1] + "," + a[2]);
-			InvariantMatrix.print(A,Y,4,0);
+			InvariantMatrix.print(A,Y,6,0);
 		}
     }
 	
@@ -104,7 +104,7 @@ public class ComputeInvariant {
 			Y = Y.eliminateRow(a[0]);
 			m--; // 减掉一行
 			print("唯一的+ve/-ve的行列，值：" + a[0] + "," + a[1] + "," + element);
-			InvariantMatrix.print(A,Y,4,0);
+			InvariantMatrix.print(A,Y,6,0);
 		}
     }
 	
@@ -127,8 +127,9 @@ public class ComputeInvariant {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
+				print("LinearlyCombine("+positiveRow + "," +negativeRow+"):");
+				InvariantMatrix.print(A,Y,6,0);
 			}
-			InvariantMatrix.print(A,Y,4,0);
 		}
 		
 		// 删除annelCol列的非0行
@@ -136,32 +137,34 @@ public class ComputeInvariant {
 		A = A.eliminateRows(positives);
 		Y = Y.eliminateRows(positives);
 		
-		InvariantMatrix.print(A,Y,4,0);
+		print("消去列("+annelCol+")"+"中的非0行：");
+		InvariantMatrix.print(A,Y,6,0);
 	}
 	
 	public void compute() {
 		print("Matrix A | Y");
-		InvariantMatrix.print(A,Y,4,0);
+		InvariantMatrix.print(A,Y,6,0);
 		while(!A.isZeroMatrix()) {
 			// Annul all columns k of U (A | Y) in which pk and vk = 1;
 			print("compute1()===\n");
 			compute1();
 			print("affter compute1() Matrix A | Y");
-			InvariantMatrix.print(A,Y,4,0);
+			InvariantMatrix.print(A,Y,6,0);
 			// Annul all columns k of U (A | Y) in which pk or vk = 1;
 			print("compute2()===\n");
 			compute2();
 			print("affter compute2() Matrix A | Y");
-			InvariantMatrix.print(A,Y,4,0);
+			InvariantMatrix.print(A,Y,6,0);
 			// F(k) = pk*vk-(pk+vk); 删除 F(k)<0或pk*vk最小的列k
 			print("compute3()===\n");
 			compute3();
 			print("affter compute3() Matrix A | Y");
-			InvariantMatrix.print(A,Y,4,0);
+			InvariantMatrix.print(A,Y,6,0);
 		}
 	}
 	
 	/**
+	 * 选取待删除的列的启发式策略，Heuristics for selecting the columns to annul
 	 * The number of new rows to add, by combining pairs of rows, is pk*vk. 
 	 * The pk+vk rows used to annul column k are eliminated at the end of the iteration. 
 	 * The expansion factor is the net number of new rows added in annulling column k: 
@@ -169,8 +172,8 @@ public class ComputeInvariant {
 	 * 生成新行数：pk*vk; 线性组合后，删除的行数：pk+vk
 	 * @param positives 返回选定列中正元素(+ve)index列表
 	 * @param negatives 返回选定列中负元素(-ve)index列表
-	 * @return
-	 * 因此,有如下策略，选取要删除的列：<br>
+	 * @return 选定列的Index，如果没有符合条件的列，返回-1
+	 * 因此,有如下策略，选取待删除的列：<br>
 	 * （1）不产生新行的情况，即f(k) < 0, 返回将要删除的列index; <br>
 	 * （2）如果（1）不成立，选择pk*vk最小的(pk或vk至少有1个大于0，即至少有一个正或负元素),即生成的新行数最少,返回将要删除的列index; <br>
 	 * <br>
@@ -195,7 +198,7 @@ public class ComputeInvariant {
 		
 		// 生成的新行数最少
 		int minValue = -1;
-		int col = 0, minCol = 0;
+		int col = 0, minCol = -1;
 		for (int value : newRowsNum) {
 			// 初始化，要保证pk*vk>0
 			if (minValue == -1) {
@@ -210,9 +213,10 @@ public class ComputeInvariant {
 			}
 			col++;
 		}
+		
 		// 获取该行的+ve和-ve index list
 		positives.clear();negatives.clear();  // 一定要清零，初始化
-		A.positiveNegativeList(positives, negatives, minCol);
+		if (minCol > 0) A.positiveNegativeList(positives, negatives, minCol);
 		
 		return minCol;
 	}

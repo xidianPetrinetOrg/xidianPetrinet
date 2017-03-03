@@ -194,7 +194,7 @@ public class ComputeInvariantTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
 	 */
-	@Ignore
+	//@Ignore
 	@Test
 	public void testAnnelCol() {
 		//fail("Not yet implemented");
@@ -387,5 +387,46 @@ public class ComputeInvariantTest {
 	   
 	   Object negativeExpecteds[] = {2,3,4};
 	   assertArrayEquals(negativeExpecteds, negatives.toArray());
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
+	 */
+	@Ignore
+	@Test
+	public void testAnnelCol4() {
+		//fail("Not yet implemented");
+		System.out.println("testAnnelCol4()");
+		int incidence[][] = {
+    		    { 0, 0},
+    		    { 0, 0},
+    		    { 0, 0},
+    		    { 0, 0},
+    		    { 0, 0}
+        };
+		/**
+		 * pk,vk:the number of positives and negatives in column k of A(k)
+		 * 选择列：pk*vk-(pk+vk) < 0  (1)
+		 * 或pk*vk最小                                              (2)  pk或vk至少有1个大于0，即至少有一个正或负元素
+		 * p0=2,v0=3, pk*vk-(pk+vk) = 0
+		 * p1=3,v1=2, pk*vk-(pk+vk) = 2*3-(2+3) = 1  符合条件(1)
+		 * p2=2,v2=2, pk*vk-(pk+vk) = 3*2-(3+2) = 1
+		 * 选择第3(index)列，为待删除列
+		 */
+    
+       InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   incidenceM.print("incidence:");
+	   incidenceM.print(4, 0);
+	   ComputeInvariant computeInvariant = new ComputeInvariant(incidenceM);  
+	   
+	   ArrayList<Integer> positives = new ArrayList<>();
+	   ArrayList<Integer> negatives = new ArrayList<>();
+	   int col;
+	   col = computeInvariant.AnnelCol(positives, negatives);
+	   computeInvariant.print("col="+col+"\n");  // k
+	   computeInvariant.print("positives="+positives+"\n");
+	   computeInvariant.print("negatives="+negatives+"\n");  
+	   
+	   assertEquals(col,-1);
 	}
 }

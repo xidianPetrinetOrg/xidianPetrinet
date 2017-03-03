@@ -493,6 +493,7 @@ public class InvariantMatrix extends Matrix {
 	 * positiveNegativeList(positives, negatives, columnIndex);
      */
     public void positiveNegativeList(ArrayList<Integer> positives,ArrayList<Integer> negatives,int columnIndex) {
+    	if (columnIndex < 0 || columnIndex > n) return; // error
     	for(int i = 0; i < m; i++) {
     		if(A[i][columnIndex] > 0) positives.add(i);
     		else if(A[i][columnIndex] < 0) negatives.add(i);	
