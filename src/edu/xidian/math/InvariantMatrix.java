@@ -110,7 +110,7 @@ public class InvariantMatrix extends Matrix {
 	 * Add a linear combination of i-th row to k-th row for A[k][j]=0
 	 * new k row:         A[k][0]           A[k][1]          ....,A[k][j], ...<br>  
 	 *            c1*A[i][0]+c2*A[k][0], c1*A[i][1]+c2*A[k][1],...,  0,    ...<br>
-	 * @param i  
+	 * @param i  row index
 	 * @param k  add i-th row to k-th row
 	 *            
 	 * @param j  Column index to be add, for new element A[k][j] = 0
@@ -136,8 +136,8 @@ public class InvariantMatrix extends Matrix {
 	/**
 	 * linear combination of i-th row to k-th row 
 	 * 
-	 * @param i
-	 * @param k
+	 * @param i row index
+	 * @param k row index
 	 * @param Coefficient Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows.
 	 */
 	public void linearlyCombine(int i, int k, int Coefficient[]) {
@@ -147,8 +147,43 @@ public class InvariantMatrix extends Matrix {
 	}
 	
 	/**
-	 * append the row of linear combination of i-th row and k-th row
-	 * @param i  
+	 * logicalUnion of i-th row and k-th row, resulting is to k-th row 
+	 * A矩阵是0和1组成的逻辑矩阵,0:false; 1:true
+	 * @param i
+	 * @param k
+	 */
+	public void logicalUnion(int i, int k) {
+		boolean a,b,c;
+		for(int col = 0; col < n; col++) {
+			a = (A[i][col] != 0) ? true : false;
+			b = (A[k][col] != 0) ? true : false;
+			c = a && b;
+			A[k][col] = c ? 1 : 0;
+		}
+	}
+	
+	/**
+	 * logicalUnion of i-th row and k-th row, the resulting is append to new row 
+	 * A矩阵是0和1组成的逻辑矩阵,0:false; 1:true
+	 * @param i row index
+	 * @param k row index
+	 * @return matrix of appended row
+	 */
+	public InvariantMatrix AppendRowlogicalUnion(int i, int k) {
+		boolean a,b,c;
+		int row[] = new int[n];
+		for(int col = 0; col < n; col++) {
+			a = (A[i][col] != 0) ? true : false;
+			b = (A[k][col] != 0) ? true : false;
+			c = a && b;
+			row[col] = c ? 1 : 0;
+		}
+		return appendRow(row);
+	}
+	
+	/**
+	 * append the row of linear combination of i-th row and k-th row 
+	 * @param i  row index
 	 * @param k  add i-th row to k-th row       
 	 * @param j  Column index to be combination, j-th element of append row = 0
 	 * @param Coefficient Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows
@@ -177,8 +212,8 @@ public class InvariantMatrix extends Matrix {
 	/**
 	 * append the row of linear combination of i-th row and k-th row 
 	 * 
-	 * @param i
-	 * @param k
+	 * @param i row index
+	 * @param k row index
 	 * @param Coefficient Coefficient[0],Coefficient[1] is adjusted coefficients for i-th and k-th rows.
 	 * @return matrix of appended row
 	 */
@@ -230,7 +265,7 @@ public class InvariantMatrix extends Matrix {
 	
 	/**
 	 * Has negative element in the column.
-	 * @param column
+	 * @param column index
 	 * @return 负元素所在行index
 	 *         无负元素，返回-1
 	 */

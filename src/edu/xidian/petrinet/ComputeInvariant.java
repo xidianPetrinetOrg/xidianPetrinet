@@ -36,6 +36,13 @@ public class ComputeInvariant {
 	 * Initialization is the identity matrix(incidenceRowDimension*incidenceRowDimension)
 	 */
 	private InvariantMatrix Y; 
+	/**
+	 * upper bound of r matrix
+	 * Initialization is the PN(Petri Net) incidence matrix，
+	 * incidence element[i][j] != 0, B[i][j] = 1, true; 
+	 * incidence element[i][j] == 0, B[i][j] = 0, false; 
+	 */
+	private InvariantMatrix B;
 	
 	/**
 	 * 
@@ -47,6 +54,16 @@ public class ComputeInvariant {
     	incidenceColumnDimension = C.getColumnDimension();
 		A = C;
 		Y = InvariantMatrix.identity(incidenceRowDimension, incidenceRowDimension);
+		
+		int e;
+		B = new InvariantMatrix(incidenceRowDimension, incidenceColumnDimension);
+		for(int i = 0; i < incidenceRowDimension; i++) {
+			for(int j = 0; j < incidenceColumnDimension;j++) {
+				e = (C.get(i, j)!= 0) ? 1 : 0;
+				//e = (C.get(i, j)!= 0) ? 0 : 1;
+				B.set(i, j, e);
+			}
+		}
 	}
     
     public void print(String s) {
@@ -68,12 +85,15 @@ public class ComputeInvariant {
 			// +ve所在的行，加到相应-ve所在的行
 			Coefficient = A.linearlyCombine(a[0], a[1], a[2]);
 			Y.linearlyCombine(a[0], a[1], Coefficient);
+			B.logicalUnion(a[0], a[1]);
 			
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
+			B = B.eliminateRow(a[0]);
 		
 			print("唯一的+ve行,唯一的-ve的行,列：" + a[0] + "," + a[1] + "," + a[2]);
 			InvariantMatrix.print(A,Y,6,0);
+			B.print(6,0);
 		}
     }
 	
@@ -99,12 +119,15 @@ public class ComputeInvariant {
 				
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
+				B.logicalUnion(a[0], i);
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
+			B = B.eliminateRow(a[0]);
 			m--; // 减掉一行
 			print("唯一的+ve/-ve的行列，值：" + a[0] + "," + a[1] + "," + element);
 			InvariantMatrix.print(A,Y,6,0);
+			B.print(6,0);
 		}
     }
 	
@@ -127,8 +150,10 @@ public class ComputeInvariant {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
+				B = B.AppendRowlogicalUnion(positiveRow, negativeRow);
 				print("LinearlyCombine("+positiveRow + "," +negativeRow+"):");
 				InvariantMatrix.print(A,Y,6,0);
+				B.print(6,0);
 			}
 		}
 		
@@ -136,30 +161,36 @@ public class ComputeInvariant {
 		positives.addAll(negatives);  // 并集
 		A = A.eliminateRows(positives);
 		Y = Y.eliminateRows(positives);
+		B = B.eliminateRows(positives);
 		
 		print("消去列("+annelCol+")"+"中的非0行：");
 		InvariantMatrix.print(A,Y,6,0);
+		B.print(6,0);
 	}
 	
 	public void compute() {
 		print("Matrix A | Y");
 		InvariantMatrix.print(A,Y,6,0);
+		B.print(6,0);
 		while(!A.isZeroMatrix()) {
 			// Annul all columns k of U (A | Y) in which pk and vk = 1;
 			print("compute1()===\n");
 			compute1();
 			print("affter compute1() Matrix A | Y");
 			InvariantMatrix.print(A,Y,6,0);
+			B.print(6,0);
 			// Annul all columns k of U (A | Y) in which pk or vk = 1;
 			print("compute2()===\n");
 			compute2();
 			print("affter compute2() Matrix A | Y");
 			InvariantMatrix.print(A,Y,6,0);
+			B.print(6,0);
 			// F(k) = pk*vk-(pk+vk); 删除 F(k)<0或pk*vk最小的列k
 			print("compute3()===\n");
 			compute3();
 			print("affter compute3() Matrix A | Y");
 			InvariantMatrix.print(A,Y,6,0);
+			B.print(6,0);
 		}
 	}
 	

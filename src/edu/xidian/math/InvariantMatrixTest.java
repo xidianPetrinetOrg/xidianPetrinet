@@ -245,6 +245,65 @@ public class InvariantMatrixTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#logicalUnion(int, int)}.
+	 */
+	//@Ignore
+	@Test
+	public void testLogicalUnion() {
+		System.out.println("testLogicalUnion()");
+		int incidence[][] = {
+    		    { 1,  0,  1,  0},
+    		    { 1,  1,  1,  1},
+    		    { 1,  0,  1,  0},
+    		    { 0,  0,  1,  1},
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print("Before logicalUnion:");
+		m.print(4, 0);
+		
+		int row1, row2;
+		row1=3; row2=0;
+		m.logicalUnion(row1,row2);
+		m.print("logicalUnion rows:"+row1+" to "+row2);
+		m.print(4,0);
+		Object a[] = {0,0,1,0};
+		Object b[] = new Object[4];
+		for(int i = 0; i<4;i++) b[i]=m.get(row2, i);
+		assertArrayEquals(a, b);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#AppendRowlogicalUnion(int, int)}.
+	 */
+	//@Ignore
+	@Test
+	public void testAppendRowLogicalUnion() {
+		System.out.println("testLogicalUnion()");
+		int incidence[][] = {
+    		    { 1,  0,  1,  0},
+    		    { 1,  1,  1,  1},
+    		    { 1,  0,  1,  0},
+    		    { 0,  0,  1,  1},
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print("Before logicalUnion:");
+		m.print(4, 0);
+		
+		int row1, row2;
+		row1=3; row2=0;
+		InvariantMatrix m1 = m.AppendRowlogicalUnion(row1,row2);
+		m1.print("append logicalUnion rows:"+row1+","+row2);
+		m1.print(4,0);
+		int rows = m1.getRowDimension();
+		assertEquals(rows,m.getRowDimension()+1);
+		
+		Object a[] = {0,0,1,0};
+		Object b[] = new Object[4];
+		for(int i = 0; i<4;i++) b[i]=m1.get(rows-1, i);
+		assertArrayEquals(a, b);
+	}
+	
+	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#eliminateRow(int toDelete)}.
 	 */
 	//@Ignore

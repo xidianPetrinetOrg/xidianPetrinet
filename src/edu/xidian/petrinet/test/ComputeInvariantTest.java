@@ -136,6 +136,16 @@ public class ComputeInvariantTest {
 	@After
 	public void tearDown() throws Exception {
 	}
+	
+	@Ignore
+	@Test
+	public void test() {
+		boolean a=true,b=false,c;
+		c = a && b;
+		System.out.println("a && b="+c);
+		//if(a && (10/0==0)) System.out.println("ok");
+		//if(a & (10/0==0)) System.out.println("error");
+	}
 
 	/**
 	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#compute1()}.
@@ -194,7 +204,7 @@ public class ComputeInvariantTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.ComputeInvariant#AnnelCol(ArrayList, ArrayList)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testAnnelCol() {
 		//fail("Not yet implemented");
