@@ -157,7 +157,8 @@ public class InvariantMatrix extends Matrix {
 		for(int col = 0; col < n; col++) {
 			a = (A[i][col] != 0) ? true : false;
 			b = (A[k][col] != 0) ? true : false;
-			c = a && b;
+			//c = a && b;
+			c = a || b;
 			A[k][col] = c ? 1 : 0;
 		}
 	}
