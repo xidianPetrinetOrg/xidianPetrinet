@@ -157,7 +157,6 @@ public class InvariantMatrix extends Matrix {
 		for(int col = 0; col < n; col++) {
 			a = (A[i][col] != 0) ? true : false;
 			b = (A[k][col] != 0) ? true : false;
-			//c = a && b;
 			c = a || b;
 			A[k][col] = c ? 1 : 0;
 		}
@@ -176,7 +175,7 @@ public class InvariantMatrix extends Matrix {
 		for(int col = 0; col < n; col++) {
 			a = (A[i][col] != 0) ? true : false;
 			b = (A[k][col] != 0) ? true : false;
-			c = a && b;
+			c = a || b;
 			row[col] = c ? 1 : 0;
 		}
 		return appendRow(row);
@@ -561,6 +560,9 @@ public class InvariantMatrix extends Matrix {
         n1 = C.getColumnDimension();
         n2 = B.getColumnDimension();
         for (int i = 0; i < m1; i++) {
+           output.print("["+format.format(i)+"]"); // row index
+           if (i<10) output.print(' ');    
+           
            // matrix C
            for (int j = 0; j < n1; j++) {
               String s = format.format(C.get(i, j)); // format the number
