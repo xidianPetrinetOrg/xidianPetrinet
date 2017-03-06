@@ -128,9 +128,9 @@ public class ComputeInvariantTest {
 	@Before
 	public void setUp() throws Exception {
 		System.out.println("setUp()====");
-		//setUp1();  // 经典 Figure 1, P-Invariants
+		setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3, P-Invariants
-		setUp3();  // Metabolites, T-Invariants
+		//setUp3();  // Metabolites, T-Invariants
 	}
 
 	@After

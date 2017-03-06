@@ -1321,6 +1321,9 @@ public class Matrix implements Serializable {
    void print(PrintWriter output, NumberFormat format, int width) {
       output.println();  // start on new line.
       for (int i = 0; i < m; i++) {
+    	 output.print("["+format.format(i)+"]"); // row index
+         if (i<10) output.print(' '); 
+         
          for (int j = 0; j < n; j++) {
             String s = format.format(A[i][j]); // format the number
             int padding = Math.max(1,width-s.length()); // At _least_ 1 space

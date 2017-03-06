@@ -59,8 +59,8 @@ public class ComputeInvariant {
 		B = new InvariantMatrix(incidenceRowDimension, incidenceColumnDimension);
 		for(int i = 0; i < incidenceRowDimension; i++) {
 			for(int j = 0; j < incidenceColumnDimension;j++) {
-				e = (C.get(i, j)!= 0) ? 1 : 0;
-				//e = (C.get(i, j)!= 0) ? 0 : 1;
+				//e = (C.get(i, j)!= 0) ? 1 : 0;
+				e = (C.get(i, j)== 0) ? 1 : 0;
 				B.set(i, j, e);
 			}
 		}
@@ -93,7 +93,7 @@ public class ComputeInvariant {
 		
 			print("唯一的+ve行,唯一的-ve的行,列：" + a[0] + "," + a[1] + "," + a[2]);
 			InvariantMatrix.print(A,Y,6,0);
-			B.print(6,0);
+			B.print(4,0);
 		}
     }
 	
@@ -127,7 +127,7 @@ public class ComputeInvariant {
 			m--; // 减掉一行
 			print("唯一的+ve/-ve的行列，值：" + a[0] + "," + a[1] + "," + element);
 			InvariantMatrix.print(A,Y,6,0);
-			B.print(6,0);
+			B.print(4,0);
 		}
     }
 	
@@ -153,7 +153,7 @@ public class ComputeInvariant {
 				B = B.AppendRowlogicalUnion(positiveRow, negativeRow);
 				print("LinearlyCombine("+positiveRow + "," +negativeRow+"):");
 				InvariantMatrix.print(A,Y,6,0);
-				B.print(6,0);
+				B.print(4,0);
 			}
 		}
 		
@@ -165,32 +165,32 @@ public class ComputeInvariant {
 		
 		print("消去列("+annelCol+")"+"中的非0行：");
 		InvariantMatrix.print(A,Y,6,0);
-		B.print(6,0);
+		B.print(4,0);
 	}
 	
 	public void compute() {
 		print("Matrix A | Y");
 		InvariantMatrix.print(A,Y,6,0);
-		B.print(6,0);
+		B.print(4,0);
 		while(!A.isZeroMatrix()) {
 			// Annul all columns k of U (A | Y) in which pk and vk = 1;
 			print("compute1()===\n");
 			compute1();
 			print("affter compute1() Matrix A | Y");
 			InvariantMatrix.print(A,Y,6,0);
-			B.print(6,0);
+			B.print(4,0);
 			// Annul all columns k of U (A | Y) in which pk or vk = 1;
 			print("compute2()===\n");
 			compute2();
 			print("affter compute2() Matrix A | Y");
 			InvariantMatrix.print(A,Y,6,0);
-			B.print(6,0);
+			B.print(4,0);
 			// F(k) = pk*vk-(pk+vk); 删除 F(k)<0或pk*vk最小的列k
 			print("compute3()===\n");
 			compute3();
 			print("affter compute3() Matrix A | Y");
 			InvariantMatrix.print(A,Y,6,0);
-			B.print(6,0);
+			B.print(4,0);
 		}
 	}
 	
@@ -247,7 +247,7 @@ public class ComputeInvariant {
 		
 		// 获取该行的+ve和-ve index list
 		positives.clear();negatives.clear();  // 一定要清零，初始化
-		if (minCol > 0) A.positiveNegativeList(positives, negatives, minCol);
+		if (minCol >= 0) A.positiveNegativeList(positives, negatives, minCol);
 		
 		return minCol;
 	}
