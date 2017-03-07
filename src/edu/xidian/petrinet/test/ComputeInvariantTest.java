@@ -128,9 +128,9 @@ public class ComputeInvariantTest {
 	@Before
 	public void setUp() throws Exception {
 		System.out.println("setUp()====");
-		setUp1();  // 经典 Figure 1, P-Invariants
+		//setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3, P-Invariants
-		//setUp3();  // Metabolites, T-Invariants
+		setUp3();  // Metabolites, T-Invariants
 	}
 
 	@After
@@ -236,9 +236,9 @@ public class ComputeInvariantTest {
 	   ArrayList<Integer> negatives = new ArrayList<>();
 	   int col;
 	   col = computeInvariant.AnnelCol(positives, negatives);
-	   computeInvariant.print("col="+col+"\n"); // k
-	   computeInvariant.print("positives="+positives+"\n");
-	   computeInvariant.print("negatives="+negatives+"\n");  
+	   computeInvariant.println("col="+col); // k
+	   computeInvariant.println("positives="+positives);
+	   computeInvariant.println("negatives="+negatives);  
 	   
 	   assertEquals(col,2);
 	   assertEquals(positives.size(),2); // pk
@@ -286,9 +286,9 @@ public class ComputeInvariantTest {
 	   ArrayList<Integer> negatives = new ArrayList<>();
 	   int col;
 	   col = computeInvariant.AnnelCol(positives, negatives);
-	   computeInvariant.print("col="+col+"\n");  // k
-	   computeInvariant.print("positives="+positives+"\n");
-	   computeInvariant.print("negatives="+negatives+"\n");  
+	   computeInvariant.println("col="+col);  // k
+	   computeInvariant.println("positives="+positives);
+	   computeInvariant.println("negatives="+negatives);  
 	   
 	   assertEquals(col,3);
 	   assertEquals(positives.size(),2);  // pk
@@ -335,9 +335,9 @@ public class ComputeInvariantTest {
 	   ArrayList<Integer> negatives = new ArrayList<>();
 	   int col;
 	   col = computeInvariant.AnnelCol(positives, negatives);
-	   computeInvariant.print("col="+col+"\n");  // k
-	   computeInvariant.print("positives="+positives+"\n");
-	   computeInvariant.print("negatives="+negatives+"\n");  
+	   computeInvariant.println("col="+col);  // k
+	   computeInvariant.println("positives="+positives);
+	   computeInvariant.println("negatives="+negatives);  
 	   
 	   assertEquals(col,1);
 	   assertEquals(positives.size(),2);  // pk
@@ -384,9 +384,9 @@ public class ComputeInvariantTest {
 	   ArrayList<Integer> negatives = new ArrayList<>();
 	   int col;
 	   col = computeInvariant.AnnelCol(positives, negatives);
-	   computeInvariant.print("col="+col+"\n");  // k
-	   computeInvariant.print("positives="+positives+"\n");
-	   computeInvariant.print("negatives="+negatives+"\n");  
+	   computeInvariant.println("col="+col);  // k
+	   computeInvariant.println("positives="+positives);
+	   computeInvariant.println("negatives="+negatives);  
 	   
 	   assertEquals(col,0);
 	   assertEquals(positives.size(),2);  // pk
@@ -433,9 +433,9 @@ public class ComputeInvariantTest {
 	   ArrayList<Integer> negatives = new ArrayList<>();
 	   int col;
 	   col = computeInvariant.AnnelCol(positives, negatives);
-	   computeInvariant.print("col="+col+"\n");  // k
-	   computeInvariant.print("positives="+positives+"\n");
-	   computeInvariant.print("negatives="+negatives+"\n");  
+	   computeInvariant.println("col="+col);  // k
+	   computeInvariant.println("positives="+positives);
+	   computeInvariant.println("negatives="+negatives);  
 	   
 	   assertEquals(col,-1);
 	}

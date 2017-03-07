@@ -45,6 +45,11 @@ public class ComputeInvariant {
 	private InvariantMatrix B;
 	
 	/**
+	 * print test information
+	 */
+	private boolean Debug = true;
+	
+	/**
 	 * 
 	 * @param C the PN(Petri Net) incidence matrix for computing P-Invariants; <br>
 	 *          the incidence matrix's transpose for computing T-Invariants;
@@ -55,28 +60,40 @@ public class ComputeInvariant {
 		A = C;
 		Y = InvariantMatrix.identity(incidenceRowDimension, incidenceRowDimension);
 		
+		/**
+		 * upper bound of r matrix
+		 * Initialization is the PN(Petri Net) incidence matrix，
+		 * incidence element[i][j] != 0, B[i][j] = 1, true; 
+		 * incidence element[i][j] == 0, B[i][j] = 0, false; 
+		 */
 		int e;
 		B = new InvariantMatrix(incidenceRowDimension, incidenceColumnDimension);
 		for(int i = 0; i < incidenceRowDimension; i++) {
 			for(int j = 0; j < incidenceColumnDimension;j++) {
-				//e = (C.get(i, j)!= 0) ? 1 : 0;
-				e = (C.get(i, j)== 0) ? 1 : 0;
+				e = (C.get(i, j)!= 0) ? 1 : 0;
+				//e = (C.get(i, j)== 0) ? 1 : 0;
 				B.set(i, j, e);
 			}
 		}
 	}
     
-    public void print(String s) {
-    	A.print(s);
+    public void println(String s) {
+    	if (Debug) A.print(s + "\n");
     }
-
+    
+    private void printAYB() {
+    	println("Matrix A | Y, B");
+    	if (Debug) {
+    		InvariantMatrix.print(A,Y,6,0);
+    		B.print(4,0);
+    	}
+    }
+    
     /**
      * Annul all columns k of U (A | Y) in which pk and vk = 1;
      */
 	public void compute1() {
-		//print("Matrix A | Y");
-		//InvariantMatrix.print(A,Y,4,0);
-
+		println("Annul all columns k of U (A | Y) in which pk and vk = 1");
 		int a[] = new int[3]; // a[0],a[1],a[2],唯一+ve行,唯一-ve行，列
 		int Coefficient[]; // 调整系数
 		
@@ -90,10 +107,10 @@ public class ComputeInvariant {
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			B = B.eliminateRow(a[0]);
-		
-			print("唯一的+ve行,唯一的-ve的行,列：" + a[0] + "," + a[1] + "," + a[2]);
-			InvariantMatrix.print(A,Y,6,0);
-			B.print(4,0);
+            
+			println("Annul column [" + a[2] + "]");
+			println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
+			printAYB();
 		}
     }
 	
@@ -101,9 +118,8 @@ public class ComputeInvariant {
      * Annul all columns k of U (A | Y) in which pk or vk = 1;
      */
 	public void compute2() {
-		//print("Matrix A | Y");
-		//InvariantMatrix.print(A,Y,4,0);
-
+		println("Annul all columns k of U (A | Y) in which pk or vk = 1");
+		
 		int a[] = new int[2]; // a[0],a[1]唯一的+ve或-ve所在的行和列
 		int Coefficient[]; // 调整系数
 		
@@ -111,7 +127,7 @@ public class ComputeInvariant {
 		
 		// 符合算法的基数条件,仅有一个+ve或-ve的列, 线性组合到其它行，删除此行.
 		while (A.cardinalityOne(a) == 0) {
-			int element = A.get(a[0], a[1]); // 唯一的+ve或-ve
+			// int element = A.get(a[0], a[1]); // 唯一的+ve或-ve
 			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
 			for (int i = 0; i < m; i++) {
 				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
@@ -120,40 +136,36 @@ public class ComputeInvariant {
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
 				B.logicalUnion(a[0], i);
+				println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			B = B.eliminateRow(a[0]);
 			m--; // 减掉一行
-			print("唯一的+ve/-ve的行列，值：" + a[0] + "," + a[1] + "," + element);
-			InvariantMatrix.print(A,Y,6,0);
-			B.print(4,0);
+			println("Annul column [" + a[1] + "], eliminate row["+a[0]+ "]");
+			printAYB();
 		}
     }
 	
 	/** 
-	 * F(k) = pk*vk-(pk+vk)
-	 * 删除F(k)<0或pk*vk最小的列k
+	 * expansion factor: F(k) = pk*vk-(pk+vk)
+	 * Annul columns:  F(k)<0 or if there is none, select column with lowest pk*vk
 	 */
 	public void compute3() {
-		//print("Matrix A | Y");
-		//InvariantMatrix.print(A,Y,4,0);
+		println("Annul columns: expansion factor F(k)<0 or if there is none, select column with lowest pk*vk");
 		int Coefficient[] = new int[2]; // 调整系数
 		ArrayList<Integer> positives = new ArrayList<Integer>();
 		ArrayList<Integer> negatives = new ArrayList<Integer>();
 		int annelCol = AnnelCol(positives, negatives);
-		print("annelColumn:" + annelCol + "\n");
-		print("positives:" + positives + "\n");
-		print("negatives:" + negatives + "\n");
-		
+
+		println("Annul column [" + annelCol + "]");
 		for (int positiveRow : positives ) {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
 				B = B.AppendRowlogicalUnion(positiveRow, negativeRow);
-				print("LinearlyCombine("+positiveRow + "," +negativeRow+"):");
-				InvariantMatrix.print(A,Y,6,0);
-				B.print(4,0);
+				println("Append Row of LinearlyCombine("+positiveRow + "," +negativeRow+"):");
+				printAYB();
 			}
 		}
 		
@@ -163,34 +175,31 @@ public class ComputeInvariant {
 		Y = Y.eliminateRows(positives);
 		B = B.eliminateRows(positives);
 		
-		print("消去列("+annelCol+")"+"中的非0行：");
-		InvariantMatrix.print(A,Y,6,0);
-		B.print(4,0);
+		println("eliminate rows: " + positives);
+		printAYB();
 	}
 	
 	public void compute() {
-		print("Matrix A | Y");
-		InvariantMatrix.print(A,Y,6,0);
-		B.print(4,0);
+		printAYB();
 		while(!A.isZeroMatrix()) {
 			// Annul all columns k of U (A | Y) in which pk and vk = 1;
-			print("compute1()===\n");
+			println("compute1()===");
 			compute1();
-			print("affter compute1() Matrix A | Y");
-			InvariantMatrix.print(A,Y,6,0);
-			B.print(4,0);
+			println("affter compute1()");
+			printAYB();
+			
 			// Annul all columns k of U (A | Y) in which pk or vk = 1;
-			print("compute2()===\n");
+			println("compute2()===");
 			compute2();
-			print("affter compute2() Matrix A | Y");
-			InvariantMatrix.print(A,Y,6,0);
-			B.print(4,0);
-			// F(k) = pk*vk-(pk+vk); 删除 F(k)<0或pk*vk最小的列k
-			print("compute3()===\n");
+			println("affter compute2()");
+			printAYB();
+			
+			// expansion factor: F(k) = pk*vk-(pk+vk)
+			// Annul columns:  F(k)<0 or if there is none, select column with lowest pk*vk
+			println("compute3()===");
 			compute3();
-			print("affter compute3() Matrix A | Y");
-			InvariantMatrix.print(A,Y,6,0);
-			B.print(4,0);
+			println("affter compute3()");
+			printAYB();
 		}
 	}
 	
