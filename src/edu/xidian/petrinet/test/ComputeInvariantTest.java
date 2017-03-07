@@ -42,12 +42,12 @@ public class ComputeInvariantTest {
 	   		          /** p14*/ { 0, -1,  0,  0,  0,  1,  0,  0,  0,  0}
 	   		         };
 	   InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	   
+	   System.out.println("经典，Figure 1， P-Invariants:");
 	   incidenceM.print("incidence:");
 	   incidenceM.print(4, 0);
 	   
 	   computeInvariant = new ComputeInvariant(incidenceM);
-	   System.out.println("经典，Figure 1， P-Invariants:");
-	   // Compute P-Invariants
        /**
           p1    p2    p3    p4    p5    p6    p7    p8    p9    p10  p11   p12   p13   p14
           1     1     0     1     0     0     0     0     0     0     0     0     0     0   一致
@@ -78,11 +78,13 @@ public class ComputeInvariantTest {
        		         };
        
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    System.out.println("经典，Figure 3， P-Invariants:");
 	    incidenceM.print("incidence:");
 		incidenceM.print(4, 0);
 		
 		computeInvariant = new ComputeInvariant(incidenceM);
-		System.out.println("经典，Figure 3， P-Invariants:");
+		
        /**
           1     0     0     1     0     0     1     0     0
           1     0     0     1     0     0     0     1     0
@@ -92,7 +94,7 @@ public class ComputeInvariantTest {
 	}
    
    /**
-    * Metabolites
+    * Metabolites, Compute T-Invariants
     */
     void setUp3() {
         // Metabolites
@@ -107,11 +109,64 @@ public class ComputeInvariantTest {
         		    { 0, -1, -1,  0,  0, 29, -1,  0,  0}
         };
         InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        
+        System.out.println("Metabolites,T-Invariants:");
         incidenceM.print("incidence:");
  	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM.transpose());
-		System.out.println("Metabolites,T-Invariants:");
+    }
+    
+	// Li，图2.2 Compute P-Invariants
+    void setUp4() {
+		int incidence[][] = {
+  		        /** t1  t2  t3  t4  t5  t6  t7  t8  t9 **/
+       /** p1 */  { 0,  0,  1,  0,  0,  0, -1,  0,  1},
+       /** p2 */  { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+       /** p3 */  { 0,  1, -1,  0,  0,  0,  0,  0,  0},
+       /** p4 */  { 0,  0,  0, -1,  0,  1,  0,  0,  0},
+       /** p5 */  { 0,  0,  0,  1, -1,  0,  0,  0,  0},
+       /** p6 */  { 0,  0,  0,  0,  1, -1,  0,  0,  0},
+       /** p7 */  {-1,  1,  0,  0, -1,  1,  0,  0,  0},
+       /** p8 */  { 0, -1,  1, -1,  1,  0,  0,  0,  0},
+       /** p9 */  {-1,  0,  0,  0,  0,  0,  1, -1,  0},
+       /** p10*/  { 0,  0,  0,  0,  0,  0,  0,  1, -1},
+       /** p11*/  { 0,  0,  0,  0,  0,  0,  0, -1,  1},
+       /** p12*/  { 1,  0,  0,  0,  0,  0, -1,  1,  0}};
+	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    // Compute P-Invariants
+	    System.out.println("Li，图2.2 Compute P-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+    }
+    
+	// Li，图2.2 Compute T-Invariants
+    void setUp5() {
+		int incidence[][] = {
+  		        /** t1  t2  t3  t4  t5  t6  t7  t8  t9 **/
+       /** p1 */  { 0,  0,  1,  0,  0,  0, -1,  0,  1},
+       /** p2 */  { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+       /** p3 */  { 0,  1, -1,  0,  0,  0,  0,  0,  0},
+       /** p4 */  { 0,  0,  0, -1,  0,  1,  0,  0,  0},
+       /** p5 */  { 0,  0,  0,  1, -1,  0,  0,  0,  0},
+       /** p6 */  { 0,  0,  0,  0,  1, -1,  0,  0,  0},
+       /** p7 */  {-1,  1,  0,  0, -1,  1,  0,  0,  0},
+       /** p8 */  { 0, -1,  1, -1,  1,  0,  0,  0,  0},
+       /** p9 */  {-1,  0,  0,  0,  0,  0,  1, -1,  0},
+       /** p10*/  { 0,  0,  0,  0,  0,  0,  0,  1, -1},
+       /** p11*/  { 0,  0,  0,  0,  0,  0,  0, -1,  1},
+       /** p12*/  { 1,  0,  0,  0,  0,  0, -1,  1,  0}};
+	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    // Compute T-Invariants
+	    System.out.println("Li，图2.2 Compute T-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM.transpose());
     }
 	
 
@@ -128,9 +183,12 @@ public class ComputeInvariantTest {
 	@Before
 	public void setUp() throws Exception {
 		System.out.println("setUp()====");
+		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 		//setUp1();  // 经典 Figure 1, P-Invariants
-		//setUp2();  // 经典 Figure 3, P-Invariants
-		setUp3();  // Metabolites, T-Invariants
+		setUp2();  // 经典 Figure 3, P-Invariants
+		//setUp3();  // Metabolites, T-Invariants
+		//setUp4();  // Li，图2.2 Compute P-Invariants
+		//setUp5();  // Li，图2.2 Compute T-Invariants
 	}
 
 	@After

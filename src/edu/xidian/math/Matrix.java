@@ -45,8 +45,8 @@ public class Matrix implements Serializable {
    
    /**
     * Row and column dimensions.
-    * @serial row dimension.
-    * @serial column dimension.
+    * @serial m: row dimension.
+    * @serial n: column dimension.
     */
    protected int m, n;
    

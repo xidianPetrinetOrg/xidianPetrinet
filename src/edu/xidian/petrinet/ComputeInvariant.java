@@ -45,7 +45,7 @@ public class ComputeInvariant {
 	private InvariantMatrix B;
 	
 	/**
-	 * print test information
+	 *  enable/disable print debug information
 	 */
 	private boolean Debug = true;
 	
@@ -75,19 +75,9 @@ public class ComputeInvariant {
 				B.set(i, j, e);
 			}
 		}
+		
+		this.Debug = true;
 	}
-    
-    public void println(String s) {
-    	if (Debug) A.print(s + "\n");
-    }
-    
-    private void printAYB() {
-    	println("Matrix A | Y, B");
-    	if (Debug) {
-    		InvariantMatrix.print(A,Y,6,0);
-    		B.print(4,0);
-    	}
-    }
     
     /**
      * Annul all columns k of U (A | Y) in which pk and vk = 1;
@@ -99,6 +89,7 @@ public class ComputeInvariant {
 		
 		// 符合算法的基数条件,仅有一个+ve和-ve的列, 线性组合+ve行到-ve行，删除+ve行.
 		while (A.cardinalityOne1(a) == 0) {
+			println("Annul column [" + a[2] + "]");
 			// +ve所在的行，加到相应-ve所在的行
 			Coefficient = A.linearlyCombine(a[0], a[1], a[2]);
 			Y.linearlyCombine(a[0], a[1], Coefficient);
@@ -108,7 +99,6 @@ public class ComputeInvariant {
 			Y = Y.eliminateRow(a[0]);
 			B = B.eliminateRow(a[0]);
             
-			println("Annul column [" + a[2] + "]");
 			println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
 			printAYB();
 		}
@@ -127,8 +117,9 @@ public class ComputeInvariant {
 		
 		// 符合算法的基数条件,仅有一个+ve或-ve的列, 线性组合到其它行，删除此行.
 		while (A.cardinalityOne(a) == 0) {
-			// int element = A.get(a[0], a[1]); // 唯一的+ve或-ve
 			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
+			println("Annul column [" + a[1] + "]");
+			int num = 0;
 			for (int i = 0; i < m; i++) {
 				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
 				if (A.get(i, a[1]) == 0) continue; // 不与0元素所在的行线性组合
@@ -136,13 +127,14 @@ public class ComputeInvariant {
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
 				B.logicalUnion(a[0], i);
+				num++;
 				println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			B = B.eliminateRow(a[0]);
 			m--; // 减掉一行
-			println("Annul column [" + a[1] + "], eliminate row["+a[0]+ "]");
+			println("eliminate row ["+a[0]+ "]，modify invariants number: " + num);
 			printAYB();
 		}
     }
@@ -158,13 +150,13 @@ public class ComputeInvariant {
 		ArrayList<Integer> negatives = new ArrayList<Integer>();
 		int annelCol = AnnelCol(positives, negatives);
 
-		println("Annul column [" + annelCol + "]");
+		println("Annul column [" + annelCol + "]，Append rows = "+positives.size()*negatives.size());
 		for (int positiveRow : positives ) {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
 				B = B.AppendRowlogicalUnion(positiveRow, negativeRow);
-				println("Append Row of LinearlyCombine("+positiveRow + "," +negativeRow+"):");
+				println("Append row is linearlyCombine of row["+positiveRow + "] and row[" +negativeRow+"]:");
 				printAYB();
 			}
 		}
@@ -204,7 +196,7 @@ public class ComputeInvariant {
 	}
 	
 	/**
-	 * 选取待删除的列的启发式策略，Heuristics for selecting the columns to annul
+	 * 选取待消除的列的启发式策略，Heuristics for selecting the columns to annul
 	 * The number of new rows to add, by combining pairs of rows, is pk*vk. 
 	 * The pk+vk rows used to annul column k are eliminated at the end of the iteration. 
 	 * The expansion factor is the net number of new rows added in annulling column k: 
@@ -260,6 +252,40 @@ public class ComputeInvariant {
 		
 		return minCol;
 	}
+	
+	   /**
+     * print string s + "\n"
+     * @param s
+     */
+    public void println(String s) {
+    	if (Debug) A.print(s + "\n");
+    }
+    
+    /**
+     * print Matrix A | Y, B 
+     */
+    private void printAYB() {
+    	println("Matrix A | Y, B");
+    	if (Debug) {
+    		InvariantMatrix.print(A,Y,6,0);
+    		B.print(4,0);
+    	}
+    }
+    
+    /**
+     * enable/disable print debug information
+     * @param debug true enable print debug information; false disable print debug information
+     */
+    public void setDebug(boolean debug) {
+    	this.Debug = debug;
+    }
+    
+    /**
+     * @return  enable/disable print debug information
+     */
+    public boolean getDebug() {
+    	return this.Debug;
+    }
 	
 	public static void main(String[] args) {
          	   

@@ -518,6 +518,47 @@ public class InvariantMatrix extends Matrix {
     	return negative;
     }
     
+    // TODO: modify
+    /**
+     * Find a row with non-minimal support.
+     * @return The row index that has non-minimal support, -1 if there is none.
+     */
+    public int findNonMinimal() {
+       int k = -1; // the non-minimal support column index
+       
+       // x,y,z不用初始化，仅说明即可，例如：Matrix x; 因为以下循环语句中会给它赋值.
+       Matrix x = new Matrix(m, 1); // column one, represents first col of comparison
+       Matrix y = new Matrix(m, 1); // col two, represents rest columns of comparison
+       Matrix z = new Matrix(m, 1); // difference column 1 - column 2
+       
+       for (int i = 0; i < n ; i++){
+          x = getMatrix(0, m-1, i, i);
+          for (int j = 0; j < n; j++){
+             if (i != j){
+                y = getMatrix(0, m-1, j, j);
+                z = x.minus(y);
+                // if there is at least one -ve element then break inner loop
+                // and try another Y vector (because X is minimal with respect to Y)
+                // if there is no -ve element then return from the function with index of X
+                // to be eliminated, because X is not minimal with respect to Y
+                if (!(z.hasNegativeElements())) {
+                   return i;
+                }
+             }
+          }
+       }
+       
+       return k;
+       // compare each columns' set with the other columns
+       
+       // if you find during comparison with another another column that it has
+       // one more element, stop the comparison (the current col cannot be eliminated
+       // based on this comparison) and go to the next comparison
+       
+       // if you find that the col in question has all the elements of another one
+       // then eliminate the col in question
+    }
+    
     /** 
      * 计算特定列中的所有+ve/-ve索引的列表
      * @param columnIndex 列index
