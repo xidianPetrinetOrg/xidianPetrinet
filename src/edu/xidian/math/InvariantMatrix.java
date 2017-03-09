@@ -559,6 +559,77 @@ public class InvariantMatrix extends Matrix {
        // then eliminate the col in question
     }
     
+    /**
+     * Find a rows with non-minimal support.
+     * @return The row index lists of non-minimal row.
+     */
+    public ArrayList<Integer> findNonMinimalRow() {
+    	int i,k,j;
+    	ArrayList<Integer> nonMinmals = new ArrayList<>(); // The row index lists of non-minimal row.
+    	for (i = 0; i < m-1; i++) {
+    		if (nonMinmals.contains(i)) continue;  // 不用比较已经存储的
+    		for (k = i+1; k < m; k++) {
+    		  if (nonMinmals.contains(k)) continue;  // 不用比较已经存储的
+    		  for (j = 0; j < n; j++) {
+    			 if ((A[i][j] != 0 && A[k][j] != 0) || (A[i][j] == 0 && A[k][j] == 0)) continue; // 相同
+    			 if ((A[i][j] != 0 && A[k][j] == 0) || (A[i][j] == 0 && A[k][j] != 0)) break; // 不同
+    		  }
+    		  if (j == n) nonMinmals.add(k);  // i,k行，各列同为非0或0, 因此,i行(或k行)是非极小支撑
+    	    }
+    	}
+    	return nonMinmals;
+    }
+    
+    
+    /**
+     * Find a rows with non-minimal support.
+     * @return The row index lists of non-minimal row.
+     */
+    public ArrayList<Integer> findNonMinimalRows() {
+    	int i,k,j;
+    	int noZeroCols,ckNoZeroCols; // 某行非0列数,
+    	ArrayList<Integer> nonMinmals = new ArrayList<>(); // The row index lists of non-minimal row.
+    	for (i = 0; i < m; i++) {
+    		noZeroCols = 0; // 第i行非0列数
+    		ckNoZeroCols = 0; // 检查非0列数
+    		for (j = 0; j < n; j++) {
+    			if (A[i][j] == 0) continue;
+    			noZeroCols++;
+    			for (k = i+1; k < m; k++) {
+    				if (A[k][j] != 0) {
+    					ckNoZeroCols++;
+    					break;
+    				}
+    			}
+    	    }
+    		if (ckNoZeroCols == noZeroCols) nonMinmals.add(i);  
+    	}
+    	return nonMinmals;
+    }
+    
+    /**
+     * 是否是线性相关的行，即每个非0元素，均在矩阵A的相应列中存在
+     * @param row 待检查的行向量
+     * @return true: 是线性相关行，false： 不是线性相关行
+     */
+    public boolean isDependenceRow(int row[]) {
+    	int noZeroCols = 0,ckNoZeroCols = 0; // 非0列数,
+    	
+    	// 每个非0元素，均在矩阵A的相应列中存在，则为非极小行向量，即该行是线性相关行
+    	for (int j = 0; j < n; j++) {
+    		if (row[j] == 0) continue;
+    		noZeroCols++;
+    		for (int i = 0; i < m; i++) {
+    			if (A[i][j] != 0) {
+    				ckNoZeroCols++;
+    				break;
+    			}
+    		}
+    	}
+    	if (ckNoZeroCols == noZeroCols) return true;  
+    	return false;
+    }
+    
     /** 
      * 计算特定列中的所有+ve/-ve索引的列表
      * @param columnIndex 列index

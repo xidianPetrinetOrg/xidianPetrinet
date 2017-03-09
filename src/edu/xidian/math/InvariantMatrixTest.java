@@ -132,7 +132,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#cardinalityOne1(int[])}.
 	 */
-	//@Ignore("testCardinalityOne1IntArray()")
+	@Ignore("testCardinalityOne1IntArray()")
 	@Test
 	public void testCardinalityOne1IntArray() {
 		System.out.println("testCardinalityOne1IntArray()");
@@ -247,7 +247,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#logicalUnion(int, int)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testLogicalUnion() {
 		System.out.println("testLogicalUnion()");
@@ -266,7 +266,7 @@ public class InvariantMatrixTest {
 		m.logicalUnion(row1,row2);
 		m.print("logicalUnion rows:"+row1+" to "+row2);
 		m.print(4,0);
-		Object a[] = {0,0,1,0};
+		Object a[] = {1,0,1,1};
 		Object b[] = new Object[4];
 		for(int i = 0; i<4;i++) b[i]=m.get(row2, i);
 		assertArrayEquals(a, b);
@@ -275,7 +275,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#AppendRowlogicalUnion(int, int)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testAppendRowLogicalUnion() {
 		System.out.println("testLogicalUnion()");
@@ -297,7 +297,7 @@ public class InvariantMatrixTest {
 		int rows = m1.getRowDimension();
 		assertEquals(rows,m.getRowDimension()+1);
 		
-		Object a[] = {0,0,1,0};
+		Object a[] = {1,0,1,1};
 		Object b[] = new Object[4];
 		for(int i = 0; i<4;i++) b[i]=m1.get(rows-1, i);
 		assertArrayEquals(a, b);
@@ -306,7 +306,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#eliminateRow(int toDelete)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testEliminateRow() {
 		System.out.println("testEliminateRow()");
@@ -340,7 +340,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#eliminateRows(ArrayList)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testEliminateRows() {
 		System.out.println("testEliminateRows()");
@@ -475,7 +475,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#getPositiveList(int)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testGetPostiveList() {
 		System.out.println("testGetPostiveList()");
@@ -499,7 +499,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#getgetNegativeList(int)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testGetNegativeList() {
 		System.out.println("testGetNegativeList()");
@@ -523,7 +523,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#positiveNegativeList(ArrayList, ArrayList, int)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testPositiveNegativeList() {
 		System.out.println("testPositiveNegativeList()");
@@ -553,6 +553,96 @@ public class InvariantMatrixTest {
 		
 		m.print("positives:"+positives+"\n");
 		m.print("negatives"+negatives+"\n");
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#findNonMinimalRow()}.
+	 */
+	//@Ignore
+	@Test
+	public void testFindNonMinimalRow() {
+		System.out.println("testFindNonMinimalRow()");
+		int incidence[][] = {
+    		    {  1,  0, -2,  0},
+    		    {  1,  1,  2,  0},
+    		    {  1,  0,  1,  1},
+    		    { -1,  0, -4, -2},
+    		    {  0,  0, -4, -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		ArrayList<Integer> nonMinmals = m.findNonMinimalRow();
+		Object e[] = {3};
+		m.print("nonMinmals=" + nonMinmals);
+		assertArrayEquals(e, nonMinmals.toArray());  // row index 2，3行有同样的支撑
+		
+		int incidence1[][] = {
+    		    {  10,  0, -2,  0},
+    		    {  1,   1,  2,  0},
+    		    {  1,   0,  1,  1},
+    		    { -1,   0,  0, -2},
+    		    {  20,  0, -4,  0}
+        };
+		m = new InvariantMatrix(incidence1);
+		m.print(4, 0);
+		nonMinmals.clear();
+		nonMinmals = m.findNonMinimalRow();
+		Object e1[] = {4};
+		m.print("nonMinmals=" + nonMinmals);
+		assertArrayEquals(e1, nonMinmals.toArray());  // row index 0，4行有同样的支撑
+		
+		int incidence2[][] = {
+    		    {  1,   0, -2,  0},
+    		    {  1,   1,  2,  0}, /* 1 */
+    		    {  1,   5,  8,  0}, /* 2 */
+    		    { -1,   0,  0, -2},
+    		    {  2,   3, -4,  0}  /* 4 */
+        };
+		m = new InvariantMatrix(incidence2);
+		m.print(4, 0);
+		nonMinmals.clear();
+		nonMinmals = m.findNonMinimalRow();
+		Object e2[] = {2,4};
+		m.print("nonMinmals=" + nonMinmals);
+		assertArrayEquals(e2, nonMinmals.toArray());  // row index 1，2，4行有同样的支撑
+		
+		int incidence3[][] = {
+    		    {  1,   0, -2,  0}, /* 0 */
+    		    {  1,   1,  2,  0}, /* 1 */
+    		    {  1,   5,  8,  0}, /* 2同1 */
+    		    { -1,   0,  1,  0}, /* 3同0 */
+    		    {  2,   3, -4,  0}  /* 4同1 */
+        };
+		m = new InvariantMatrix(incidence3);
+		m.print(4, 0);
+		nonMinmals.clear();
+		nonMinmals = m.findNonMinimalRow();
+		Object e3[] = {3,2,4};
+		m.print("nonMinmals=" + nonMinmals);
+		assertArrayEquals(e3, nonMinmals.toArray());  // row index 3,2,4行是多余的支撑
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#isDependenceRow(int[])}.
+	 */
+	//@Ignore
+	@Test
+	public void testIsDependenceRow() {
+		System.out.println("testIsDependenceRow()");
+		int incidence[][] = {
+    		    {  1,  0, -2,  0},
+    		    {  1,  1,  2,  0},
+    		    {  1,  0,  1,  1},
+    		    { -1,  0, -4, -2},
+    		    {  0,  0, -4, -5}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		
+		int row[] = {1,2,3,4};
+		assertTrue(m.isDependenceRow(row));
+		int row1[] = {1,0,0,4};
+		assertTrue(m.isDependenceRow(row1));
 	}
 	
 	/**
