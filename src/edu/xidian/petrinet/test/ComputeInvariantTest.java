@@ -168,6 +168,28 @@ public class ComputeInvariantTest {
  	   
 		computeInvariant = new ComputeInvariant(incidenceM.transpose());
     }
+    
+	// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
+    void setUp6() {
+		int incidence[][] = {
+  		        /** t1  t2  t3  t4  t5  t6  t7 **/
+       /** p1 */  { 1,  0,  0, 14,  0,  0, -3},
+       /** p2 */  { 0,  0,  7,  0, -1, -2,  1},
+       /** p3 */  { 0,  0, -1,  0, -2,  1,  0},
+       /** p4 */  { 0,  0, -1, -1,  1,  0,  0},
+       /** p5 */  { 1,  0,  0, -1,  0,  0,  0},
+       /** p6 */  {-1,  0,  0,  1,  0,  0,  0},
+       /** p7 */  { 0, -7,  0,  7,  0,  0,  0},
+       /** p8 */  {-1,  1,  0,  0,  0,  0,  0}};
+	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    // Compute T-Invariants
+	    System.out.println("Fritz. Compute P-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+    }
 	
 
 	@BeforeClass
@@ -186,9 +208,11 @@ public class ComputeInvariantTest {
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 		//setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3, P-Invariants
-		setUp3();  // Metabolites, T-Invariants
+		//setUp3();  // Metabolites, T-Invariants
 		//setUp4();  // Li，图2.2 Compute P-Invariants
 		//setUp5();  // Li，图2.2 Compute T-Invariants
+		// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
+		setUp6();
 	}
 
 	@After
