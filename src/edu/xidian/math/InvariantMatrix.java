@@ -298,12 +298,12 @@ public class InvariantMatrix extends Matrix {
 	 * all elements of the row is negative or 0.
 	 * @return 行index，否则返回-1.
 	 */
-	int allNegativeOrZeroRow() {
+	public int allNegativeOrZeroRow() {
 		int cols;
 		for (int i = 0; i < m; i++) {
 			cols = 0;
 			for(int j = 0; j < n; j++) {
-			  if (get(i, j) <= 0) cols++; 
+			  if (A[i][j] <= 0) cols++; 
 			}
 			if (cols == n) return i;
 		}

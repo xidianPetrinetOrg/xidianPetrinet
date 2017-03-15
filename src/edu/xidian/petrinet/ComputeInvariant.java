@@ -194,6 +194,47 @@ public class ComputeInvariant {
 			printAYB();
 		}
 		
+		////////////////////////////////////////////
+		// 规范化矩阵Minimal Support matrix Y
+		/** Y is called standardized iff
+		(1) y1,...,yq 属于整数integers（0,1,2,3，...）
+		(2) for the first yi不等于0，yi > 0 and
+		(3) y cannot be divided by an element k属于正整数(positive integers), k > 1 without destroying (1)
+		**/
+		////////////////////////////////////////////
+		println("规范化矩阵Minimal Support matrix Y===");
+		// 全部由负元素或0组成的行，取正，即负行取正
+		while (true) {
+			int row = Y.allNegativeOrZeroRow();
+			if (row == -1)
+				break;
+			for (int j = 0; j < incidenceRowDimension; j++) {
+				if (Y.get(row, j) < 0)
+					Y.set(row, j, Math.abs(Y.get(row, j))); // 负元素取正
+			}
+		}
+		println("全部由负元素或0组成的行，取正，即负行取正.");
+		printY();
+		
+		// 通过与正元素行的线性组合，负元素置0
+		for(int col = 0; col < incidenceRowDimension; col++) {
+			Y.negativeToZero(col);
+		}
+		println("通过与正元素行的线性组合，负元素置0.");
+		printY();
+
+		// 各行除以该行的最大公约数
+		for (int i = 0; i < Y.getRowDimension(); i++) {
+			int gcd = Y.gcdRow(i);
+			if (gcd > 1) {
+				for (int j = 0; j < incidenceRowDimension; j++) {
+					Y.set(i, j, Y.get(i, j) / gcd);
+				}
+			}
+		}
+		println("各行除以该行的最大公约数.");
+		printY();
+		
 		//Find a rows with non-minimal support.
 		ArrayList<Integer> nonMinimals = Y.findNonMinimalRow();
 		println("non-minimal support: " + nonMinimals);
@@ -273,6 +314,16 @@ public class ComputeInvariant {
     	if (Debug) {
     		InvariantMatrix.print(A,Y,6,0);
     		B.print(4,0);
+    	}
+    }
+    
+    /**
+     * print Matrix Y 
+     */
+    private void printY() {
+    	println("Matrix Y");
+    	if (Debug) {
+    		Y.print(4,0);
     	}
     }
     
