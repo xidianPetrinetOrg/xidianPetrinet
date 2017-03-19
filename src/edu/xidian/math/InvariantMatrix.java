@@ -559,52 +559,33 @@ public class InvariantMatrix extends Matrix {
        // then eliminate the col in question
     }
     
+    
     /**
-     * Find a rows with non-minimal support.
-     * @return The row index lists of non-minimal row.
+     * Find a row with non-minimal support.
+     * i-th and k-th row comparison.(i=0,...m-2; k= i+1,...,m-1)
+     * if (row i-th = row k-th) return i or k
+     * if (row i-th > row k-th) return i; 
+     * if (row i-th < row k-th) return k
+     * @return The row index of non-minimal row; no exist,return -1 
      */
-    public ArrayList<Integer> findNonMinimalRow() {
-    	int i,k,j;
-    	ArrayList<Integer> nonMinmals = new ArrayList<>(); // The row index lists of non-minimal row.
+    public int findNonMinimalRow() {
+    	int i,k,j,positive=0,negative = 0,zero = 0;
     	for (i = 0; i < m-1; i++) {
-    		if (nonMinmals.contains(i)) continue;  // 不用比较已经存储的
     		for (k = i+1; k < m; k++) {
-    		  if (nonMinmals.contains(k)) continue;  // 不用比较已经存储的
+    		  positive = 0; negative = 0; zero = 0;
     		  for (j = 0; j < n; j++) {
-    			 if ((A[i][j] != 0 && A[k][j] != 0) || (A[i][j] == 0 && A[k][j] == 0)) continue; // 相同
-    			 if ((A[i][j] != 0 && A[k][j] == 0) || (A[i][j] == 0 && A[k][j] != 0)) break; // 不同
+    			 if (A[i][j] - A[k][j] == 0) zero++; 
+    			 else {
+    				 if (A[i][j] - A[k][j] < 0) negative++; 
+    				 else positive++;
+    			 }
     		  }
-    		  if (j == n) nonMinmals.add(k);  // i,k行，各列同为非0或0, 因此,i行(或k行)是非极小支撑
+    		  if (zero == n)  return i;            // row i-th = row k-th
+    		  if (positive + zero  == n) return i; // row i-th > row k-th
+    		  if (negative + zero == n)  return k; // row i-th < row k-th
     	    }
     	}
-    	return nonMinmals;
-    }
-    
-    
-    /**
-     * Find a rows with non-minimal support.
-     * @return The row index lists of non-minimal row.
-     */
-    public ArrayList<Integer> findNonMinimalRows() {
-    	int i,k,j;
-    	int noZeroCols,ckNoZeroCols; // 某行非0列数,
-    	ArrayList<Integer> nonMinmals = new ArrayList<>(); // The row index lists of non-minimal row.
-    	for (i = 0; i < m; i++) {
-    		noZeroCols = 0; // 第i行非0列数
-    		ckNoZeroCols = 0; // 检查非0列数
-    		for (j = 0; j < n; j++) {
-    			if (A[i][j] == 0) continue;
-    			noZeroCols++;
-    			for (k = i+1; k < m; k++) {
-    				if (A[k][j] != 0) {
-    					ckNoZeroCols++;
-    					break;
-    				}
-    			}
-    	    }
-    		if (ckNoZeroCols == noZeroCols) nonMinmals.add(i);  
-    	}
-    	return nonMinmals;
+    	return -1;
     }
     
     /**

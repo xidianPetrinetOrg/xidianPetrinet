@@ -571,55 +571,31 @@ public class InvariantMatrixTest {
         };
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
-		ArrayList<Integer> nonMinmals = m.findNonMinimalRow();
-		Object e[] = {3};
-		m.print("nonMinmals=" + nonMinmals);
-		assertArrayEquals(e, nonMinmals.toArray());  // row index 2，3行有同样的支撑
+		int nonMinmal = m.findNonMinimalRow();  
+		m.print("nonMinmal=" + nonMinmal); /** 0-th row - 1-th row < 0 */
+		assertEquals(nonMinmal,1);
 		
 		int incidence1[][] = {
-    		    {  10,  0, -2,  0},
-    		    {  1,   1,  2,  0},
-    		    {  1,   0,  1,  1},
-    		    { -1,   0,  0, -2},
-    		    {  20,  0, -4,  0}
+    		    {  1,  0,  2,  0},
+    		    {  1,  0,  0,  1},
+    		    {  1,  1,  1,  0},
         };
 		m = new InvariantMatrix(incidence1);
 		m.print(4, 0);
-		nonMinmals.clear();
-		nonMinmals = m.findNonMinimalRow();
-		Object e1[] = {4};
-		m.print("nonMinmals=" + nonMinmals);
-		assertArrayEquals(e1, nonMinmals.toArray());  // row index 0，4行有同样的支撑
-		
-		int incidence2[][] = {
-    		    {  1,   0, -2,  0},
-    		    {  1,   1,  2,  0}, /* 1 */
-    		    {  1,   5,  8,  0}, /* 2 */
-    		    { -1,   0,  0, -2},
-    		    {  2,   3, -4,  0}  /* 4 */
-        };
-		m = new InvariantMatrix(incidence2);
-		m.print(4, 0);
-		nonMinmals.clear();
-		nonMinmals = m.findNonMinimalRow();
-		Object e2[] = {2,4};
-		m.print("nonMinmals=" + nonMinmals);
-		assertArrayEquals(e2, nonMinmals.toArray());  // row index 1，2，4行有同样的支撑
+		nonMinmal = m.findNonMinimalRow();  
+		m.print("nonMinmal=" + nonMinmal); /** No exist i-th row - k-th row < 0; >0; 0*/
+		assertEquals(nonMinmal,-1);
 		
 		int incidence3[][] = {
-    		    {  1,   0, -2,  0}, /* 0 */
-    		    {  1,   1,  2,  0}, /* 1 */
-    		    {  1,   5,  8,  0}, /* 2同1 */
-    		    { -1,   0,  1,  0}, /* 3同0 */
-    		    {  2,   3, -4,  0}  /* 4同1 */
+				 {  1,  0,  2,  0},
+	    		 {  1,  0,  0,  1},
+	    		 {  1,  1,  1,  2},
         };
 		m = new InvariantMatrix(incidence3);
 		m.print(4, 0);
-		nonMinmals.clear();
-		nonMinmals = m.findNonMinimalRow();
-		Object e3[] = {3,2,4};
-		m.print("nonMinmals=" + nonMinmals);
-		assertArrayEquals(e3, nonMinmals.toArray());  // row index 3,2,4行是多余的支撑
+		nonMinmal = m.findNonMinimalRow();  
+		m.print("nonMinmal=" + nonMinmal); /** 1-th row - 2-th row < 0 */
+		assertEquals(nonMinmal,2);
 	}
 	
 	/**

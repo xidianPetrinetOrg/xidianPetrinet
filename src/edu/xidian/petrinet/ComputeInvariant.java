@@ -236,8 +236,7 @@ public class ComputeInvariant {
 		printY();
 		
 		//Find a rows with non-minimal support.
-		ArrayList<Integer> nonMinimals = Y.findNonMinimalRow();
-		println("non-minimal support: " + nonMinimals);
+		println("n="+Y.findNonMinimalRow());
 	}
 	
 	/**
