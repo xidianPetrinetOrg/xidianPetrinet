@@ -190,7 +190,7 @@ public class ComputeInvariantTest {
        /** p8 */  {-1,  1,  0,  0,  0,  0,  0}};
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
-	    // Compute T-Invariants
+	    // Compute P-Invariants
 	    System.out.println("Fritz. Compute P-Invariants:");
 	    incidenceM.print("incidence:");
 	    incidenceM.print(4, 0);
@@ -198,7 +198,53 @@ public class ComputeInvariantTest {
 		computeInvariant = new ComputeInvariant(incidenceM);
     }
 	
-
+    // (1) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+    void setUp7() {
+		int incidence[][] = {
+  		        /** t1  t2  t3  t4  t5  t6 **/
+       /** p1 */  { 0,  0,  0, -1,  1,  0},
+       /** p2 */  { 1,  0,  0,  0, -1,  0},
+       /** p3 */  {-1,  0,  0,  1,  0,  0},
+       /** p4 */  { 1, -1,  0,  0,  0,  0},
+       /** p5 */  {-1,  1,  0,  0,  0,  0},
+       /** p6 */  { 0,  1,  0,  0,  0, -1},
+       /** p7 */  { 0, -1,  1,  0,  0,  0},
+       /** p8 */  { 0,  0, -1,  0,  0,  1},
+       /** p9 */  { 0,  0,  1, -1,  0,  0}};
+	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    // Compute P-Invariants
+	    System.out.println("(1) K. Takano. Compute P-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+    }
+    
+    // (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+    void setUp8() {
+		int incidence[][] = {
+  		        /** t1  t2  t3  t4  t5  t6 t7  t8 t9 **/
+       /** p1 */  { 1, -1,  0,  0,  0,  0,  0,  0,  0},
+       /** p2 */  {-1,  0,  1,  0,  0,  0,  0,  0,  0},
+       /** p3 */  { 0, -1,  0, -1,  0,  0,  0,  0,  0},
+       /** p4 */  { 0,  1, -1,  0,  0,  0,  0,  0,  0},
+       /** p5 */  { 0,  0,  0,  1, -1,  1,  0,  0,  0},
+       /** p6 */  { 0,  0,  1,  0,  1,  0,  0,  0, -1},
+       /** p7 */  { 0,  0,  0,  0,  0,  1, -1,  0,  0},
+       /** p8 */  { 0,  0,  0,  0,  0, -1,  0,  1,  0},
+       /** p9 */  { 0,  0,  0,  0,  0,  0,  1, -1,  0},
+       /** p10*/  { 0,  0,  0,  0,  0,  0,  1, -1,  1}};
+	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    // Compute P-Invariants
+	    System.out.println("(2) K. Takano. Compute P-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+    }
+    
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		System.out.println("setUpBeforeClass()");
@@ -218,8 +264,15 @@ public class ComputeInvariantTest {
 		setUp3();  // Metabolites, T-Invariants
 		//setUp4();  // Li，图2.2 Compute P-Invariants
 		//setUp5();  // Li，图2.2 Compute T-Invariants
+		
 		// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
 		//setUp6();
+		
+		// (1) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+		//setUp7();
+		
+		// (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+		//setUp8();
 	}
 
 	@After
