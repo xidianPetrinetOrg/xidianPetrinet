@@ -1061,7 +1061,7 @@ public class Matrix implements Serializable {
     * Find the greatest common divisor of 2 integers.
     * @param a    The first integer.
     * @param b    The second integer.
-    * @return     The gcd of the column
+    * @return     The gcd of a,b, gcd > 0, a=0 && b=0,return 0;
     */
    public int gcd2(int a, int b) {
       int gcd;

@@ -457,8 +457,9 @@ public class InvariantMatrix extends Matrix {
     }
     
     /**
-     * Find the greatest common divisor of a row matrix (vector) of integers.
-     * @return     The gcd of the column matrix.
+     * Find the greatest common divisor of a row.
+     * @param row index of row
+     * @return  gcd of the row,gcd > 0
      */
     public int gcdRow(int row) {
        int gcd = A[row][0];
@@ -466,6 +467,22 @@ public class InvariantMatrix extends Matrix {
        for (int j = 0; j < n; j++) {
     	   if ((A[row][j] != 0) || (gcd != 0)){
     		   gcd = gcd2(gcd, A[row][j]);
+    	   }
+       }
+       return gcd; // this should never be zero
+    }
+    
+    /**
+     * Find the greatest common divisor of a column.
+     * @param col index of column
+     * @return  gcd of the column. gcd >0
+     */
+    public int gcdCol(int col) {
+       int gcd = A[0][col];
+       
+       for (int i = 0; i < m; i++) {
+    	   if ((A[i][col] != 0) || (gcd != 0)){
+    		   gcd = gcd2(gcd, A[i][col]);
     	   }
        }
        return gcd; // this should never be zero
@@ -611,6 +628,8 @@ public class InvariantMatrix extends Matrix {
     	return false;
     }
     
+
+    
     /** 
      * 计算特定列中的所有+ve/-ve索引的列表
      * @param columnIndex 列index
@@ -626,6 +645,48 @@ public class InvariantMatrix extends Matrix {
     		if(A[i][columnIndex] > 0) positives.add(i);
     		else if(A[i][columnIndex] < 0) negatives.add(i);	
     	}
+    }
+    
+    /**
+     * rank of this matrix
+     */
+    public static int rank(InvariantMatrix a) {
+    	int r = 0;
+    	int rowNum = a.getRowDimension();
+    	int colNum = a.getColumnDimension();
+    	int tmp;
+    	
+    	// 保证：a[0][0] != 0
+    	for (int i = 0; i < rowNum; i++) {
+    		if (a.get(0, 0) != 0) break;
+    		// 交换到第一行
+    		if (a.get(i, 0) != 0) {
+    			for (int j = 0; j < colNum; j++ ) {
+    			  tmp = a.get(0, j);
+    			  a.set(0, j, a.get(i, j));
+    			  a.set(i, j, tmp);
+    			}
+    		}
+    	}
+    	
+    	// a[i][0] ==> 0, i=1...,rowNum
+    	for (int i = 1; i < rowNum; i++)  a.linearlyCombine(0, i, 0);
+    	
+    	// construct matrix b, (rowNum-1)*(colNum-1)
+    	InvariantMatrix b = new InvariantMatrix(rowNum-1,colNum-1);
+    	boolean zeroFlag = true; // 是否全0 
+    	for (int i = 0; i < rowNum-1; i++) {
+    		for (int j = 0; j < colNum-1; j++) {
+    			tmp = a.get(i+1, j+1);
+    			if (tmp != 0) zeroFlag = false;
+    			b.set(i, j, tmp);
+    		}
+    	}
+    	
+    	a.print(4, 0);
+    	b.print(4,0);
+    	if (zeroFlag) return 0;
+    	else return rank(b)+1;
     }
     
     /**

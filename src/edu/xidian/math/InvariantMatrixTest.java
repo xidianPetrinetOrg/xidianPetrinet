@@ -558,7 +558,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#findNonMinimalRow()}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testFindNonMinimalRow() {
 		System.out.println("testFindNonMinimalRow()");
@@ -601,7 +601,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#isDependenceRow(int[])}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testIsDependenceRow() {
 		System.out.println("testIsDependenceRow()");
@@ -619,6 +619,26 @@ public class InvariantMatrixTest {
 		assertTrue(m.isDependenceRow(row));
 		int row1[] = {1,0,0,4};
 		assertTrue(m.isDependenceRow(row1));
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.math.InvariantMatrix#rank(InvariantMatrix)}.
+	 */
+	//@Ignore
+	@Test
+	public void testRank() {
+		System.out.println("testRank()");
+		int incidence[][] = {
+				{3, 2, 2},
+				{5, 3, 7},
+				{8, 5, 9}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		
+		int r = InvariantMatrix.rank(m);
+		System.out.println("rank=" + r);
+		//assertEquals(InvariantMatrix.rank(m),2);
 	}
 	
 	/**
