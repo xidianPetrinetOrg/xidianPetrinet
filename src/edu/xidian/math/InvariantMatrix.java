@@ -650,43 +650,50 @@ public class InvariantMatrix extends Matrix {
     /**
      * rank of this matrix
      */
-    public static int rank(InvariantMatrix a) {
-    	int r = 0;
-    	int rowNum = a.getRowDimension();
-    	int colNum = a.getColumnDimension();
-    	int tmp;
+    public int rank(InvariantMatrix a) {
+    	int c[][] = a.getArray();
+    	return rank(c, a.getRowDimension(), a.getColumnDimension());
+    }
+    
+    /**
+     * rank of this matrix
+     */
+    private int rank(int a[][], int m, int n) {
+    	int tmp, gcd;
     	
     	// 保证：a[0][0] != 0
-    	for (int i = 0; i < rowNum; i++) {
-    		if (a.get(0, 0) != 0) break;
+    	for (int i = 0; i < m; i++) {
+    		if (a[0][0] != 0) break;
     		// 交换到第一行
-    		if (a.get(i, 0) != 0) {
-    			for (int j = 0; j < colNum; j++ ) {
-    			  tmp = a.get(0, j);
-    			  a.set(0, j, a.get(i, j));
-    			  a.set(i, j, tmp);
+    		if (a[i][0] != 0) {
+    			for (int j = 0; j < n; j++ ) {
+    			  tmp = a[0][j]; a[0][j] = a[i][j]; a[i][j] = tmp;
     			}
     		}
     	}
     	
-    	// a[i][0] ==> 0, i=1...,rowNum
-    	for (int i = 1; i < rowNum; i++)  a.linearlyCombine(0, i, 0);
-    	
-    	// construct matrix b, (rowNum-1)*(colNum-1)
-    	InvariantMatrix b = new InvariantMatrix(rowNum-1,colNum-1);
-    	boolean zeroFlag = true; // 是否全0 
-    	for (int i = 0; i < rowNum-1; i++) {
-    		for (int j = 0; j < colNum-1; j++) {
-    			tmp = a.get(i+1, j+1);
-    			if (tmp != 0) zeroFlag = false;
-    			b.set(i, j, tmp);
+    	// r[i][:] + r[0][:] ==> r[i][:]; a[i][0] ==> 0, i=1...,m
+    	for (int i = 1; i < m; i++) {
+    		for (int j = 0; j < n; j++) {
+    		   a[i][j] = a[i][j]*a[0][0] - a[0][j]*a[i][0];
     		}
     	}
     	
-    	a.print(4, 0);
-    	b.print(4,0);
+    	// construct matrix b, (rowNum-1)*(colNum-1)
+    	int b[][] = new int[m-1][n-1];
+    	boolean zeroFlag = true; // 是否全0 
+    	for (int i = 0; i < m -1; i++) {
+    		for (int j = 0; j < n -1; j++) {
+    			tmp = a[i+1][j+1];
+    			if (tmp != 0) zeroFlag = false;
+    			b[i][j] = tmp;
+    		}
+    	}
+    	
+    	//a.print(4, 0);
+    	//b.print(4,0);
     	if (zeroFlag) return 0;
-    	else return rank(b)+1;
+    	else return rank(b,m-1,n-1)+1;
     }
     
     /**
