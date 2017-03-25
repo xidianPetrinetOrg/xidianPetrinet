@@ -652,7 +652,8 @@ public class InvariantMatrix extends Matrix {
      */
     public int rank(InvariantMatrix a) {
     	int c[][] = a.getArray();
-    	return rank(c, a.getRowDimension(), a.getColumnDimension());
+    	//return rank(c, a.getRowDimension(), a.getColumnDimension());
+    	return rank(c);
     }
     
     /**
@@ -664,7 +665,7 @@ public class InvariantMatrix extends Matrix {
     	// 保证：a[0][0] != 0
     	for (int i = 0; i < m; i++) {
     		if (a[0][0] != 0) break;
-    		// 交换到第一行
+    		// 保证a[0][0] != 0
     		if (a[i][0] != 0) {
     			for (int j = 0; j < n; j++ ) {
     			  tmp = a[0][j]; a[0][j] = a[i][j]; a[i][j] = tmp;
@@ -674,26 +675,107 @@ public class InvariantMatrix extends Matrix {
     	
     	// r[i][:] + r[0][:] ==> r[i][:]; a[i][0] ==> 0, i=1...,m
     	for (int i = 1; i < m; i++) {
+    		tmp = a[i][0]; // first element of this row will be set 0 
     		for (int j = 0; j < n; j++) {
-    		   a[i][j] = a[i][j]*a[0][0] - a[0][j]*a[i][0];
+    		   a[i][j] = a[i][j]*a[0][0] - a[0][j]*tmp;
     		}
     	}
     	
     	// construct matrix b, (rowNum-1)*(colNum-1)
     	int b[][] = new int[m-1][n-1];
-    	boolean zeroFlag = true; // 是否全0 
+    	boolean zeroFlag = true; // 是否全0
+    	int noZeroRowNum = 0;
     	for (int i = 0; i < m -1; i++) {
     		for (int j = 0; j < n -1; j++) {
     			tmp = a[i+1][j+1];
     			if (tmp != 0) zeroFlag = false;
     			b[i][j] = tmp;
     		}
+    		if (!zeroFlag) noZeroRowNum++;
     	}
     	
-    	//a.print(4, 0);
-    	//b.print(4,0);
+    	printArray(a);
+    	printArray(b);
     	if (zeroFlag) return 0;
     	else return rank(b,m-1,n-1)+1;
+    }
+    
+    /**
+     * rank of the matrix
+     * a matrix is in row echelon form（行阶梯式） if
+     * (1) all nonzero rows (rows with at least one nonzero element) are above any rows of all zeroes (all zero rows, if any, belong at the bottom of the matrix), and
+     * (2) the leading coefficient (the first nonzero number from the left, also called the pivot) of a nonzero row is always strictly to the right of the leading coefficient of the row above it.
+     * ref. https://en.wikipedia.org/wiki/Gaussian_elimination
+     */
+    private int rank(int a[][]) {
+    	int m,n,tmp;
+    	m = a.length;     // row dimension
+    	n = a[0].length;  // column dimension
+    	
+    	// 处理列数为m,n中的小者
+    	int maxCol;
+    	if (m > n) maxCol = n;
+    	else maxCol = m;
+    	
+    	// 变换为行阶梯式,正在处理的列col，
+    	/*
+    	 * 1 * * *
+    	 * 0 2 * *
+    	 * 0 0 3 *    
+    	 */
+    	for (int col = 0; col < maxCol; col++) {
+    		// 变换a使a[col][col] != 0
+    		pivot(a,m,n,col); 
+	    	
+    		// 变换（col+1）行以下的列col元素为0
+    		// a[i][col] ==> 0, i= col+1...,m
+	    	// a[i][:]*k1 - a[i][:]*k2 ==> a[i][:], k1 = a[col][col], k2 = a[i][col]
+	    	for (int i = col + 1; i < m; i++) {
+	    		tmp = a[i][col]; // first element of this row will be set 0 
+	    		for (int j = 0; j < n; j++) {
+	    		   a[i][j] = a[i][j]*a[col][col] - a[col][j]*tmp;
+	    		}
+	    	}
+	    	
+	    	printArray(a);
+    	}
+    	
+    	// 计算不全为零的行数，秩
+    	boolean zeroFlag = true; // 行全0
+    	int noZeroRowNum = 0;
+    	for (int i = 0; i < m; i++) {
+    		zeroFlag = true; // 行全0
+    		for (int j = 0; j < n; j++) {
+    			if (a[i][j] != 0) { zeroFlag = false; break; }
+    		}
+    		if (!zeroFlag) noZeroRowNum++;
+    	}
+    	
+    	return noZeroRowNum;
+    }
+    
+    /**
+     * 变换矩阵a，使a[annulCol][annulCol] != 0; 
+     * @param a
+     * @param m  row dimension
+     * @param n  column dimension
+     * @param annulCol  processing column index 
+     * @return true 矩阵变换已按要求变换好，false 未找到满足条件(a[annulCol][annulCol] != 0)的元素，即a[:][annulCol] = 0
+     */
+    private void pivot(int a[][],int m, int n,int annulCol) {
+    	int tmp;
+    	if (a[annulCol][annulCol] != 0) return;
+    	
+    	// 保证：a[annulCol][annulCol] != 0
+    	for (int i = annulCol; i < m; i++) {
+    		if (a[i][annulCol] != 0) {
+    			// Row i swap to row annulCol
+    			for (int j = 0; j < n; j++ ) {
+    			  tmp = a[annulCol][j]; a[annulCol][j] = a[i][j]; a[i][j] = tmp;
+    			}
+    			return;
+    		}
+    	}
     }
     
     /**
@@ -747,8 +829,24 @@ public class InvariantMatrix extends Matrix {
            output.println();
         }
         output.println();   // end with blank line.
-     }
+    }
     
+    /**
+	 * used to display intermiadiate results for checking
+	 *
+	 * @param a
+	 *            The array to print.
+	 */
+	public void printArray(int[][] a) {
+		System.out.println();
+		for (int i = 0; i < a.length; i++)  {
+			for (int j = 0; j < a[i].length; j++) {
+			  System.out.print(a[i][j] + "   "); 
+			}
+		    System.out.println();
+	   }
+	}
+	
 	public static void main(String[] args) {
         // Metabolites
         int incidence[][] = {

@@ -636,9 +636,117 @@ public class InvariantMatrixTest {
 		InvariantMatrix m = new InvariantMatrix(incidence);
 		m.print(4, 0);
 		
-		int r = InvariantMatrix.rank(m);
+		int r;
+		r = m.rank(m);
 		System.out.println("rank=" + r);
-		//assertEquals(InvariantMatrix.rank(m),2);
+		assertEquals(r,2);
+		
+		///////////////////////////////////////
+		int incidence1[][] = {
+				{4, 3, -5, 6},
+				{6, 2,  0, 3},
+				{8, 5,-12, 5}
+        };
+		m = new InvariantMatrix(incidence1);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,3);
+		
+		///////////////////////////////////////
+		int incidence2[][] = {
+				{1, 1, 1, 1},
+				{0, 0, 1, 1},
+				{0, 0, 1, 1}
+        };
+		m = new InvariantMatrix(incidence2);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,2);
+		
+		///////////////////////////////////////
+		int incidence3[][] = {
+		{1, 3, 1, 9},
+		{1, 1,-1, 1},
+		{3,11, 5, 35}
+		};
+		m = new InvariantMatrix(incidence3);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,2);
+		
+		///////////////////////////////////////
+		int incidence4[][] = {
+		{1,  1, 0, 2},
+		{-1,-1, 0, -2}
+		};
+		m = new InvariantMatrix(incidence4);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,1);
+		
+		///////////////////////////////////////
+		int incidence5[][] = {
+		{ 1, 0, 1},
+		{-2,-3, 1},
+		{ 3, 0, 3}
+		};
+		m = new InvariantMatrix(incidence5);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,2);
+		
+		///////////////////////////////////////
+		int incidence6[][] = {
+		{1,  1, 0, 0, 2},
+		{0,  0, 0, 0, 0},
+		{0,  0, 0, 0, 0},
+		{1,  0, 0, 0, -2}
+		};
+		m = new InvariantMatrix(incidence6);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,2);
+		
+		///////////////////////////////////////
+		int incidence7[][] = {
+		{1,  1, 0, 0, 2},
+		{0,  0, 0, 1, 0},
+		{0,  1, 0, 1, 0},
+		{1,  0, 0, 1, 2}
+		};
+		m = new InvariantMatrix(incidence7);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,3);
+		
+		///////////////////////////////////////
+		int incidence8[][] = {
+		{1,  1},
+		{0,  1},
+		{0,  1},
+		{1,  0}
+		};
+		m = new InvariantMatrix(incidence8);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,2);
+		
 	}
 	
 	/**
