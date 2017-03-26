@@ -681,23 +681,32 @@ public class InvariantMatrix extends Matrix {
     		}
     	}
     	
+    	int k;
+    	if (m < n) k = m;
+    	else k = n;
+    	if (k == 1) {
+    		boolean zeroFlag = true; // 行全0
+        	int noZeroRowNum = 0;
+        	for (int i = 0; i < m-1; i++) {
+        		zeroFlag = true; // 行全0
+        		for (int j = 0; j < n-1; j++) {
+        			zeroFlag = false;
+        		}
+        		if (!zeroFlag) noZeroRowNum++;
+        	}
+        	return noZeroRowNum;
+    	}
+    	
     	// construct matrix b, (rowNum-1)*(colNum-1)
     	int b[][] = new int[m-1][n-1];
-    	boolean zeroFlag = true; // 是否全0
-    	int noZeroRowNum = 0;
-    	for (int i = 0; i < m -1; i++) {
-    		for (int j = 0; j < n -1; j++) {
-    			tmp = a[i+1][j+1];
-    			if (tmp != 0) zeroFlag = false;
-    			b[i][j] = tmp;
-    		}
-    		if (!zeroFlag) noZeroRowNum++;
+    	for (int i = 0; i < m-1; i++) {
+    		for (int j = 0; j < n-1; j++) b[i][j] = a[i+1][j+1];
     	}
     	
     	printArray(a);
     	printArray(b);
-    	if (zeroFlag) return 0;
-    	else return rank(b,m-1,n-1)+1;
+    	
+    	return rank(b,m-1,n-1)+1;
     }
     
     /**

@@ -620,6 +620,23 @@ public class InvariantMatrixTest {
 		int row1[] = {1,0,0,4};
 		assertTrue(m.isDependenceRow(row1));
 	}
+	@Ignore
+	@Test
+	public void testRank1() {
+		System.out.println("testRank()");
+		int incidence[][] = {
+				{3, 2, 2},
+				{5, 3, 7},
+				{8, 5, 9}
+        };
+		InvariantMatrix m = new InvariantMatrix(incidence);
+		m.print(4, 0);
+		
+		int r;
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		//assertEquals(r,2);
+	}
 	
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#rank(InvariantMatrix)}.
@@ -746,6 +763,23 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		
+		///////////////////////////////////////
+		int incidence9[][] = {
+		{1,1,1,1,1,1,1,1,1},
+		{0,0,1,1,1,1,1,1,1},
+		{0,0,0,1,1,1,1,1,1},
+		{0,0,0,0,0,0,1,1,1},
+		{0,0,0,0,0,0,0,0,1},
+		{0,0,0,0,0,0,0,0,0}
+		};
+		//https://en.wikipedia.org/wiki/Gaussian_elimination#Computing_ranks_and_bases
+		m = new InvariantMatrix(incidence9);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		//assertEquals(r,6);
 		
 	}
 	
