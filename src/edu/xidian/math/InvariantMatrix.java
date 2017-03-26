@@ -6,6 +6,8 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import junit.framework.Assert;
+
 public class InvariantMatrix extends Matrix {
 
 	/**
@@ -732,17 +734,20 @@ public class InvariantMatrix extends Matrix {
     	 * 0 2 * *
     	 * 0 0 3 *    
     	 */
-    	for (int col = 0; col < maxCol; col++) {
-    		// 变换a使a[col][col] != 0
-    		pivot(a,m,n,col); 
-	    	
-    		// 变换（col+1）行以下的列col元素为0
-    		// a[i][col] ==> 0, i= col+1...,m
-	    	// a[i][:]*k1 - a[i][:]*k2 ==> a[i][:], k1 = a[col][col], k2 = a[i][col]
-	    	for (int i = col + 1; i < m; i++) {
-	    		tmp = a[i][col]; // first element of this row will be set 0 
+    	for (int k = 0; k < maxCol; k++) {
+    		// Find the k-th pivot,变换a使a[k][k] != 0
+    		pivot(a,m,n,k); 
+    		
+    		// 对于非0行，一定不等于0
+	    	//assert a[k][k] != 0; // pivot must not be 0
+    		
+	    	// 变换（k+1）行以下的列k元素为0
+    		// a[i][k] ==> 0, i= k+1...,m
+	    	// a[i][:]*k1 - a[i][:]*k2 ==> a[i][:], k1 = a[k][k], k2 = a[i][k]
+	    	for (int i = k + 1; i < m; i++) {
+	    		tmp = a[i][k]; // first element of this row will be set 0 
 	    		for (int j = 0; j < n; j++) {
-	    		   a[i][j] = a[i][j]*a[col][col] - a[col][j]*tmp;
+	    		   a[i][j] = a[i][j]*a[k][k] - a[k][j]*tmp;
 	    		}
 	    	}
 	    	
@@ -764,7 +769,10 @@ public class InvariantMatrix extends Matrix {
     }
     
     /**
+     * Find the k-th(annulCol-th) pivot
+     * the leading coefficient (the first nonzero number from the left, also called the pivot)
      * 变换矩阵a，使a[annulCol][annulCol] != 0; 
+     * 对于非0行，pivot must not be 0
      * @param a
      * @param m  row dimension
      * @param n  column dimension
@@ -775,6 +783,7 @@ public class InvariantMatrix extends Matrix {
     	int tmp;
     	if (a[annulCol][annulCol] != 0) return;
     	
+    	// 行变换
     	// 保证：a[annulCol][annulCol] != 0
     	for (int i = annulCol; i < m; i++) {
     		if (a[i][annulCol] != 0) {
@@ -785,6 +794,19 @@ public class InvariantMatrix extends Matrix {
     			return;
     		}
     	}
+    	
+    	// a[annulCol][annulCol] == 0，此时实行列变换，使其不等于0
+    	for (int j = 0; j < n; j++) {
+    		if (a[annulCol][j] != 0) {
+    			// column j swap to column annulCol
+    			for (int i = 0; i < m; i++ ) {
+    			  tmp = a[i][annulCol]; a[i][annulCol] = a[i][j]; a[i][j] = tmp;
+    			}
+    			return;
+    		}
+    	}
+    	
+    	// 对于0行，a[annulCol][annulCol] = 0
     }
     
     /**
