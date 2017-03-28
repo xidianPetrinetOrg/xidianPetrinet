@@ -620,23 +620,6 @@ public class InvariantMatrixTest {
 		int row1[] = {1,0,0,4};
 		assertTrue(m.isDependenceRow(row1));
 	}
-	@Ignore
-	@Test
-	public void testRank1() {
-		System.out.println("testRank()");
-		int incidence[][] = {
-				{3, 2, 2},
-				{5, 3, 7},
-				{8, 5, 9}
-        };
-		InvariantMatrix m = new InvariantMatrix(incidence);
-		m.print(4, 0);
-		
-		int r;
-		r = m.rank(m);
-		System.out.println("rank=" + r);
-		//assertEquals(r,2);
-	}
 	
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#rank(InvariantMatrix)}.

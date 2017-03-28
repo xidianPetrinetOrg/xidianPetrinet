@@ -654,61 +654,7 @@ public class InvariantMatrix extends Matrix {
      */
     public int rank(InvariantMatrix a) {
     	int c[][] = a.getArray();
-    	//return rank(c, a.getRowDimension(), a.getColumnDimension());
     	return rank(c);
-    }
-    
-    /**
-     * rank of this matrix
-     */
-    private int rank(int a[][], int m, int n) {
-    	int tmp, gcd;
-    	
-    	// 保证：a[0][0] != 0
-    	for (int i = 0; i < m; i++) {
-    		if (a[0][0] != 0) break;
-    		// 保证a[0][0] != 0
-    		if (a[i][0] != 0) {
-    			for (int j = 0; j < n; j++ ) {
-    			  tmp = a[0][j]; a[0][j] = a[i][j]; a[i][j] = tmp;
-    			}
-    		}
-    	}
-    	
-    	// r[i][:] + r[0][:] ==> r[i][:]; a[i][0] ==> 0, i=1...,m
-    	for (int i = 1; i < m; i++) {
-    		tmp = a[i][0]; // first element of this row will be set 0 
-    		for (int j = 0; j < n; j++) {
-    		   a[i][j] = a[i][j]*a[0][0] - a[0][j]*tmp;
-    		}
-    	}
-    	
-    	int k;
-    	if (m < n) k = m;
-    	else k = n;
-    	if (k == 1) {
-    		boolean zeroFlag = true; // 行全0
-        	int noZeroRowNum = 0;
-        	for (int i = 0; i < m-1; i++) {
-        		zeroFlag = true; // 行全0
-        		for (int j = 0; j < n-1; j++) {
-        			zeroFlag = false;
-        		}
-        		if (!zeroFlag) noZeroRowNum++;
-        	}
-        	return noZeroRowNum;
-    	}
-    	
-    	// construct matrix b, (rowNum-1)*(colNum-1)
-    	int b[][] = new int[m-1][n-1];
-    	for (int i = 0; i < m-1; i++) {
-    		for (int j = 0; j < n-1; j++) b[i][j] = a[i+1][j+1];
-    	}
-    	
-    	printArray(a);
-    	printArray(b);
-    	
-    	return rank(b,m-1,n-1)+1;
     }
     
     /**
@@ -718,7 +664,7 @@ public class InvariantMatrix extends Matrix {
      * (2) the leading coefficient (the first nonzero number from the left, also called the pivot) of a nonzero row is always strictly to the right of the leading coefficient of the row above it.
      * ref. https://en.wikipedia.org/wiki/Gaussian_elimination
      */
-    private int rank(int a[][]) {
+    public int rank(int a[][]) {
     	int m,n,tmp;
     	m = a.length;     // row dimension
     	n = a[0].length;  // column dimension
@@ -728,11 +674,11 @@ public class InvariantMatrix extends Matrix {
     	if (m > n) maxCol = n;
     	else maxCol = m;
     	
-    	// 变换为行阶梯式,正在处理的列col，
+    	// 变换为行阶梯式,正在处理的列k，
     	/*
-    	 * 1 * * *
-    	 * 0 2 * *
-    	 * 0 0 3 *    
+    	 * 1 * * * *
+    	 * 0 2 * * *
+    	 * 0 0 3 * *    
     	 */
     	for (int k = 0; k < maxCol; k++) {
     		// Find the k-th pivot,变换a使a[k][k] != 0
@@ -740,6 +686,7 @@ public class InvariantMatrix extends Matrix {
     		
     		// 对于非0行，一定不等于0
 	    	//assert a[k][k] != 0; // pivot must not be 0
+    		if (a[k][k] == 0) break; // 证明本行以下全为0，不用线性组合了。
     		
 	    	// 变换（k+1）行以下的列k元素为0
     		// a[i][k] ==> 0, i= k+1...,m
@@ -771,7 +718,7 @@ public class InvariantMatrix extends Matrix {
     /**
      * Find the k-th(annulCol-th) pivot
      * the leading coefficient (the first nonzero number from the left, also called the pivot)
-     * 变换矩阵a，使a[annulCol][annulCol] != 0; 
+     * 变换矩阵a，使a[annulCol][annulCol] != 0; 即pivot = annulCol
      * 对于非0行，pivot must not be 0
      * @param a
      * @param m  row dimension
@@ -783,7 +730,13 @@ public class InvariantMatrix extends Matrix {
     	int tmp;
     	if (a[annulCol][annulCol] != 0) return;
     	
-    	// 行变换
+    	/*
+    	 * 1 * * * *   第1行pivot: a[0][0]
+    	 * 0 0 2 * *   第2行pivot: a[1][2] ==>列变换，第2、3列交换，调整到a[1][1]
+    	 * 0 0 0 3 *   第3行pivot: a[2][3] ==>列变换，调整到a[2][2]
+    	 * 
+    	 */
+    	// 行变换，在annulCol的同列中找非零元素，将其交换到annulCol行
     	// 保证：a[annulCol][annulCol] != 0
     	for (int i = annulCol; i < m; i++) {
     		if (a[i][annulCol] != 0) {
@@ -795,7 +748,7 @@ public class InvariantMatrix extends Matrix {
     		}
     	}
     	
-    	// a[annulCol][annulCol] == 0，此时实行列变换，使其不等于0
+    	// 如果行变换没有找到pivot，尝试实行列变换，在annulCol的同行中找非零元素，将其交换到annulCol列
     	for (int j = 0; j < n; j++) {
     		if (a[annulCol][j] != 0) {
     			// column j swap to column annulCol
