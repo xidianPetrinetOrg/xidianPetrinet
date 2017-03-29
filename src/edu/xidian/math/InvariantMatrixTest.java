@@ -208,7 +208,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#linearlyCombine(int i,int k,int j)}.
 	 */
-	@Ignore
+	//@Ignore
 	@Test
 	public void testLinearlyCombine() {
 		System.out.println("testLinearlyCombine()");
@@ -624,7 +624,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#rank(InvariantMatrix)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testRank() {
 		System.out.println("testRank()");

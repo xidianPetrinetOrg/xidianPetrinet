@@ -109,6 +109,7 @@ public class InvariantMatrix extends Matrix {
 	}
 	
 	/**
+	 * row(k) = row(i)*c1 + row(k)*c2,  c1*c2<0 <br>
 	 * Add a linear combination of i-th row to k-th row for A[k][j]=0
 	 * new k row:         A[k][0]           A[k][1]          ....,A[k][j], ...<br>  
 	 *            c1*A[i][0]+c2*A[k][0], c1*A[i][1]+c2*A[k][1],...,  0,    ...<br>
@@ -136,6 +137,7 @@ public class InvariantMatrix extends Matrix {
 	}
 	
 	/**
+	 * row(k) = row(i)*c1 + row(k)*c2,  c1=Coefficient[0], c2= Coefficient[1]<br>
 	 * linear combination of i-th row to k-th row 
 	 * 
 	 * @param i row index
