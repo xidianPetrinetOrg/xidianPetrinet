@@ -650,11 +650,21 @@ public class InvariantMatrix extends Matrix {
     }
     
     /**
-     * rank of this matrix
+     * rank of this matrix,调用rank()
+     * 此函数速度优于rankE()
      */
     public int rank(InvariantMatrix a) {
     	int c[][] = a.getArray();
     	return rank(c);
+    }
+    
+    /**
+     * rank of this matrix,调用rankE()
+     * 此函数速度慢于rank()
+     */
+    public int rankE(InvariantMatrix a) {
+    	int c[][] = a.getArray();
+    	return rankE(c);
     }
     
     /**
@@ -663,8 +673,111 @@ public class InvariantMatrix extends Matrix {
      * (1) all nonzero rows (rows with at least one nonzero element) are above any rows of all zeroes (all zero rows, if any, belong at the bottom of the matrix), and
      * (2) the leading coefficient (the first nonzero number from the left, also called the pivot) of a nonzero row is always strictly to the right of the leading coefficient of the row above it.
      * ref. https://en.wikipedia.org/wiki/Gaussian_elimination
+     **
+     * rankE()函数转换为如下行阶梯式求秩, 迭代次数k与正在处理的row或column同，与pivot相同
+     * 1 * * * *  k=0  pivot=0;
+     * 0 2 * * *  k=1  pivot=1;
+     * 0 0 3 * *  k=2  pivot=2;
+     * 而rank()函数转换为如下行阶梯式求秩, 迭代次数k与row同，k与pivot不同; rank()计算速度应该比rankE()快
+     * 1 * * * * * *   row=0  pivot=0;
+     * 0 0 2 * * * *   row=1  pivot=2;
+     * 0 0 0 0 3 * *   row=2  pivot=4;
      */
     public int rank(int a[][]) {
+    	int m,n,tmp;
+    	int row,pivot;  // pivot所在的行和列
+    	boolean pivotOk = false;
+    	m = a.length;     // row dimension
+    	n = a[0].length;  // column dimension
+    	
+    	// 最大迭代次数为m,n中的小者
+    	int maxCol;
+    	if (m > n) maxCol = n;
+    	else maxCol = m;
+    	
+    	// 变换为行阶梯式
+    	/*
+    	 * 1 * * * * * *   row=0  pivot = 0;
+    	 * 0 0 2 * * * *   row=1  pivot = 2;
+    	 * 0 0 0 0 3 * *   row=2  pivot = 4;
+    	 */
+    	row = 0; pivot = 0;  // start from a[0[0]
+    	for (int k = 0; k < maxCol; k++) {
+    		// Find the k-th pivot,使pivot指向所在行的最左端的非0元素
+    		pivotOk = false;
+    		if (a[row][pivot] == 0) {
+	        	for (int j = pivot; j < n; j++) {   // column
+	        		if (a[row][j] != 0) { pivot = j; break; };
+	        		for (int i = row+1; i < m; i++) {  // row
+		        		if (a[i][j] != 0) {
+		        			// Row swap: i == >row
+		        			for (int c = 0; c < n; c++ ) {
+		        			  tmp = a[row][c]; a[row][c] = a[i][c]; a[i][c] = tmp;
+		        			}
+		                    pivot = j; pivotOk = true; break; // 为了退出两层for循环，设置pivotOk标志变量
+		        		}
+	        		}
+	        		if (pivotOk) break;
+	        	}
+    		}
+    		
+    		if (a[row][pivot] == 0) { // 说明本行及其以下全为0，不用计算非0行数了。 秩就是row
+    		  return row;	
+    		}
+    		
+    		if (a[row][pivot] != 0 && row == maxCol) { // 不用计算非0行数了。 秩就是row
+      		  return row;	
+      		}
+    		  		
+	    	// 变换使a[row+1][pivot] = 0
+    		// a[i][pivot] ==> 0, i= row+1...,m
+	    	// L(i)*k1 - L(row)*k2 ==> L(i)
+	    	// a[i][:]*k1 - a[row][:]*k2 ==> a[i][:], k1 = a[row][pivot], k2 = a[i][pivot]
+	    	for (int i = row + 1; i < m; i++) {
+	    		tmp = a[i][pivot]; // first element of this row will be set 0
+                if (tmp != 0) { // 如果0，不需线性组合了
+		    		for (int j = pivot; j < n; j++) {
+		    		   a[i][j] = a[i][j]*a[row][pivot] - a[row][j]*tmp;
+		    		}
+                }
+	    	}
+	    	row++;  // next row
+	    	pivot++;
+	    	if (row > maxCol || pivot > maxCol) break;  // 迭代结束
+	    	//printArray(a);
+    	}
+    	
+    	// 计算不全为零的行数，秩
+    	boolean zeroFlag = true; // 行全0
+    	int noZeroRowNum = 0;
+    	for (int i = 0; i < m; i++) {
+    		zeroFlag = true; // 行全0
+    		for (int j = 0; j < n; j++) {
+    			if (a[i][j] != 0) { zeroFlag = false; break; }
+    		}
+    		if (!zeroFlag) noZeroRowNum++;
+    	}
+    	
+    	return noZeroRowNum;
+    }
+    
+    /**
+     * rank of the matrix
+     * a matrix is in row echelon form（行阶梯式） if
+     * (1) all nonzero rows (rows with at least one nonzero element) are above any rows of all zeroes (all zero rows, if any, belong at the bottom of the matrix), and
+     * (2) the leading coefficient (the first nonzero number from the left, also called the pivot) of a nonzero row is always strictly to the right of the leading coefficient of the row above it.
+     * ref. https://en.wikipedia.org/wiki/Gaussian_elimination
+     **
+     * rankE()函数转换为如下行阶梯式求秩, 迭代次数k与正在处理的row或column同，与pivot相同
+     * 1 * * * *  k=0  pivot=0;
+     * 0 2 * * *  k=1  pivot=1;
+     * 0 0 3 * *  k=2  pivot=2;
+     * 而rank()函数转换为如下行阶梯式求秩, 迭代次数k与row同，k与pivot不同; rank()计算速度应该比rankE()快
+     * 1 * * * * * *   row=0  pivot=0;
+     * 0 0 2 * * * *   row=1  pivot=2;
+     * 0 0 0 0 3 * *   row=2  pivot=4;
+     */
+    public int rankE(int a[][]) {
     	int m,n,tmp;
     	m = a.length;     // row dimension
     	n = a[0].length;  // column dimension
@@ -675,30 +788,33 @@ public class InvariantMatrix extends Matrix {
     	else maxCol = m;
     	
     	// 变换为行阶梯式,正在处理的列k，
-    	/*
-    	 * 1 * * * *
-    	 * 0 2 * * *
-    	 * 0 0 3 * *    
-    	 */
     	for (int k = 0; k < maxCol; k++) {
     		// Find the k-th pivot,变换a使a[k][k] != 0
     		pivot(a,m,n,k); 
     		
     		// 对于非0行，一定不等于0
 	    	//assert a[k][k] != 0; // pivot must not be 0
-    		if (a[k][k] == 0) break; // 证明本行以下全为0，不用线性组合了。
+    		if (a[k][k] == 0) { // 说明本行及其以下全为0，不用计算非0行数了。 秩就是k
+    		   return k;
+    		}
+    		
+    		if (a[k][k] != 0 && k == maxCol) { // 不用计算非0行数了。 秩就是k
+        	   return k;	
+        	}
     		
 	    	// 变换（k+1）行以下的列k元素为0
     		// a[i][k] ==> 0, i= k+1...,m
-	    	// a[i][:]*k1 - a[i][:]*k2 ==> a[i][:], k1 = a[k][k], k2 = a[i][k]
+	    	// L(i)*k1 - L(k)*k2 ==> L(i), k1 = a[k][k], k2 = a[i][k]
 	    	for (int i = k + 1; i < m; i++) {
 	    		tmp = a[i][k]; // first element of this row will be set 0 
-	    		for (int j = 0; j < n; j++) {
-	    		   a[i][j] = a[i][j]*a[k][k] - a[k][j]*tmp;
+	    		if (tmp != 0) { // 如果0，不需线性组合了
+		    		for (int j = k; j < n; j++) {
+		    		   a[i][j] = a[i][j]*a[k][k] - a[k][j]*tmp;
+		    		}
 	    		}
 	    	}
 	    	
-	    	printArray(a);
+	    	//printArray(a);
     	}
     	
     	// 计算不全为零的行数，秩

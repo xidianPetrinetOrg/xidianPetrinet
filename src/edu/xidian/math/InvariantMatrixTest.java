@@ -640,6 +640,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence1[][] = {
@@ -653,6 +654,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence2[][] = {
@@ -666,6 +668,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence3[][] = {
@@ -679,6 +682,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence4[][] = {
@@ -691,6 +695,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,1);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence5[][] = {
@@ -704,6 +709,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence6[][] = {
@@ -718,6 +724,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence7[][] = {
@@ -732,6 +739,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence8[][] = {
@@ -746,6 +754,7 @@ public class InvariantMatrixTest {
 		r = m.rank(m);
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence9[][] = {
@@ -762,7 +771,75 @@ public class InvariantMatrixTest {
 		
 		r = m.rank(m);
 		System.out.println("rank=" + r);
-		//assertEquals(r,6);
+		assertEquals(r,5);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		
+		///////////////////////////////////////
+		int incidence10[][] = {
+		{0, 1, 1},
+		{1, 0, 1},
+		{1, 0, 1},
+		{0, 1, 0}
+		};
+		m = new InvariantMatrix(incidence10);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,3);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		
+		///////////////////////////////////////
+		int incidence11[][] = {
+		{0, 1, 1, 0},
+		{1, 0, 1, 0},
+		{1, 0, 1, 0},
+		{0, 1, 0, 0}
+		};
+		m = new InvariantMatrix(incidence11);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,3);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		
+		///////////////////////////////////////
+		int incidence12[][] = {
+		{0, 1, 1, 0},
+		{0, 0, 0, 0},
+		{1, 0, 1, 0},
+		{1, 0, 1, 0},
+		{0, 0, 0, 0},
+		{0, 0, 0, 0},
+		{0, 1, 0, 0}
+		};
+		m = new InvariantMatrix(incidence12);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,3);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+
+		///////////////////////////////////////
+		int incidence13[][] = {
+		{0, 1, 1, 0, 0, 1, 1, 0},
+		{0, 0, 0, 0, 0, 1, 0, 0},
+		{1, 0, 1, 0, 1, 2, 3, 0},
+		{1, 0, 1, 0, 1, 2, 3, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 1, 0, 0},
+		{0, 1, 0, 0, 1, 2, 3, 0}
+		};
+		m = new InvariantMatrix(incidence13);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,4);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+
 		
 	}
 	
