@@ -59,7 +59,7 @@ public class ComputeInvariantTest {
    }
    
    /**
-    * 经典 Figure 3
+    * 经典 Figure 3 （1）
     */
    void setUp2() {
 	   // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
@@ -79,7 +79,62 @@ public class ComputeInvariantTest {
        
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
-	    System.out.println("经典，Figure 3， P-Invariants:");
+	    System.out.println("经典，Figure 3 (1)， P-Invariants:");
+	    incidenceM.print("incidence:");
+		incidenceM.print(4, 0);
+		
+		computeInvariant = new ComputeInvariant(incidenceM);
+		
+       /**
+          1     0     0     1     0     0     1     0     0
+          1     0     0     1     0     0     0     1     0
+          1     0     0     1     0     0     0     0     1
+
+        */
+	}
+   
+   /**
+    * 经典 Figure 3 （2）program net
+    */
+   void setUp22() {
+	   // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
+	   // Figure 3
+       int incidence1[][] = {
+       		                 /** t1  t2  t3  **/
+       		          /** p11*/ { 1,  -1,   0 },
+       		          /** p12*/ { 1,  -1,   0 },
+       		          /** p13*/ { 1,  -1,   0 },
+       		    
+       		          /** p21*/ { 0,   1,  -1 },
+       		          /** p22*/ { 0,   1,  -1 },
+       		          /** p23*/ { 0,   1,  -1 },
+       		          
+       		          /** p31*/ {-1,   0,   1 },
+       		          /** p32*/ {-1,   0,   1 },
+       		          /** p33*/ {-1,   0,   1 }
+       		         };
+        
+        int k = 3;
+        int t = 3;    // |T|
+        int p = k*t;  // |P|
+        int incidence[][] = new int[p][t];
+        /***
+        for (int i = 0; i < p; i++) {
+        	for (int j = 0; j < t; j++) {
+        		for (int m = 0; m < k; m++) {
+        			
+        		}
+        	}
+        }
+        ***/
+        for (int j = 0; j < t; j++) {
+        	for (int m = 0; m < k; m++) {
+        		incidence[m][j]
+        	}
+        }
+	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+	    
+	    System.out.println("经典，Figure 3 (2)， P-Invariants:");
 	    incidenceM.print("incidence:");
 		incidenceM.print(4, 0);
 		
@@ -261,8 +316,8 @@ public class ComputeInvariantTest {
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 		//setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3, P-Invariants
-		setUp3();  // Metabolites, T-Invariants
-		//setUp4();  // Li，图2.2 Compute P-Invariants
+		//setUp3();  // Metabolites, T-Invariants
+		setUp4();  // Li，图2.2 Compute P-Invariants
 		//setUp5();  // Li，图2.2 Compute T-Invariants
 		
 		// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
