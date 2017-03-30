@@ -100,19 +100,19 @@ public class ComputeInvariantTest {
 	   // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 	   // Figure 3
        int incidence1[][] = {
-       		                 /** t1  t2  t3  **/
-       		          /** p11*/ { 1,  -1,   0 },
+       		                 /** t1   t2   t3  **/
+       		     /**pp0   p11*/ { 1,  -1,   0 },  /** k个 **/
        		          /** p12*/ { 1,  -1,   0 },
        		          /** p13*/ { 1,  -1,   0 },
        		    
-       		          /** p21*/ { 0,   1,  -1 },
+       		     /**pp1   p21*/ { 0,   1,  -1 },  /** k个 **/
        		          /** p22*/ { 0,   1,  -1 },
        		          /** p23*/ { 0,   1,  -1 },
        		          
-       		          /** p31*/ {-1,   0,   1 },
+       		     /**pp2   p31*/ {-1,   0,   1 },  /** k个 **/
        		          /** p32*/ {-1,   0,   1 },
        		          /** p33*/ {-1,   0,   1 }
-       		         };
+       		         };  // pp: 0 ~ （|T|-1）
         
         int k = 3;
         int t = 3;    // |T|
@@ -127,11 +127,18 @@ public class ComputeInvariantTest {
         	}
         }
         ***/
-        for (int j = 0; j < t; j++) {
-        	for (int m = 0; m < k; m++) {
-        		incidence[m][j]
-        	}
+        for (int pp = 0; pp < t; pp++) {
+	        for (int j = 0; j < t; j++) {
+	        	for (int m = 0; m < k; m++) {
+	        		if (j%k==0) incidence[pp*k+m][j] = 1; 
+	        		else if (m == pp+1) incidence[pp*k+m][j] = -1; 
+	        		else incidence[pp*k+m][j] = 0; 
+	        	}
+	        }
         }
+   
+        
+        
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
 	    System.out.println("经典，Figure 3 (2)， P-Invariants:");
