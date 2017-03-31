@@ -11,12 +11,15 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.invation.code.toval.time.TimeScale;
+import de.invation.code.toval.time.TimeValue;
 import edu.xidian.math.InvariantMatrix;
 import edu.xidian.petrinet.ComputeInvariant;
 
 public class ComputeInvariantTest {
 
    ComputeInvariant computeInvariant;
+   long start;
    
    /**
     * 经典 Figure 1
@@ -95,11 +98,13 @@ public class ComputeInvariantTest {
    
    /**
     * 经典 Figure 3 （2）program net
+    * @param k
+    * @param t |T|, |P|=k*t
     */
-   void setUp22() {
+   void setUp22(int k, int t) {
 	   // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 	   // Figure 3
-       int incidence1[][] = {
+       int incidence1111[][] = {
        		                 /** t1   t2   t3  **/
        		     /**pp0   p11*/ { 1,  -1,   0 },  /** k个 **/
        		          /** p12*/ { 1,  -1,   0 },
@@ -112,28 +117,28 @@ public class ComputeInvariantTest {
        		     /**pp2   p31*/ {-1,   0,   1 },  /** k个 **/
        		          /** p32*/ {-1,   0,   1 },
        		          /** p33*/ {-1,   0,   1 }
-       		         };  // pp: 0 ~ （|T|-1）
+       		         };  // pp: |T|个
         
-        int k = 3;
-        int t = 3;    // |T|
+        //int k = 4;
+        //int t = 5;    // |T|
         int p = k*t;  // |P|
         int incidence[][] = new int[p][t];
-        /***
-        for (int i = 0; i < p; i++) {
-        	for (int j = 0; j < t; j++) {
-        		for (int m = 0; m < k; m++) {
-        			
-        		}
-        	}
-        }
-        ***/
+        
+        int v = 0;
         for (int pp = 0; pp < t; pp++) {
 	        for (int j = 0; j < t; j++) {
-	        	for (int m = 0; m < k; m++) {
-	        		if (j%k==0) incidence[pp*k+m][j] = 1; 
-	        		else if (m == pp+1) incidence[pp*k+m][j] = -1; 
-	        		else incidence[pp*k+m][j] = 0; 
+	        	if ( pp == t-1 ) { // 最后一个pp
+	        		if (j == 0) v = -1;
+	        		else if (j == t-1) v = 1;
+	        		else v = 0;
 	        	}
+	        	else {  // 不是最后一个pp
+	        		if (j == pp) v = 1;
+	        		else if (j == pp+1) v = -1;
+	        		else v = 0;
+	        	}
+	        	
+	        	for (int m = 0; m < k; m++) incidence[pp*k+m][j] = v; 
 	        }
         }
    
@@ -144,6 +149,8 @@ public class ComputeInvariantTest {
 	    System.out.println("经典，Figure 3 (2)， P-Invariants:");
 	    incidenceM.print("incidence:");
 		incidenceM.print(4, 0);
+		
+		System.out.println("|p|="+t*k+",|T|="+t+",Invariants="+Math.pow(k, t));
 		
 		computeInvariant = new ComputeInvariant(incidenceM);
 		
@@ -322,9 +329,10 @@ public class ComputeInvariantTest {
 		System.out.println("setUp()====");
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 		//setUp1();  // 经典 Figure 1, P-Invariants
-		//setUp2();  // 经典 Figure 3, P-Invariants
+		//setUp2();  // 经典 Figure 3 (1), P-Invariants
+		setUp22(6,6);  // 经典 Figure 3 (2), P-Invariants
 		//setUp3();  // Metabolites, T-Invariants
-		setUp4();  // Li，图2.2 Compute P-Invariants
+		//setUp4();  // Li，图2.2 Compute P-Invariants
 		//setUp5();  // Li，图2.2 Compute T-Invariants
 		
 		// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
@@ -335,10 +343,17 @@ public class ComputeInvariantTest {
 		
 		// (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
 		//setUp8();
+		
+		start = System.currentTimeMillis();
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		System.out.println("tearDown()");
+		TimeValue runtime = new TimeValue(System.currentTimeMillis() - start, TimeScale.MILLISECONDS);
+		runtime.adjustScale();
+		
+		System.out.println(runtime + " done.");
 	}
 	
 	@Ignore
