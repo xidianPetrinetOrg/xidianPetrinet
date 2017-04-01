@@ -237,6 +237,10 @@ public class ComputeInvariant {
 		
 		//Find a rows with non-minimal support.
 		println("n="+Y.findNonMinimalRow());
+		
+		// 最后打印出极小不变式，即使在Debug状态也输出
+		System.out.println("minimal support invariants:");
+		Y.print(4,0);
 	}
 	
 	/**
@@ -309,8 +313,8 @@ public class ComputeInvariant {
      * print Matrix A | Y, B 
      */
     private void printAYB() {
-    	println("Matrix A | Y, B");
     	if (Debug) {
+    	    println("Matrix A | Y, B");
     		InvariantMatrix.print(A,Y,6,0);
     		B.print(4,0);
     	}
@@ -320,8 +324,8 @@ public class ComputeInvariant {
      * print Matrix Y 
      */
     private void printY() {
-    	println("Matrix Y");
     	if (Debug) {
+    		println("Matrix Y");
     		Y.print(4,0);
     	}
     }

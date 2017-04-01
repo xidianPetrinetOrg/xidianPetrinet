@@ -327,15 +327,27 @@ public class ComputeInvariantTest {
 	@Before
 	public void setUp() throws Exception {
 		System.out.println("setUp()====");
+		
+		
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 		//setUp1();  // 经典 Figure 1, P-Invariants
-		//setUp2();  // 经典 Figure 3 (1), P-Invariants
-		//setUp22(3,2);  // 经典 Figure 3 (2), P-Invariants，9Invariants
-		//setUp22(3,3);  // 经典 Figure 3 (2), P-Invariants，27Invariants
-		//setUp22(4,4);  // 经典 Figure 3 (2), P-Invariants，256Invariants, 5.71 seconds done.
-		//setUp22(4,5);  // 经典 Figure 3 (2), P-Invariants，1024Invariants, 1.68 minutes done.
-		//setUp22(5,5);  // 经典 Figure 3 (2), P-Invariants，3125Invariants, 16.77 minutes done.
-		setUp22(6,6);  // 经典 Figure 3 (2), P-Invariants，3125Invariants, 16.77 minutes done.
+		//setUp2();  // 经典 Figure 3 (1), P-Invariants,|T|=3,|P|=3*3,
+		//setUp22(3,2);  // 经典 Figure 3 (2), P-Invariants，|T|=2,|P|=3*2,9Invariants
+		//setUp22(3,3);  // 经典 Figure 3 (2), P-Invariants，|T|=3,|P|=3*3,27Invariants
+		
+		// 经典 Figure 3 (2), P-Invariants，|T|=4,|P|=4*4,256Invariants, 5.71 seconds done.
+		//setUp22(4,4); 
+		
+		// 经典 Figure 3 (2), P-Invariants，|T|=4,|P|=4*5,1024Invariants, 1.68 minutes done.
+		//setUp22(4,5);  
+		
+		// 经典 Figure 3 (2), P-Invariants，|T|=5,|P|=5*5,3125Invariants, 
+		// Debug：16.77 minutes done; setDebug(false)不显示中间过程：2.69 seconds done.
+		setUp22(5,5); 
+		
+		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants, ? minutes done.
+		//setUp22(6,6); 
+		
 		//setUp3();  // Metabolites, T-Invariants
 		//setUp4();  // Li，图2.2 Compute P-Invariants
 		//setUp5();  // Li，图2.2 Compute T-Invariants
@@ -349,6 +361,7 @@ public class ComputeInvariantTest {
 		// (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
 		//setUp8();
 		
+		//computeInvariant.setDebug(false);
 		start = System.currentTimeMillis();
 	}
 
