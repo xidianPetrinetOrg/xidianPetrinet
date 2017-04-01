@@ -330,7 +330,7 @@ public class ComputeInvariantTest {
 		
 		
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
-		//setUp1();  // 经典 Figure 1, P-Invariants
+		setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3 (1), P-Invariants,|T|=3,|P|=3*3,
 		//setUp22(3,2);  // 经典 Figure 3 (2), P-Invariants，|T|=2,|P|=3*2,9Invariants
 		//setUp22(3,3);  // 经典 Figure 3 (2), P-Invariants，|T|=3,|P|=3*3,27Invariants
@@ -342,8 +342,8 @@ public class ComputeInvariantTest {
 		//setUp22(4,5);  
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=5,|P|=5*5,3125Invariants, 
-		// Debug：16.77 minutes done; setDebug(false)不显示中间过程：2.69 seconds done.
-		setUp22(5,5); 
+		// Debug：16.39 minutes done; setDebug(false)不显示中间过程：2.05 seconds done.
+		//setUp22(5,5); 
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants, ? minutes done.
 		//setUp22(6,6); 

@@ -1,6 +1,7 @@
 package edu.xidian.petrinet;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.xidian.math.InvariantMatrix;
 
@@ -36,14 +37,12 @@ public class ComputeInvariant {
 	 * Initialization is the identity matrix(incidenceRowDimension*incidenceRowDimension)
 	 */
 	private InvariantMatrix Y; 
-	/**
-	 * upper bound of r matrix
-	 * Initialization is the PN(Petri Net) incidence matrix，
-	 * incidence element[i][j] != 0, B[i][j] = 1, true; 
-	 * incidence element[i][j] == 0, B[i][j] = 0, false; 
-	 */
-	private InvariantMatrix B;
 	
+    /**
+     * 记录已经消去的列index
+     */
+	private List<Integer> annulColumns = new ArrayList<Integer>();
+		
 	/**
 	 *  enable/disable print debug information
 	 */
@@ -59,22 +58,6 @@ public class ComputeInvariant {
     	incidenceColumnDimension = C.getColumnDimension();
 		A = C;
 		Y = InvariantMatrix.identity(incidenceRowDimension, incidenceRowDimension);
-		
-		/**
-		 * upper bound of r matrix
-		 * Initialization is the PN(Petri Net) incidence matrix，
-		 * incidence element[i][j] != 0, B[i][j] = 1, true; 
-		 * incidence element[i][j] == 0, B[i][j] = 0, false; 
-		 */
-		int e;
-		B = new InvariantMatrix(incidenceRowDimension, incidenceColumnDimension);
-		for(int i = 0; i < incidenceRowDimension; i++) {
-			for(int j = 0; j < incidenceColumnDimension;j++) {
-				e = (C.get(i, j)!= 0) ? 1 : 0;
-				//e = (C.get(i, j)== 0) ? 1 : 0;
-				B.set(i, j, e);
-			}
-		}
 		
 		this.Debug = true;
 	}
@@ -93,14 +76,14 @@ public class ComputeInvariant {
 			// +ve所在的行，加到相应-ve所在的行
 			Coefficient = A.linearlyCombine(a[0], a[1], a[2]);
 			Y.linearlyCombine(a[0], a[1], Coefficient);
-			B.logicalUnion(a[0], a[1]);
-			
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
-			B = B.eliminateRow(a[0]);
-            
+			
+			annulColumns.add(a[2]); // record annul column
+			println("auuul columns: " + annulColumns);
+			
 			println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
-			printAYB();
+			printAY();
 		}
     }
 	
@@ -126,16 +109,19 @@ public class ComputeInvariant {
 				
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
-				B.logicalUnion(a[0], i);
 				num++;
+				
 				println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
-			B = B.eliminateRow(a[0]);
 			m--; // 减掉一行
+			
+			annulColumns.add(a[1]); // record annul column
+			println("auuul columns: " + annulColumns);
+			
 			println("eliminate row ["+a[0]+ "]，modify invariants number: " + num);
-			printAYB();
+			printAY();
 		}
     }
 	
@@ -148,16 +134,18 @@ public class ComputeInvariant {
 		int Coefficient[] = new int[2]; // 调整系数
 		ArrayList<Integer> positives = new ArrayList<Integer>();
 		ArrayList<Integer> negatives = new ArrayList<Integer>();
-		int annelCol = AnnelCol(positives, negatives);
-
+		int annelCol = AnnelCol(positives, negatives);	
+		
 		println("Annul column [" + annelCol + "]，Append rows = "+positives.size()*negatives.size());
+		if (annelCol == -1) return;
+		
 		for (int positiveRow : positives ) {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
-				B = B.AppendRowlogicalUnion(positiveRow, negativeRow);
+
 				println("Append row is linearlyCombine of row["+positiveRow + "] and row[" +negativeRow+"]:");
-				printAYB();
+				printAY();
 			}
 		}
 		
@@ -165,33 +153,35 @@ public class ComputeInvariant {
 		positives.addAll(negatives);  // 并集
 		A = A.eliminateRows(positives);
 		Y = Y.eliminateRows(positives);
-		B = B.eliminateRows(positives);
 		
+		annulColumns.add(annelCol); // record annul column
+		println("auuul columns: " + annulColumns);
+				
 		println("eliminate rows: " + positives);
-		printAYB();
+		printAY();
 	}
 	
 	public void compute() {
-		printAYB();
+		printAY();
 		while(!A.isZeroMatrix()) {
 			// Annul all columns k of U (A | Y) in which pk and vk = 1;
 			println("compute1()===");
 			compute1();
 			println("affter compute1()");
-			printAYB();
+			printAY();
 			
 			// Annul all columns k of U (A | Y) in which pk or vk = 1;
 			println("compute2()===");
 			compute2();
 			println("affter compute2()");
-			printAYB();
+			printAY();
 			
 			// expansion factor: F(k) = pk*vk-(pk+vk)
 			// Annul columns:  F(k)<0 or if there is none, select column with lowest pk*vk
 			println("compute3()===");
 			compute3();
 			println("affter compute3()");
-			printAYB();
+			printAY();
 		}
 		
 		////////////////////////////////////////////
@@ -312,11 +302,10 @@ public class ComputeInvariant {
     /**
      * print Matrix A | Y, B 
      */
-    private void printAYB() {
+    private void printAY() {
     	if (Debug) {
-    	    println("Matrix A | Y, B");
+    	    println("Matrix A | Y");
     		InvariantMatrix.print(A,Y,6,0);
-    		B.print(4,0);
     	}
     }
     
