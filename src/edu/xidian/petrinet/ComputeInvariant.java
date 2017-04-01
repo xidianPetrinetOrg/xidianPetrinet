@@ -41,7 +41,7 @@ public class ComputeInvariant {
     /**
      * 记录已经消去的列index
      */
-	private List<Integer> annulColumns = new ArrayList<Integer>();
+	private List<Integer> annuledColumns = new ArrayList<Integer>();
 		
 	/**
 	 *  enable/disable print debug information
@@ -79,8 +79,8 @@ public class ComputeInvariant {
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			
-			annulColumns.add(a[2]); // record annul column
-			println("auuul columns: " + annulColumns);
+			annuledColumns.add(a[2]); // record annul column
+			System.out.println("Annuled columns: " + annuledColumns.size() + " of " + incidenceColumnDimension);
 			
 			println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
 			printAY();
@@ -117,8 +117,8 @@ public class ComputeInvariant {
 			Y = Y.eliminateRow(a[0]);
 			m--; // 减掉一行
 			
-			annulColumns.add(a[1]); // record annul column
-			println("auuul columns: " + annulColumns);
+			annuledColumns.add(a[1]); // record annul column
+			System.out.println("Annuled columns: " + annuledColumns.size() + " of " + incidenceColumnDimension);
 			
 			println("eliminate row ["+a[0]+ "]，modify invariants number: " + num);
 			printAY();
@@ -154,10 +154,10 @@ public class ComputeInvariant {
 		A = A.eliminateRows(positives);
 		Y = Y.eliminateRows(positives);
 		
-		annulColumns.add(annelCol); // record annul column
-		println("auuul columns: " + annulColumns);
+		annuledColumns.add(annelCol); // record annul column
+		System.out.println("Annuled columns: " + annuledColumns.size() + " of " + incidenceColumnDimension);
 				
-		println("eliminate rows: " + positives);
+		//println("eliminate rows: " + positives);
 		printAY();
 	}
 	
@@ -229,8 +229,12 @@ public class ComputeInvariant {
 		println("n="+Y.findNonMinimalRow());
 		
 		// 最后打印出极小不变式，即使在Debug状态也输出
-		System.out.println("minimal support invariants:");
-		Y.print(4,0);
+		//System.out.println("minimal support invariants:");
+		//Y.print(4,0);
+	}
+	
+	public InvariantMatrix getInvariants() {
+		return Y;
 	}
 	
 	/**

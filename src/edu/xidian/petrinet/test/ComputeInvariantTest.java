@@ -327,25 +327,27 @@ public class ComputeInvariantTest {
 	@Before
 	public void setUp() throws Exception {
 		System.out.println("setUp()====");
-		
-		
+				
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
 		setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3 (1), P-Invariants,|T|=3,|P|=3*3,
 		//setUp22(3,2);  // 经典 Figure 3 (2), P-Invariants，|T|=2,|P|=3*2,9Invariants
 		//setUp22(3,3);  // 经典 Figure 3 (2), P-Invariants，|T|=3,|P|=3*3,27Invariants
 		
-		// 经典 Figure 3 (2), P-Invariants，|T|=4,|P|=4*4,256Invariants, 5.71 seconds done.
+		// 经典 Figure 3 (2), P-Invariants，|T|=4,|P|=4*4,256Invariants
+		// Debug: 2.56 seconds done; setDebug(false)不显示中间过程：58 milliseconds done.
 		//setUp22(4,4); 
 		
-		// 经典 Figure 3 (2), P-Invariants，|T|=4,|P|=4*5,1024Invariants, 1.68 minutes done.
+		// 经典 Figure 3 (2), P-Invariants，|T|=4,|P|=4*5,1024Invariants
+		// Debug: 1.68 minutes done; setDebug(false)不显示中间过程：342 milliseconds done.
 		//setUp22(4,5);  
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=5,|P|=5*5,3125Invariants, 
 		// Debug：16.39 minutes done; setDebug(false)不显示中间过程：2.05 seconds done.
 		//setUp22(5,5); 
 		
-		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants, ? minutes done.
+		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants
+		// Debug：? minutes done; setDebug(false)不显示中间过程：9.81 minutes done.
 		//setUp22(6,6); 
 		
 		//setUp3();  // Metabolites, T-Invariants
@@ -368,6 +370,11 @@ public class ComputeInvariantTest {
 	@After
 	public void tearDown() throws Exception {
 		System.out.println("tearDown()");
+		
+		InvariantMatrix invariants = computeInvariant.getInvariants();
+		System.out.println("minimal support invariants:");
+		invariants.print(4, 0);
+		
 		TimeValue runtime = new TimeValue(System.currentTimeMillis() - start, TimeScale.MILLISECONDS);
 		runtime.adjustScale();
 		
