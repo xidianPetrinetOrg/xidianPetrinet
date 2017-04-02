@@ -329,7 +329,7 @@ public class ComputeInvariantTest {
 		System.out.println("setUp()====");
 				
 		// 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
-		setUp1();  // 经典 Figure 1, P-Invariants
+		//setUp1();  // 经典 Figure 1, P-Invariants
 		//setUp2();  // 经典 Figure 3 (1), P-Invariants,|T|=3,|P|=3*3,
 		//setUp22(3,2);  // 经典 Figure 3 (2), P-Invariants，|T|=2,|P|=3*2,9Invariants
 		//setUp22(3,3);  // 经典 Figure 3 (2), P-Invariants，|T|=3,|P|=3*3,27Invariants
@@ -350,7 +350,10 @@ public class ComputeInvariantTest {
 		// Debug：? minutes done; setDebug(false)不显示中间过程：9.81 minutes done.
 		//setUp22(6,6); 
 		
-		//setUp3();  // Metabolites, T-Invariants
+		// has minimal support invariants
+		setUp3();  // Metabolites, T-Invariants
+		
+		
 		//setUp4();  // Li，图2.2 Compute P-Invariants
 		//setUp5();  // Li，图2.2 Compute T-Invariants
 		

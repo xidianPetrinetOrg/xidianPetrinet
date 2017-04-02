@@ -39,9 +39,14 @@ public class ComputeInvariant {
 	private InvariantMatrix Y; 
 	
     /**
-     * 记录已经消去的列index
+     * 记录已经消去A矩阵的列index
      */
 	private List<Integer> annuledColumns = new ArrayList<Integer>();
+	
+	/**
+	 * 记录原始矩阵A(即未消去列的矩阵),是求秩的基础
+	 */
+	private int AA[][];
 		
 	/**
 	 *  enable/disable print debug information
@@ -58,6 +63,7 @@ public class ComputeInvariant {
     	incidenceColumnDimension = C.getColumnDimension();
 		A = C;
 		Y = InvariantMatrix.identity(incidenceRowDimension, incidenceRowDimension);
+		AA = A.getArrayCopy();
 		
 		this.Debug = true;
 	}
@@ -72,6 +78,7 @@ public class ComputeInvariant {
 		
 		// 符合算法的基数条件,仅有一个+ve和-ve的列, 线性组合+ve行到-ve行，删除+ve行.
 		while (A.cardinalityOne1(a) == 0) {
+			println("唯一的+ve和唯一的-ve：A[" + a[0] + "][" + a[2] + "],A[" + a[1] + "][" + a[2] + "]");
 			println("Annul column [" + a[2] + "]");
 			// +ve所在的行，加到相应-ve所在的行
 			Coefficient = A.linearlyCombine(a[0], a[1], a[2]);
@@ -79,11 +86,12 @@ public class ComputeInvariant {
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			
-			annuledColumns.add(a[2]); // record annul column
-			System.out.println("Annuled columns: " + annuledColumns.size() + " of " + incidenceColumnDimension);
-			
-			println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
+			//println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
 			printAY();
+			
+			annuledColumns.add(a[2]); // record annul column
+			System.out.println("Annuled columns: " + annuledColumns + "," + 
+			              annuledColumns.size() + " of " + incidenceColumnDimension);
 		}
     }
 	
@@ -101,27 +109,27 @@ public class ComputeInvariant {
 		// 符合算法的基数条件,仅有一个+ve或-ve的列, 线性组合到其它行，删除此行.
 		while (A.cardinalityOne(a) == 0) {
 			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
+			println("唯一的+ve或-ve：A[" + a[0] + "][" + a[1] + "]");
 			println("Annul column [" + a[1] + "]");
 			int num = 0;
 			for (int i = 0; i < m; i++) {
 				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
 				if (A.get(i, a[1]) == 0) continue; // 不与0元素所在的行线性组合
-				
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
 				num++;
-				
-				println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
+				//println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			m--; // 减掉一行
 			
-			annuledColumns.add(a[1]); // record annul column
-			System.out.println("Annuled columns: " + annuledColumns.size() + " of " + incidenceColumnDimension);
-			
-			println("eliminate row ["+a[0]+ "]，modify invariants number: " + num);
+			//println("eliminate row ["+a[0]+ "]，modify invariants number: " + num);
 			printAY();
+			
+			annuledColumns.add(a[1]); // record annul column
+			System.out.println("Annuled columns: " + annuledColumns + "," + 
+		              annuledColumns.size() + " of " + incidenceColumnDimension);
 		}
     }
 	
@@ -143,9 +151,8 @@ public class ComputeInvariant {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
-
-				println("Append row is linearlyCombine of row["+positiveRow + "] and row[" +negativeRow+"]:");
-				printAY();
+				//println("Append row is linearlyCombine of row["+positiveRow + "] and row[" +negativeRow+"]:");
+				//printAY();
 			}
 		}
 		
@@ -154,11 +161,12 @@ public class ComputeInvariant {
 		A = A.eliminateRows(positives);
 		Y = Y.eliminateRows(positives);
 		
-		annuledColumns.add(annelCol); // record annul column
-		System.out.println("Annuled columns: " + annuledColumns.size() + " of " + incidenceColumnDimension);
-				
 		//println("eliminate rows: " + positives);
 		printAY();
+		
+		annuledColumns.add(annelCol); // record annul column
+		System.out.println("Annuled columns: " + annuledColumns + "," + 
+	              annuledColumns.size() + " of " + incidenceColumnDimension);
 	}
 	
 	public void compute() {
@@ -184,6 +192,15 @@ public class ComputeInvariant {
 			printAY();
 		}
 		
+		println("矩阵A成为全0矩阵, 矩阵Y的各行是所求不变式的候选向量.");
+		//System.out.println("Annuled columns: " + annuledColumns + "," + 
+	    //          annuledColumns.size() + " of " + incidenceColumnDimension);
+		if ( annuledColumns.size() != incidenceColumnDimension) {
+		   System.out.println("Annuled columns: " + annuledColumns);
+		   int n = incidenceColumnDimension - annuledColumns.size();
+		   System.out.println("算法需要消去A的列数：" + incidenceColumnDimension + ",其中主动消去列数：" + annuledColumns.size() + ",顺带消去列数：" + n);
+		}
+		
 		////////////////////////////////////////////
 		// 规范化矩阵Minimal Support matrix Y
 		/** Y is called standardized iff
@@ -192,12 +209,11 @@ public class ComputeInvariant {
 		(3) y cannot be divided by an element k属于正整数(positive integers), k > 1 without destroying (1)
 		**/
 		////////////////////////////////////////////
-		println("规范化矩阵Minimal Support matrix Y===");
+		System.out.println("规范化矩阵Minimal Support Matrix Y===");
 		// 全部由负元素或0组成的行，取正，即负行取正
 		while (true) {
 			int row = Y.allNegativeOrZeroRow();
-			if (row == -1)
-				break;
+			if (row == -1) break;
 			for (int j = 0; j < incidenceRowDimension; j++) {
 				if (Y.get(row, j) < 0)
 					Y.set(row, j, Math.abs(Y.get(row, j))); // 负元素取正
@@ -225,14 +241,41 @@ public class ComputeInvariant {
 		println("各行除以该行的最大公约数.");
 		printY();
 		
-		//Find a rows with non-minimal support.
-		println("n="+Y.findNonMinimalRow());
+		// Delete the rows of non minimal support in matrix Y
+		// 使用以下任意一种方法即可。
+		System.out.println("Delete the rows of non minimal support in matrix Y===");
+		// method 1:
+		/**
+		while(true) {
+			//Find a row with non-minimal support.
+			int row = Y.findNonMinimalRow();
+			if (row == -1) break;
+			println(row+"-th row of Y, is non minimal support, to be delete.");
+			Y = Y.eliminateRow(row);
+		}
+		**/
 		
-		// 最后打印出极小不变式，即使在Debug状态也输出
-		//System.out.println("minimal support invariants:");
-		//Y.print(4,0);
+		// method 2:
+		// ref. K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants  
+		int n = -1;
+		for (int row = 0; row < Y.getRowDimension(); row++) {
+			n = noMiniSupport(row, annuledColumns);
+			if (n != -1) {
+				println(n+"-th row of Y, is non minimal support, to be delete.");
+				Y = Y.eliminateRow(row);
+				row--;
+			}
+		}
+		
+		// 最后打印出极小不变式
+	    println("minimal support invariants:");
+		Y.print(4,0);
 	}
 	
+	/**
+	 * 计算后，通过此函数获取计算结果(所求不变式)
+	 * @return
+	 */
 	public InvariantMatrix getInvariants() {
 		return Y;
 	}
@@ -295,7 +338,42 @@ public class ComputeInvariant {
 		return minCol;
 	}
 	
-	   /**
+	/**
+	 * Delete the row of non minimal support in matrix Y
+	 * Deleting any candidate vector such that |sup(Y)| > rank(H)+1
+	 * @param row index of row for matrix Y
+	 * @param annuledColumns  已经消去的矩阵A的列
+	 * @return the row index of non minimal support in matrix Y, 
+	 *         if not, return -1;
+	 * ref. K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants  
+	 */
+	public int noMiniSupport(int row, List<Integer> annuledColumns) {
+		List<Integer> noZeroes = new ArrayList<Integer>();
+		
+		for (int j = 0; j < incidenceRowDimension; j++) { // Y的行数和列数相同
+			if (Y.get(row, j) != 0) noZeroes.add(j);
+		}
+		
+		// construct H
+		int m = noZeroes.size();  // row
+	    int n = annuledColumns.size(); // column
+	    int r = 0, c = 0; // row,column index
+		int H[][] = new int[m][n];
+		for (Integer i : noZeroes) {
+			c = 0;
+			for (Integer j : annuledColumns) {
+			  H[r][c] = AA[i][j]; c++; 
+			}
+			r++;
+		}
+		
+		int rank = Y.rank(H); 
+		//println("rank:"+noZeroes.size()+","+rank);
+		if (noZeroes.size() > rank+1) return row;
+		else return -1;
+	}
+	
+	/**
      * print string s + "\n"
      * @param s
      */
@@ -304,7 +382,7 @@ public class ComputeInvariant {
     }
     
     /**
-     * print Matrix A | Y, B 
+     * print Matrix A | Y
      */
     private void printAY() {
     	if (Debug) {
@@ -338,7 +416,7 @@ public class ComputeInvariant {
     	return this.Debug;
     }
 	
-	public static void main(String[] args) {
-         	   
-	}
+//	public static void main(String[] args) {
+//         	   
+//	}
 }
