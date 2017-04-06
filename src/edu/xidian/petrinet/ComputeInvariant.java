@@ -111,20 +111,17 @@ public class ComputeInvariant {
 			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
 			println("唯一的+ve或-ve：A[" + a[0] + "][" + a[1] + "]");
 			println("Annul column [" + a[1] + "]");
-			int num = 0;
 			for (int i = 0; i < m; i++) {
 				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
 				if (A.get(i, a[1]) == 0) continue; // 不与0元素所在的行线性组合
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
-				num++;
 				//println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			m--; // 减掉一行
 			
-			//println("eliminate row ["+a[0]+ "]，modify invariants number: " + num);
 			printAY();
 			
 			annuledColumns.add(a[1]); // record annul column
@@ -259,7 +256,7 @@ public class ComputeInvariant {
 		// ref. K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants  
 		int n = -1;
 		for (int row = 0; row < Y.getRowDimension(); row++) {
-			n = noMiniSupport(row, annuledColumns);
+			n = noMinimalSupport(row, annuledColumns);
 			if (n != -1) {
 				println(n+"-th row of Y, is non minimal support, to be delete.");
 				Y = Y.eliminateRow(row);
@@ -347,7 +344,7 @@ public class ComputeInvariant {
 	 *         if not, return -1;
 	 * ref. K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants  
 	 */
-	public int noMiniSupport(int row, List<Integer> annuledColumns) {
+	public int noMinimalSupport(int row, List<Integer> annuledColumns) {
 		List<Integer> noZeroes = new ArrayList<Integer>();
 		
 		for (int j = 0; j < incidenceRowDimension; j++) { // Y的行数和列数相同
