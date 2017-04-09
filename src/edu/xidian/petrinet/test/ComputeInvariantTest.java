@@ -347,11 +347,11 @@ public class ComputeInvariantTest {
 		//setUp22(5,5); 
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants
-		// Debug：? minutes done; setDebug(false)不显示中间过程：9.81 minutes done.
-		//setUp22(6,6); 
+		// Debug：? minutes done; setDebug(false)不显示中间过程：9.81/4.59 minutes done.
+		setUp22(6,6); 
 		
 		// has minimal support invariants
-		setUp3();  // Metabolites, T-Invariants
+		//setUp3();  // Metabolites, T-Invariants
 		
 		
 		//setUp4();  // Li，图2.2 Compute P-Invariants
@@ -366,7 +366,7 @@ public class ComputeInvariantTest {
 		// (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
 		//setUp8();
 		
-		//computeInvariant.setDebug(false);
+		computeInvariant.setDebug(false);
 		start = System.currentTimeMillis();
 	}
 

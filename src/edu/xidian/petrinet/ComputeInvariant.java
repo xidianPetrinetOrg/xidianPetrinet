@@ -44,7 +44,7 @@ public class ComputeInvariant {
 	private List<Integer> annuledColumns = new ArrayList<Integer>();
 	
 	/**
-	 * 记录原始矩阵A(即未消去列的矩阵),是求秩的基础
+	 * 记录原始矩阵A(即未消去任何列的矩阵A),是noMinimalSupport()求非极小支撑的基础
 	 */
 	private int AA[][];
 		
@@ -83,13 +83,24 @@ public class ComputeInvariant {
 			// +ve所在的行，加到相应-ve所在的行
 			Coefficient = A.linearlyCombine(a[0], a[1], a[2]);
 			Y.linearlyCombine(a[0], a[1], Coefficient);
+			
+			annuledColumns.add(a[2]); // record annul column
+			
+			// 如果新添加的候选向量不是极小的，删除之
+			int no = noMinimalSupport(a[1], annuledColumns);
+		    if (no != -1) {
+		      assert(no == a[1]);
+			  println("delete non minimal candidate vector:" + no);
+			  A = A.eliminateRow(no); Y = Y.eliminateRow(no);
+			}
+			
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
 			
 			//println("唯一的+ve,唯一的-ve：[" + a[0] + "]row, add to [" + a[1] + "]row,at col[" + a[2] + "],eliminate row[" + a[0] + "]");
 			printAY();
 			
-			annuledColumns.add(a[2]); // record annul column
+			//annuledColumns.add(a[2]); // record annul column
 			System.out.println("Annuled columns: " + annuledColumns + "," + 
 			              annuledColumns.size() + " of " + incidenceColumnDimension);
 		}
@@ -111,12 +122,23 @@ public class ComputeInvariant {
 			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
 			println("唯一的+ve或-ve：A[" + a[0] + "][" + a[1] + "]");
 			println("Annul column [" + a[1] + "]");
+			
+			annuledColumns.add(a[1]); // record annul column
 			for (int i = 0; i < m; i++) {
 				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
 				if (A.get(i, a[1]) == 0) continue; // 不与0元素所在的行线性组合
 				Coefficient = A.linearlyCombine(a[0], i, a[1]);
 				Y.linearlyCombine(a[0], i, Coefficient);
 				//println("唯一的+ve或-ve：[" + a[0] + "]row, add to [" + i + "]row,at col[" + a[1] + "]");
+				
+				// 如果新添加的候选向量不是极小的，删除之
+				int no = noMinimalSupport(i, annuledColumns);
+			    if (no != -1) {
+			      assert(no == i);
+				  println("delete non minimal candidate vector:" + no);
+				  A = A.eliminateRow(no); Y = Y.eliminateRow(no);
+				  m--;
+				}
 			}
 			A = A.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
 			Y = Y.eliminateRow(a[0]);
@@ -124,7 +146,7 @@ public class ComputeInvariant {
 			
 			printAY();
 			
-			annuledColumns.add(a[1]); // record annul column
+			//annuledColumns.add(a[1]); // record annul column
 			System.out.println("Annuled columns: " + annuledColumns + "," + 
 		              annuledColumns.size() + " of " + incidenceColumnDimension);
 		}
@@ -144,12 +166,21 @@ public class ComputeInvariant {
 		println("Annul column [" + annelCol + "]，Append rows = "+positives.size()*negatives.size());
 		if (annelCol == -1) return;
 		
+		annuledColumns.add(annelCol); // record annul column
 		for (int positiveRow : positives ) {
 			for (int negativeRow : negatives) {
 				A = A.AppendRowLinearlyCombine(positiveRow, negativeRow, annelCol, Coefficient);
 				Y = Y.AppendRowLinearlyCombine(positiveRow, negativeRow, Coefficient);
 				//println("Append row is linearlyCombine of row["+positiveRow + "] and row[" +negativeRow+"]:");
-				//printAY();
+				printAY();
+				
+				// 如果新添加的候选向量不是极小的，删除之
+				int no = noMinimalSupport(Y.getRowDimension()-1, annuledColumns);
+			    if (no != -1) {
+			      assert(no == Y.getRowDimension()-1);
+				  println("delete non minimal candidate vector:" + no);
+				  A = A.eliminateRow(no); Y = Y.eliminateRow(no);
+				}
 			}
 		}
 		
@@ -161,7 +192,7 @@ public class ComputeInvariant {
 		//println("eliminate rows: " + positives);
 		printAY();
 		
-		annuledColumns.add(annelCol); // record annul column
+		//annuledColumns.add(annelCol); // record annul column
 		System.out.println("Annuled columns: " + annuledColumns + "," + 
 	              annuledColumns.size() + " of " + incidenceColumnDimension);
 	}
@@ -250,9 +281,9 @@ public class ComputeInvariant {
 			println(row+"-th row of Y, is non minimal support, to be delete.");
 			Y = Y.eliminateRow(row);
 		}
-		**/
 		
-		// method 2:
+		
+		// method 2: 删除非极小候选向量，即 |sup(Y)| > rank(H)+1， #see#noMinimalSupport()函数
 		// ref. K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants  
 		int n = -1;
 		for (int row = 0; row < Y.getRowDimension(); row++) {
@@ -263,6 +294,10 @@ public class ComputeInvariant {
 				row--;
 			}
 		}
+		**/
+		
+		// method 3: 
+		// 同method 2， 将其应用于compute1(),compute2(),compute3(),在这些函数中调用noMinimalSupport()处理非极小候选向量
 		
 		// 最后打印出极小不变式
 	    println("minimal support invariants:");
@@ -336,8 +371,9 @@ public class ComputeInvariant {
 	}
 	
 	/**
-	 * Delete the row of non minimal support in matrix Y
-	 * Deleting any candidate vector such that |sup(Y)| > rank(H)+1
+	 * 非极小支撑
+	 * The row index of non minimal support in matrix Y
+	 * non minimal support: any candidate vector such that |sup(Y)| > rank(H)+1
 	 * @param row index of row for matrix Y
 	 * @param annuledColumns  已经消去的矩阵A的列
 	 * @return the row index of non minimal support in matrix Y, 
@@ -345,13 +381,14 @@ public class ComputeInvariant {
 	 * ref. K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants  
 	 */
 	public int noMinimalSupport(int row, List<Integer> annuledColumns) {
-		List<Integer> noZeroes = new ArrayList<Integer>();
+		List<Integer> noZeroes = new ArrayList<Integer>(); // Y矩阵第row行，非0元素，构成|sup（Y）|
 		
+		// sup(Y)
 		for (int j = 0; j < incidenceRowDimension; j++) { // Y的行数和列数相同
 			if (Y.get(row, j) != 0) noZeroes.add(j);
 		}
 		
-		// construct H
+		// construct H, 来自AA的子矩阵： 行：noZeroes; 列：annuledColumns
 		int m = noZeroes.size();  // row
 	    int n = annuledColumns.size(); // column
 	    int r = 0, c = 0; // row,column index
