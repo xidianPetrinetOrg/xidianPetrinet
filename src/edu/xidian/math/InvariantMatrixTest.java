@@ -208,7 +208,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#linearlyCombine(int i,int k,int j)}.
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void testLinearlyCombine() {
 		System.out.println("testLinearlyCombine()");
@@ -624,7 +624,7 @@ public class InvariantMatrixTest {
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#rank(InvariantMatrix)}.
 	 */
-	@Ignore
+	//@Ignore
 	@Test
 	public void testRank() {
 		System.out.println("testRank()");
@@ -839,8 +839,23 @@ public class InvariantMatrixTest {
 		System.out.println("rank=" + r);
 		assertEquals(r,4);
 		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
-
 		
+		///////////////////////////////////////
+		int incidence14[][] = {
+			{-1,   1,   1,   0,   0},   
+			{0,   -1,   0,   0,   1},   
+			{0,    0,  -1,   0,   1},   
+			{0,    0,   0,   0, -29},   
+			{0,   -1,  -1,   0,   0}   
+		};
+		m = new InvariantMatrix(incidence14);
+		m.print(4, 0);
+		
+		r = m.rank(m);
+		System.out.println("rank=" + r);
+		assertEquals(r,4);
+		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+	
 	}
 	
 	/**

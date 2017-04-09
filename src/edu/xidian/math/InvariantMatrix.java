@@ -692,7 +692,7 @@ public class InvariantMatrix extends Matrix {
     	m = a.length;     // row dimension
     	n = a[0].length;  // column dimension
     	
-    	// 最大迭代次数为m,n中的小者
+    	// 最大迭代次数为m,n中的小者,即下面k的最大取值
     	int maxCol;
     	if (m > n) maxCol = n;
     	else maxCol = m;
@@ -704,34 +704,35 @@ public class InvariantMatrix extends Matrix {
     	 * 0 0 0 0 3 * *   row=2  pivot = 4;
     	 */
     	row = 0; pivot = 0;  // start from a[0[0]
-    	for (int k = 0; k < maxCol; k++) {
-    		// Find the k-th pivot,使pivot指向所在行的最左端的非0元素
+    	for (int k = 0; k < maxCol; k++) { // k表示对角线元素序号a[0][0] ==> k=0,a[1][1] ==> k=1,a[2][2] ==> k=2
+    		// Find the k-th pivot,使pivot指向row行的最左端的非0元素
     		pivotOk = false;
-    		if (a[row][pivot] == 0) {
-	        	for (int j = pivot; j < n; j++) {   // column
-	        		if (a[row][j] != 0) { pivot = j; break; };
-	        		for (int i = row+1; i < m; i++) {  // row
-		        		if (a[i][j] != 0) {
-		        			// Row swap: i == >row
-		        			for (int c = 0; c < n; c++ ) {
-		        			  tmp = a[row][c]; a[row][c] = a[i][c]; a[i][c] = tmp;
+    		//System.out.println("row,pivot="+row+","+pivot);
+    		if (a[row][pivot] == 0) { // 找row行最左端的非0元素 ==> pivot
+	        	for (int j = pivot; j < n; j++) {    // column
+	        		for (int i = row; i < m; i++) {  // row
+		        		if (a[i][j] != 0) { 
+		        			if (i != row) { // Row swap: i == >row
+		        				for (int c = 0; c < n; c++ ) {
+		        					tmp = a[row][c]; a[row][c] = a[i][c]; a[i][c] = tmp;
+		        				}
 		        			}
 		                    pivot = j; pivotOk = true; break; // 为了退出两层for循环，设置pivotOk标志变量
 		        		}
 	        		}
 	        		if (pivotOk) break;
 	        	}
+	        	if (!pivotOk) {  // pivot无非0指向，即a[row][pivot] = 0, 说明本行及其以下全为0，不用计算非0行数了。 秩就是row
+	        		return row;
+	        	}
     		}
     		
-    		if (a[row][pivot] == 0) { // 说明本行及其以下全为0，不用计算非0行数了。 秩就是row
-    		  return row;	
-    		}
-    		
-    		if (a[row][pivot] != 0 && row == maxCol) { // 不用计算非0行数了。 秩就是row
+    		if (a[row][pivot] != 0 && row == m) { // 不用计算非0行数了。 秩就是row
       		  return row;	
       		}
+      		
     		  		
-	    	// 变换使a[row+1][pivot] = 0
+	    	// 变换使a[row+1,...][pivot] = 0
     		// a[i][pivot] ==> 0, i= row+1...,m
 	    	// L(i)*k1 - L(row)*k2 ==> L(i)
 	    	// a[i][:]*k1 - a[row][:]*k2 ==> a[i][:], k1 = a[row][pivot], k2 = a[i][pivot]
@@ -745,7 +746,8 @@ public class InvariantMatrix extends Matrix {
 	    	}
 	    	row++;  // next row
 	    	pivot++;
-	    	if (row > maxCol || pivot > maxCol) break;  // 迭代结束
+	    	if (row >= m) row = m - 1;
+	    	if (pivot >= n) pivot = n -1;  // 迭代结束
 	    	//printArray(a);
     	}
     	
@@ -784,13 +786,13 @@ public class InvariantMatrix extends Matrix {
     	m = a.length;     // row dimension
     	n = a[0].length;  // column dimension
     	
-    	// 处理列数为m,n中的小者
+    	// 处理列数为m,n中的小者,即下面k的最大取值
     	int maxCol;
     	if (m > n) maxCol = n;
     	else maxCol = m;
     	
     	// 变换为行阶梯式,正在处理的列k，
-    	for (int k = 0; k < maxCol; k++) {
+    	for (int k = 0; k < maxCol; k++) { // k表示对角线元素序号a[0][0] ==> k=0,a[1][1] ==> k=1,a[2][2] ==> k=2
     		// Find the k-th pivot,变换a使a[k][k] != 0
     		pivot(a,m,n,k); 
     		
