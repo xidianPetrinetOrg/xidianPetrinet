@@ -343,12 +343,12 @@ public class ComputeInvariantTest {
 		//setUp22(4,5);  
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=5,|P|=5*5,3125Invariants, 
-		// Debug：16.39 minutes done; setDebug(false)不显示中间过程：2.05 seconds done.
-		//setUp22(5,5); 
+		// Debug：16.39 minutes done; setDebug(false)不显示中间过程：1.37 seconds done.
+		setUp22(5,5); 
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants
-		// Debug：? minutes done; setDebug(false)不显示中间过程：9.81/4.59 minutes done.
-		setUp22(6,6); 
+		// Debug：? minutes done; setDebug(false)不显示中间过程：4.59 minutes done.
+		//setUp22(6,6); 
 		
 		// has minimal support invariants
 		//setUp3();  // Metabolites, T-Invariants
