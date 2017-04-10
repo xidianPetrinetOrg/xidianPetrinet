@@ -87,13 +87,7 @@ public class ComputeInvariantTest {
 		incidenceM.print(4, 0);
 		
 		computeInvariant = new ComputeInvariant(incidenceM);
-		
-       /**
-          1     0     0     1     0     0     1     0     0
-          1     0     0     1     0     0     0     1     0
-          1     0     0     1     0     0     0     0     1
 
-        */
 	}
    
    /**
@@ -102,23 +96,6 @@ public class ComputeInvariantTest {
     * @param t |T|, |P|=k*t
     */
    void setUp22(int k, int t) {
-	   // 经典,A Simple and Fast Algorithm To Obain All Invariants Of A Generalised Petri Net
-	   // Figure 3
-       int incidence1111[][] = {
-       		                 /** t1   t2   t3  **/
-       		     /**pp0   p11*/ { 1,  -1,   0 },  /** k个 **/
-       		          /** p12*/ { 1,  -1,   0 },
-       		          /** p13*/ { 1,  -1,   0 },
-       		    
-       		     /**pp1   p21*/ { 0,   1,  -1 },  /** k个 **/
-       		          /** p22*/ { 0,   1,  -1 },
-       		          /** p23*/ { 0,   1,  -1 },
-       		          
-       		     /**pp2   p31*/ {-1,   0,   1 },  /** k个 **/
-       		          /** p32*/ {-1,   0,   1 },
-       		          /** p33*/ {-1,   0,   1 }
-       		         };  // pp: |T|个
-        
         //int k = 4;
         //int t = 5;    // |T|
         int p = k*t;  // |P|
@@ -153,13 +130,7 @@ public class ComputeInvariantTest {
 		System.out.println("|p|="+t*k+",|T|="+t+",Invariants="+Math.pow(k, t));
 		
 		computeInvariant = new ComputeInvariant(incidenceM);
-		
-       /**
-          1     0     0     1     0     0     1     0     0
-          1     0     0     1     0     0     0     1     0
-          1     0     0     1     0     0     0     0     1
 
-        */
 	}
    
    /**
@@ -188,8 +159,6 @@ public class ComputeInvariantTest {
 		/**
 		 [0]     15    15    15     0    13     2    28    15    28
          [1]      0     0     0     1     1     0     0     0     0
-         [2]    435   435   435    28   405    58   812   435   812
-		 Y3 = 29*Y1+28*Y2 
 		 */
     }
     
@@ -217,6 +186,17 @@ public class ComputeInvariantTest {
 	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM);
+		
+		/***
+        p1    p2    p3    p4    p5    p6    p7    p8    p9   p10   p11   p12
+        1     1     1     0     0     0     0     0     1     1     0     0  (1)一致
+        0     0     0     1     1     1     0     0     0     0     0     0  (2)一致
+        0     1     0     0     0     1     1     0     0     0     0     0  (3)一致
+        0     0     1     0     1     0     0     1     0     0     0     0   (4) 书没有
+        0     0     0     0     0     0     0     0     0     1     1     0   (5) 书没有
+        0     0     0     0     0     0     0     0     1     0     0     1   (6) 书没有
+                          1     1     1                -1                -1    (2)-(6)一致
+       */
     }
     
 	// Li，图2.2 Compute T-Invariants
@@ -243,6 +223,13 @@ public class ComputeInvariantTest {
 	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM.transpose());
+	   
+	   /**
+          t1        t2        t3        t4        t5        t6        t7        t8        t9
+          1         1         1         0         0         0         1         0         0     一致
+          0         0         0         1         1         1         0         0         0     一致
+          0         0         0         0         0         0         1         1         1     一致
+        */
     }
     
 	// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
@@ -344,7 +331,7 @@ public class ComputeInvariantTest {
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=5,|P|=5*5,3125Invariants, 
 		// Debug：16.39 minutes done; setDebug(false)不显示中间过程：1.37 seconds done.
-		setUp22(5,5); 
+		//setUp22(5,5); 
 		
 		// 经典 Figure 3 (2), P-Invariants，|T|=6,|P|=6*6,46656Invariants
 		// Debug：? minutes done; setDebug(false)不显示中间过程：4.59 minutes done.
@@ -355,7 +342,7 @@ public class ComputeInvariantTest {
 		
 		
 		//setUp4();  // Li，图2.2 Compute P-Invariants
-		//setUp5();  // Li，图2.2 Compute T-Invariants
+		setUp5();  // Li，图2.2 Compute T-Invariants
 		
 		// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
 		//setUp6();
@@ -366,7 +353,7 @@ public class ComputeInvariantTest {
 		// (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
 		//setUp8();
 		
-		computeInvariant.setDebug(false);
+		//computeInvariant.setDebug(false);
 		start = System.currentTimeMillis();
 	}
 
