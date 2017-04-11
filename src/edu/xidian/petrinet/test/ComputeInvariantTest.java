@@ -82,7 +82,7 @@ public class ComputeInvariantTest {
        
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
-	    System.out.println("经典，Figure 3 (1)， P-Invariants:");
+	    System.out.println("经典，27(3^3)个P不变式，Figure 3 (1)， P-Invariants:");
 	    incidenceM.print("incidence:");
 		incidenceM.print(4, 0);
 		
@@ -96,6 +96,30 @@ public class ComputeInvariantTest {
     * @param t |T|, |P|=k*t
     */
    void setUp22(int k, int t) {
+//	   int incidence[][] = {
+//	                 /** t1   t2   t3  **/
+//	     /**pp0   p11*/ { 1,  -1,   0 },  /** k个 **/
+//	          /** p12*/ { 1,  -1,   0 },
+//	          /** p13*/ { 1,  -1,   0 },
+//            ...
+//	          /** p1k*/
+//	    
+//	     /**pp1   p21*/ { 0,   1,  -1 },  /** k个 **/
+//	          /** p22*/ { 0,   1,  -1 },
+//	          /** p23*/ { 0,   1,  -1 },
+//            ...
+//            /** p2k*/
+//	          
+//	     /**pp2   p31*/ {-1,   0,   1 },  /** k个 **/
+//	          /** p32*/ {-1,   0,   1 },
+//	          /** p33*/ {-1,   0,   1 }
+//            ...
+//            /** p3k*/
+	   
+//	     /**pp(|T|-1)   */   ...            
+	   
+//	         };             // pp: |T|个
+	   
         //int k = 4;
         //int t = 5;    // |T|
         int p = k*t;  // |P|
@@ -127,7 +151,7 @@ public class ComputeInvariantTest {
 	    incidenceM.print("incidence:");
 		incidenceM.print(4, 0);
 		
-		System.out.println("|p|="+t*k+",|T|="+t+",Invariants="+Math.pow(k, t));
+		System.out.println("|p|="+t*k+",|T|="+t+",Invariants="+Math.pow(k, t));  // k^t
 		
 		computeInvariant = new ComputeInvariant(incidenceM);
 
@@ -232,7 +256,7 @@ public class ComputeInvariantTest {
         */
     }
     
-	// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
+	// Fritz., (figure 2.1) Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
     void setUp6() {
 		int incidence[][] = {
   		        /** t1  t2  t3  t4  t5  t6  t7 **/
@@ -247,14 +271,26 @@ public class ComputeInvariantTest {
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
 	    // Compute P-Invariants
-	    System.out.println("Fritz. Compute P-Invariants:");
+	    System.out.println("Fritz. Compute P-Invariants:(figure 2.1)");
 	    incidenceM.print("incidence:");
 	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM);
+		/**
+		 * minimal support invariants:
+			[0]      1     3     6    15     0     1     0     0
+			[1]      7    21    42   105     0     0     1     7
+			[2]      0     0     0     0     1     1     0     0
+			[3]      0     0     0     0     7     0     1     7
+			
+			没有计算出：
+			[4]      1     3     6    15     6     0     1     7
+			x[4] = (6/7)*x[3] + (1/7)*x[1]
+		 */
     }
 	
-    // (1) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+    // (P2873) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+    // FM(Fourier-Motizkin method) and Its Improvement
     void setUp7() {
 		int incidence[][] = {
   		        /** t1  t2  t3  t4  t5  t6 **/
@@ -270,14 +306,16 @@ public class ComputeInvariantTest {
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
 	    // Compute P-Invariants
-	    System.out.println("(1) K. Takano. Compute P-Invariants:");
+	    System.out.println("(P2873) K. Takano. Compute P-Invariants:");
 	    incidenceM.print("incidence:");
 	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM);
     }
     
-    // (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+    // (P2878) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+    // (1) Extracting mutually disjoint siphons that are traps.
+    // (2) Execution of FM(Fourier-Motizkin method)
     void setUp8() {
 		int incidence[][] = {
   		        /** t1  t2  t3  t4  t5  t6 t7  t8 t9 **/
@@ -294,11 +332,111 @@ public class ComputeInvariantTest {
 	    InvariantMatrix incidenceM = new InvariantMatrix(incidence);
 	    
 	    // Compute P-Invariants
-	    System.out.println("(2) K. Takano. Compute P-Invariants:");
+	    System.out.println("(P2878) K. Takano. Compute P-Invariants:");
 	    incidenceM.print("incidence:");
 	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM);
+    }
+    
+    // 袁崇义p52，Compute P-Invariants
+    void setUp9() {
+    	// 袁崇义p52，
+        int incidence[][] = {
+        		                 /**  t1  t2  t3  t4  **/
+        		          /** s1 */ { -1,  1,  0,  0 },
+        		          /** s2 */ {  1, -1, -1,  1 },
+        		          /** s3 */ {  0,  0,  1, -1 }
+        		         };
+        
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute P-Invariants
+	    System.out.println("袁崇义p52. Compute P-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+		/**
+		    s1    s2    s3
+         	1     1     1
+         */
+    }
+    
+    // 袁崇义p52，Compute T-Invariants
+    void setUp10() {
+    	// 袁崇义p52，
+        int incidence[][] = {
+        		                 /**  t1  t2  t3  t4  **/
+        		          /** s1 */ { -1,  1,  0,  0 },
+        		          /** s2 */ {  1, -1, -1,  1 },
+        		          /** s3 */ {  0,  0,  1, -1 }
+        		         };
+        
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute T-Invariants
+	    System.out.println("袁崇义p52. Compute T-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM.transpose());
+		/**
+		     t1    t2    t3    t4
+             1     1     0     0
+     		 0     0     1     1
+         */
+    }
+    
+    // Compute P-Invariants, PIPE (Platform Independent Petri Net Editor)
+    // PIPEv4.3.0_src/PIPEv4.3.0_src/src/documentation/0.Analysis Modules.htm
+    void setUp11() {
+    	// PIPEv4.3.0  5 place * 4 transition
+        int incidence[][] = {
+        		                 /**  t0  t1  t2  t3  **/
+        		          /** p0 */ { -1,  1,  0,  0 },
+        		          /** p1 */ {  1, -1,  0,  0 },
+        		          /** p2 */ { -1,  1, -1,  1 },
+        		          /** p3 */ {  0,  0, -1,  1 },
+        		          /** p4 */ {  0,  0,  1, -1 }
+        		         };
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute P-Invariants
+	    System.out.println("PIPEv4.3.0. Compute P-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+		/** p0    p1    p2    p3   p4  // 原文档：Invariant Analysis.htm, 描述support(Y)在任何状态下，与初始标识一致
+         	1     1     0     0     0  // M(p0)+M(p1) = 5
+     		0     1     1     0     1  // M(p1)+M(p2)+3M(p4) = 3
+     		0     0     0     1     1  // M(p3)+M(p4) = 2
+         */
+		
+    }
+    
+    // Compute T-Invariants, PIPE (Platform Independent Petri Net Editor)
+    // PIPEv4.3.0_src/PIPEv4.3.0_src/src/documentation/0.Analysis Modules.htm
+    void setUp12() {
+    	// PIPEv4.3.0  5 place * 4 transition
+        int incidence[][] = {
+        		                 /**  t0  t1  t2  t3  **/
+        		          /** p0 */ { -1,  1,  0,  0 },
+        		          /** p1 */ {  1, -1,  0,  0 },
+        		          /** p2 */ { -1,  1, -1,  1 },
+        		          /** p3 */ {  0,  0, -1,  1 },
+        		          /** p4 */ {  0,  0,  1, -1 }
+        		         };
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute T-Invariants
+	    System.out.println("PIPEv4.3.0. Compute T-Invariants:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM.transpose());
+		 /**t0     t1    t2    t3  // 原文档：Invariant Analysis.htm
+             1     1     0     0   // 1 1 0 0
+ 		     0     0     1     1   // 0 0 3 3
+          */
+		
     }
     
 	@BeforeClass
@@ -342,18 +480,30 @@ public class ComputeInvariantTest {
 		
 		
 		//setUp4();  // Li，图2.2 Compute P-Invariants
-		setUp5();  // Li，图2.2 Compute T-Invariants
+		//setUp5();  // Li，图2.2 Compute T-Invariants
 		
-		// Fritz., Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
+		// Fritz., (figure2.1) Mathematics Methods for Calculate Invariants in Petri Nets, Compute P-Invariants
 		//setUp6();
 		
-		// (1) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+		// (P2873) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
 		//setUp7();
 		
-		// (2) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
+		// (P2878) K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants
 		//setUp8();
 		
-		//computeInvariant.setDebug(false);
+		// 袁崇义p52，Compute P-Invariants
+		//setUp9();
+		
+		// 袁崇义p52，Compute T-Invariants
+		// setUp10();
+		
+		// Compute P-Invariants, PIPE (Platform Independent Petri Net Editor)
+		//setUp11();
+		
+		// Compute P-Invariants, PIPE (Platform Independent Petri Net Editor)
+		setUp12();
+		
+		//computeInvariant.setDebug(false);  // 不打印中间过程
 		start = System.currentTimeMillis();
 	}
 
