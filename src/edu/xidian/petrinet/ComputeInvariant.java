@@ -6,16 +6,43 @@ import java.util.List;
 import edu.xidian.math.InvariantMatrix;
 
 /**
- * Computation of p-semiflows
-   C:    the PN incidence matrix(dimensions m*n)
+ * FM(Fourier-Motizkin) method, Computation of p-semiflows(p-invariants):
+ * 
+   C:    the PN incidence matrix(dimensions m*n, m=|P|,n=|T|)
    I:    identity matrix(dimensions m*m)
-   U(k)  matrix [A(k)|Y(k)] where
-         for k=0 A(k)=C and Y(k)=I
-         for k>0 A(k) is the matrix resulting from annulling k columns of C
-                 Y(k) is the matrix which memorizes the coefficients of linear combinations of rows of C
-   U(-) the matrix which contains the rows of U k-1 whose k-th column is negative
-   U(+) the malrix which contains the rows of U k-1 whose k-th column is positive
+   
+   1. A = C; Y = I;
+   2. For each k, k=1,....,n in this order,execute the following pair of procedures (a) and (b)；
+      (a) Insert into B = [A | Y] every new row constructed by a positive coefficient linear combination of any two rows of 
+          the original B such that the k-th column element of the resulting vector is zero;
+      (b) Delete from B any row whose k-th column element is nonzero,and let B denote the resulting matrix;
+      
+      Rows finally appeared in the submatrix corresponding Y of B form a class of P-invariants computed by the method.
+       
+         
+   Improving FM:  
+   (1) Heuristics for selecting the columns to annul: 
+       Annul columns:  F(k)<0 or if there is none, select column with lowest pk*vk
+       compute1(): selecting the columns with pk=1 and vk=1;
+       compute2(): selecting the columns with pk=1 or vk=1;
+       compute3(): F(k)<0 or if there is none, select column with lowest pk*vk
+   (2) Deleting any candidate vector V such that |sup(V)| > rank(H)+1. it is non minimal support.
+       check |sup(v)| in the compute() function or in the compute1(),compute2(),and compute3().
+       the candidate vector V is the new row of Y in the step 2(a).  
+     
    pk,vk:the number of positives and negatives in column k of A(k)
+   expansion factor: F(k) = pk*vk-(pk+vk)
+   The number of new rows to add, by combining pairs of rows, is pk*vk. 
+   The pk+vk rows used to annul column k are eliminated at the end of the iteration. 
+   The expansion factor is the net number of new rows added in annulling column k. 
+   
+   Reference：
+   [1] MARTINEZ J., SILVA M. A Simple and Fast Algorithm to Obtain all Invariants of a Generalized Petri Net. 
+       Second European Workshop on Application Theory of Petri Nets, Bad Honnef, September, pp. 411-422.
+   [2] K. Takano., Experimental Evaluation of Two Algorithms for Computing Petri Net Invariants,
+       IEICE Trans. Fundamentals, vol.E84-A,no.11,pp.2871-2880,Nov.2001
+   [3] M.Silva and J.M. Colom, "CONVEX GEOMETRY AND SEMIFLOWS IN P/T NETS. A COMPARATIVE STUDY OF ALGORITHMS FOR COMPUTATION OF MINIMAL P-SEMIFLOWS," 
+       Advances in Petri Nets 1990,Lecture Notes in Computer Science 483,pp.79-112,Springer-Verlag,Berlin,Germany,1991.
    
  * @author Administrator
  *
