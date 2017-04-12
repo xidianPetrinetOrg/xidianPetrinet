@@ -405,6 +405,10 @@ public class ComputeInvariantTest {
 	    incidenceM.print(4, 0);
  	   
 		computeInvariant = new ComputeInvariant(incidenceM);
+		/**
+		 * The net used in this example was the net representing the readers and writers problem
+		 * M0 = 5p0 + 3p2 + 2p3
+		 */
 		/** p0    p1    p2    p3   p4  // 原文档：Invariant Analysis.htm, 描述support(Y)在任何状态下，与初始标识一致
          	1     1     0     0     0  // M(p0)+M(p1) = 5
      		0     1     1     0     1  // M(p1)+M(p2)+3M(p4) = 3
