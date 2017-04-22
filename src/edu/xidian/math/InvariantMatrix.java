@@ -6,8 +6,6 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import junit.framework.Assert;
-
 public class InvariantMatrix extends Matrix {
 
 	/**
@@ -314,117 +312,6 @@ public class InvariantMatrix extends Matrix {
 		return -1;
 	}
 
-	/**
-     * Transform a matrix to obtain the minimal generating set of vectors.
-     * Initialisation: C = A; B: m*m单位阵 , 
-	 * the matrix A: m*n关联矩阵, 本函数求P-Invariants;  若是关联矩阵的转置，则本函数求T-Invariants
-	 * m: place number; n: transition number  
-	 * for (j=0;j<n;i++) // 遍历C各列，C非全零；启发式选择去掉的列（heuristics for selecting the columns to annul）
-	 * {  
-	 *   Append to the matrix D = [C:B] every rows resulting from positive linear combinations of row pairs in B that annihilate column j of C.                                                                            
-	 *   Eliminate from D the rows in which the j-th row of C is non-zero.
-	 * }
-	 * C is all zeros
-	 * B denotes the invariance matrix.
-     * @return A matrix containing the invariant vectors.
-     */
-	public static Matrix invariants(InvariantMatrix C) {
-		int m = C.getRowDimension();  // C的行数
-
-		// generate the mxm identity matrix
-		InvariantMatrix B = InvariantMatrix.identity(m, m);
-		
-		B.print("Matrix C | B");
-		print(C,B,4,0);
-
-		int a[] = new int[2]; // a[0],a[1]唯一的+ve或-ve所在的行和列
-		int Coefficient[]; // 调整系数
-		
-		// 符合算法的基数条件,仅有一个+ve或-ve的列, 线性组合到其它行，删除此行.
-		while (C.cardinalityOne(a) == 0) {
-			int element = C.get(a[0], a[1]); // 唯一的+ve或-ve
-			// +ve所在的行，加到相应负元素所在的行; -ve所在的行，加到相应正元素所在的行
-			for (int i = 0; i < m; i++) {
-				if (a[0] == i) continue;  // 不与本行(+ve或-ve所在的行)线性组合
-				if (C.get(i, a[1]) == 0) continue; // 不与0元素所在的行线性组合
-				
-				Coefficient = C.linearlyCombine(a[0], i, a[1]);
-				B.linearlyCombine(a[0], i, Coefficient);
-			}
-			C = C.eliminateRow(a[0]); // 删除唯一的+ve或-ve所在的行
-			B = B.eliminateRow(a[0]);
-			m--; // 减掉一行
-			C.print("唯一的+ve/-ve的行列，值：" + a[0] + "," + a[1] + "," + element);
-			print(C,B,4,0);
-		}
-		
-		//////////////////////////////////////////////////////////////////
-		// 第一个非0元素所在的行，线性组合到其它行，消除此行
-		while (C.firstNonZeroElementIndex(a) == 0) {
-			int element = C.get(a[0], a[1]); // 第一个非0元素
-			// 线性组合
-			for (int i = 0; i < m; i++) {
-				if (a[0] == i) continue;  // 不与非0元素所在的行线性组合
-				if (C.get(i, a[1]) == 0) continue; // 不与0元素线性组合
-				
-				// 同号，也得线性组合，否则，会丢失应有的不变式
-				//if (C.get(i, a[1])*element > 0) continue; // 不与同号元素线性组合
-				
-				Coefficient = C.linearlyCombine(a[0], i, a[1]);
-				B.linearlyCombine(a[0], i, Coefficient);
-			}
-			C = C.eliminateRow(a[0]); // 第一个非0元素所在的行
-			B = B.eliminateRow(a[0]);
-			m--; // 减掉一行
-			C.print("第一个非0元素的行列，值：" + a[0] + "," + a[1] + "," + element);
-			print(C,B,4,0);
-		}
-		
-		C.print("C应该是全0" );
-		print(C,B,4,0);
-		
-		// 此时，C应该是全0,
-		if (!C.isZeroMatrix()) {
-			C.print("==========Error!!!==========\n");
-			return null;
-		}
-
-		B.print("规范化： matrix B");
-		// 规范化B
-		// 负元素或0组成的行，取正，即负行取正
-		int b_cols = B.getColumnDimension();
-		while (true) {
-			int row = B.allNegativeOrZeroRow();
-			if (row == -1)
-				break;
-			for (int j = 0; j < b_cols; j++) {
-				if (B.get(row, j) < 0)
-					B.set(row, j, Math.abs(B.get(row, j))); // 负元素取正
-			}
-		}
-		B.print("matrix B,负行取正：");
-		B.print(4, 0);
-
-		// 通过与正元素行的线性组合，负元素置0
-		for(int col = 0; col < b_cols; col++) {
-			B.negativeToZero(col);
-		}
-		B.print("matrix B,负元素置0：");
-		B.print(4, 0);
-
-		// 各行除以该行的最大公约数
-		for (int i = 0; i < m; i++) {
-			int gcd = B.gcdRow(i);
-			if (gcd > 1) {
-				for (int j = 0; j < b_cols; j++) {
-					B.set(i, j, B.get(i, j) / gcd);
-				}
-			}
-		}
-		B.print("matrix B,各行除以该行的最大公约数：");
-		B.print(4, 0);
-		return B;
-	}
     
     /**
      * Matrix transpose.
@@ -949,38 +836,6 @@ public class InvariantMatrix extends Matrix {
 			}
 		    System.out.println();
 	   }
-	}
-	
-	public static void main(String[] args) {
-        // Metabolites
-        int incidence[][] = {
-        		    {-1,  0,  0,  0,  0,  0,  0,  1,  0},
-        		    { 1, -1,  0,  0,  0,  0,  0,  0,  0},
-        		    { 1,  0, -1,  0,  0,  0,  0,  0,  0},
-        		    { 0,  0,  1,  1, -1, -1,  0,  0,  0},
-        		    { 0,  1,  0, -1,  1,  0, -1,  0,  0},
-        		    { 0,  0,  0,  0,  0,  0,  1,  0, -1},
-        		    { 0,  1,  1,  0,  0,-29,  1,  0,  0},
-        		    { 0, -1, -1,  0,  0, 29, -1,  0,  0}
-        };
-        
-        InvariantMatrix invariantM = new InvariantMatrix(incidence);
-        // invariantM.print("incidence:");
-        // invariantM.print(4, 0);
-        // invariantM.print("incidence transpose:");
-        // invariantM.transpose().print(4, 0);
-        
-        // Compute P-Invariants
-        // InvariantMatrix.invariants(invariantM);
-        
-        // Compute T-Invariants
-        InvariantMatrix.invariants(invariantM.transpose());
-        /**
-         t1        t2        t3        t4        t5       t6        t7        t8         t9
-         0         0         0         1         1         0         0         0         0
-        15        15        15         0        13         2        28        15        28
-         */
-        
 	}
 
 }
