@@ -443,6 +443,62 @@ public class ComputeInvariantTest {
 		
     }
     
+    // 齐次线性方程组（1）
+    void setUp13() {
+        int incidence[][] = {
+        		                 /**  x1   x2  x3  x4  x5  **/
+        		          /** t1 */ {  1, -1, -1,  0,  3 },
+        		          /** t2 */ {  2, -2, -1,  2,  4 },
+        		          /** t3 */ {  3, -3, -1,  4,  5 },
+        		          /** t4 */ {  1, -1,  1,  1,  8 }
+        		         };
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute T-Invariants
+	    System.out.println("齐次线性方程组（1）:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM.transpose());
+		
+		/**
+		 *         x1    x2    x3    x4     x5
+		 * [0]      1     1     0     0     0
+		 * 
+		 * 本方法仅能求解x>0,因此不能求解出第二组解。
+		 * 方程组有一下两组解：k1,k2为任意常数
+		 * X = k1[1    + k2[-7
+		 *        1          0
+		 *        0         -4
+		 *        0          3
+		 *        0]         1]
+		 */
+    }
+    
+    // 齐次线性方程组（2）
+    void setUp14() {
+        int incidence[][] = {
+        		                 /**  x1   x2  x3  x4 **/
+        		          /** t1 */ {  1, -3,  0,  1 },
+        		          /** t2 */ {  1,  2, -1, -1 },
+        		          /** t3 */ {  0,  1,  2, -2 }
+        		         };
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute T-Invariants
+	    System.out.println("齐次线性方程组（1）:");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM.transpose());
+		
+		/**
+		 *         x1    x2    x3    x4
+		 * [0]      7     6     8    11
+		 * 
+		 * 方程组的解：(ˇˍˇ) x4 = k为任意常数
+		 * X = (7/11k,6/11k,8/11k,k)
+		 */
+    }
+    
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		System.out.println("setUpBeforeClass()");
@@ -504,9 +560,15 @@ public class ComputeInvariantTest {
 		// Compute P-Invariants, PIPE (Platform Independent Petri Net Editor)
 		//setUp11();
 		
-		// Compute P-Invariants, PIPE (Platform Independent Petri Net Editor)
-		setUp12();
+		// Compute T-Invariants, PIPE (Platform Independent Petri Net Editor)
+		//setUp12();
 		
+		// 齐次线性方程组（1）
+		//setUp13();
+		
+		// 齐次线性方程组（2）
+		setUp14();
+				
 		//computeInvariant.setDebug(false);  // 不打印中间过程
 		start = System.currentTimeMillis();
 	}
