@@ -529,6 +529,33 @@ public class ComputeInvariantTest {
 		 */
     }
     
+    // Compute P-Invariants, Wang. p28, 图3.1
+    void setUp16() {
+        int incidence[][] = {
+        		                 /**  t1  t2  t3   **/
+        		          /** p1 */ { -1,  0,  1 },
+        		          /** p2 */ {  1, -1,  0 },
+        		          /** p3 */ {  0,  1, -1 },
+        		          /** p4 */ {  0, -1,  1 },
+        		          /** p5 */ { -1, -2,  3 }      
+        		         };
+        InvariantMatrix incidenceM = new InvariantMatrix(incidence);
+        // Compute P-Invariants
+	    System.out.println("Compute P-Invariants, Wang. p41, 图3.8（c):");
+	    incidenceM.print("incidence:");
+	    incidenceM.print(4, 0);
+ 	   
+		computeInvariant = new ComputeInvariant(incidenceM);
+		
+		/**
+		 * minimal support invariants:  与p37一致
+	            p1    p2    p3    p4    p5    
+		[0]      1     1     1     0     0
+        [1]      0     0     1     1     0
+        [2]      0     1     3     0     1  
+		 */
+    }
+    
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		System.out.println("setUpBeforeClass()");
@@ -600,7 +627,10 @@ public class ComputeInvariantTest {
 		//setUp14();
 		
 		// Compute P-Invariants, Wang. p41, 图3.8（c)
-	    setUp15();
+	    //setUp15();
+	    
+	    // Compute P-Invariants, Wang. p28, 图3.1
+	    setUp16();
 				
 		//computeInvariant.setDebug(false);  // 不打印中间过程
 		start = System.currentTimeMillis();
