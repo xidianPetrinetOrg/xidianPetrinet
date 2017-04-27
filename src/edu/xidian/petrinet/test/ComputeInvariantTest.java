@@ -621,8 +621,8 @@ public class ComputeInvariantTest {
 		// Debug：? minutes done; setDebug(false)不显示中间过程：4.59 minutes done.
 		//setUp22(6,6); 
 		
-		// has minimal support invariants
-		//setUp3();  // Metabolites, T-Invariants
+		// has non minimal support invariants
+		setUp3();  // Metabolites, T-Invariants
 		
 		
 		//setUp4();  // Li，图2.2 Compute P-Invariants
@@ -662,7 +662,7 @@ public class ComputeInvariantTest {
 	    //setUp16();
 	    
 	   // Compute P-Invariants, Wang. p45, 图3.10
-	    setUp17();
+	   // setUp17();
 				
 		//computeInvariant.setDebug(false);  // 不打印中间过程
 		start = System.currentTimeMillis();

@@ -265,6 +265,9 @@ public class ComputeInvariant {
 		**/
 		////////////////////////////////////////////
 		System.out.println("规范化矩阵Minimal Support Matrix Y===");
+		
+		/**************************************************
+		   消除矩阵A的各列采用正的线性组合（positive linear combination）的方式，即对矩阵[A|Y]中的各行进行线性组合时只有相加运算，没有相减运算，因此，以下两种情况在Y矩阵中，不可能出现。
 		// 全部由负元素或0组成的行，取正，即负行取正
 		while (true) {
 			int row = Y.allNegativeOrZeroRow();
@@ -283,6 +286,7 @@ public class ComputeInvariant {
 		}
 		println("通过与正元素行的线性组合，负元素置0.");
 		printY();
+		*************************************************/
 
 		// 各行除以该行的最大公约数
 		for (int i = 0; i < Y.getRowDimension(); i++) {
