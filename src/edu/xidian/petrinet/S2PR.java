@@ -138,6 +138,37 @@ public class S2PR extends PTNet {
 	}
 	
 	/**
+	 * 满足S2P的定义？
+	 * Li. p65, 定义4.2
+	 * @return
+	 */
+	public boolean isS2P() {
+		boolean isOk = true;
+		// 定义4.2
+		if (PA.isEmpty())  return false;
+		if (PA.contains(p0)) return false;
+		
+		// TODO: N是一强连通的状态机
+		
+		// TODO: N的每一条回路包含闲置库所p0
+		
+		return isOk;
+	}
+	
+	/**
+	 * 满足S2PR的定义？
+	 * Li. p66, 定义4.3
+	 * @return
+	 */
+	public boolean isS2PR() {
+	   boolean isOk = true;
+
+       if(!isS2P()) return false;
+		
+	   return isOk;
+	}
+	
+	/**
 	 * 是否满足许可初始标识
 	 * Li. p66, 定义4.4,
 	 * @return
