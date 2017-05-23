@@ -5,12 +5,24 @@ package edu.xidian.petrinet.test;
 
 import static org.junit.Assert.*;
 
+import java.util.Iterator;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.uni.freiburg.iig.telematik.jagal.traverse.TraversalUtils;
+import de.uni.freiburg.iig.telematik.jagal.traverse.Traverser;
+import de.uni.freiburg.iig.telematik.jagal.traverse.Traverser.TraversalMode;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPetriNet;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 import edu.xidian.petrinet.S2PR;
 
 /**
@@ -50,12 +62,138 @@ public class S2PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S2PR#S2PR(int)}.
 	 */
-	@Test
+	//@Test
 	public void testS2PR() {
 		//fail("Not yet implemented");
 		S2PR s2pr = new S2PR(2,1,4);
-		s2pr.SetResourceSame();
 		System.out.println(s2pr);
 	}
-
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S2PR#isS2P()}.
+	 */
+	//@Test
+	public void testS2PR1() {
+		//fail("Not yet implemented");
+		S2PR s2pr = new S2PR(2,1,4);
+		System.out.println(s2pr);
+		s2pr.isS2P();
+	}
+	
+	@Test
+	public void testTraverser1() {
+		PTNet ptnet1 = new PTNet();
+		ptnet1.addPlace("p1");
+		ptnet1.addTransition("t1");
+		ptnet1.addPlace("p2");
+		ptnet1.addTransition("t2");
+		ptnet1.addFlowRelationPT("p1", "t1");
+		ptnet1.addFlowRelationTP("t1", "p2");
+		ptnet1.addFlowRelationPT("p2", "t2");
+		
+		System.out.println("ptnet1：" + ptnet1);
+		
+		AbstractPetriNet<PTPlace, PTTransition, PTFlowRelation, PTMarking, Integer> ptnet2 = ptnet1.clone();
+		System.out.println("ptnet2: " + ptnet2);
+		
+		ptnet2.removeTransition("t2");
+		System.out.println("ptnet2: " + ptnet2);
+		
+		// 正确，ptnet2.getPlace("p1"), 表示正确的ptnet2的起点
+		Iterator<AbstractPNNode<PTFlowRelation>> iter1 = new Traverser<>(ptnet2, ptnet2.getPlace("p1"), TraversalMode.DEPTHFIRST);
+        while (iter1.hasNext()) {
+        	 AbstractPNNode<PTFlowRelation> v=iter1.next();
+             System.out.println("正确="+v);
+        }
+        
+        // 错误，ptnet1.getPlace("p1"), 本应表示ptnet2的起点，错误的表示成ptnet1的起点，因此从ptnet1开始查找了所有节点（包含已经删除的节点）
+        Iterator<AbstractPNNode<PTFlowRelation>> iter2 = new Traverser<>(ptnet2, ptnet1.getPlace("p1"), TraversalMode.DEPTHFIRST);
+        while (iter2.hasNext()) {
+        	 AbstractPNNode<PTFlowRelation> v=iter2.next();
+             System.out.println("错误="+v);
+        }
+        
+        System.out.println("两个网的p1不同,==是 " + (ptnet1.getPlace("p1") == ptnet2.getPlace("p1")));
+		System.out.println("两个网的p1名义相同，equals是 " + ptnet1.getPlace("p1").equals(ptnet2.getPlace("p1")));	
+	}
+	
+	// @Test
+	public void testTraverser2() {
+		class Net extends PTNet {
+			private static final long serialVersionUID = 1L;
+			public Net() {
+				super(); // 产生对象this	
+				addPlace("p1");
+				addTransition("t1");
+				addPlace("p2");
+				addTransition("t2");
+				addFlowRelationPT("p1", "t1");
+				addFlowRelationTP("t1", "p2");
+				addFlowRelationPT("p2", "t2");
+			}
+			public void TestNet() {
+				System.out.println("this: " + this);
+				AbstractPetriNet<PTPlace, PTTransition, PTFlowRelation, PTMarking, Integer> ptnet2 = this.clone();
+				System.out.println("ptnet2: " + ptnet2);
+				
+				ptnet2.removeTransition("t1");  // 试验删除节点
+				System.out.println("ptnet2: " + ptnet2);
+				
+				// 遍历全部，不管删除节点，错误，this.getPlace("p1")
+				Iterator<AbstractPNNode<PTFlowRelation>> iter1 = new Traverser<>(ptnet2, this.getPlace("p1"), TraversalMode.DEPTHFIRST);
+		        while (iter1.hasNext()) {
+		        	 AbstractPNNode<PTFlowRelation> v=iter1.next();
+		             System.out.println("错误="+v);
+		        }
+		        
+		        // 遍历，删除的节点不在，正确，ptnet2.getPlace("p1")
+		        Iterator<AbstractPNNode<PTFlowRelation>> iter2 = new Traverser<>(ptnet2, ptnet2.getPlace("p1"), TraversalMode.DEPTHFIRST);
+		        while (iter2.hasNext()) {
+		        	 AbstractPNNode<PTFlowRelation> v=iter2.next();
+		             System.out.println("正确="+v);
+		        }
+		        
+		        System.out.println("两个网的p1不同,==是 " + (this.getPlace("p1") == ptnet2.getPlace("p1")));
+				System.out.println("两个网的p1名义相同，equals是 " + this.getPlace("p1").equals(ptnet2.getPlace("p1")));
+			}
+		}
+		
+		Net ptnet1 = new Net();
+	    ptnet1.TestNet();	
+	}
+	
+	//@Test
+	public void testTraverser3() {
+		PTNet ptnet1 = new PTNet();
+		ptnet1.addPlace("p1");
+		ptnet1.addTransition("t1");
+		ptnet1.addPlace("p2");
+		ptnet1.addTransition("t2");
+		ptnet1.addFlowRelationPT("p1", "t1");
+		ptnet1.addFlowRelationTP("t1", "p2");
+		ptnet1.addFlowRelationPT("p2", "t2");
+		ptnet1.addFlowRelationTP("t2", "p1");
+		
+		System.out.println("ptnet1：" + ptnet1);
+		
+		AbstractPetriNet<PTPlace, PTTransition, PTFlowRelation, PTMarking, Integer> ptnet2 = ptnet1.clone();
+		System.out.println("ptnet2: " + ptnet2);
+		
+		ptnet2.removeTransition("t1");
+		System.out.println("ptnet2: " + ptnet2);
+		
+		// p1可以到图的任何点
+		System.out.println("强连通：" + TraversalUtils.isStronglyConnected(ptnet1, ptnet1.getPlace("p1")));
+		
+		// p1不能到图的所有节点
+		System.out.println("不是强连通：" + TraversalUtils.isStronglyConnected(ptnet2, ptnet2.getPlace("p1")));
+		
+		// 错误判断，两个参数都要使用统一的ptnet1或ptnet2
+		System.out.println("错误判断：" + TraversalUtils.isStronglyConnected(ptnet2, ptnet1.getPlace("p1")));
+		
+		System.out.println("两个网的p1不同,==是 " + (ptnet1.getPlace("p1") == ptnet2.getPlace("p1")));
+		System.out.println("两个网的p1名义相同，equals是 " + ptnet1.getPlace("p1").equals(ptnet2.getPlace("p1")));
+	}
+	
+	
 }

@@ -4,12 +4,22 @@
 package edu.xidian.petrinet;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.uni.freiburg.iig.telematik.jagal.traverse.Traversable;
+import de.uni.freiburg.iig.telematik.jagal.traverse.TraversalUtils;
+import de.uni.freiburg.iig.telematik.jagal.traverse.Traverser;
+import de.uni.freiburg.iig.telematik.jagal.traverse.Traverser.TraversalMode;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractFlowRelation;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPetriNet;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 
 /**
  * 简单顺序过程(Simple Sequential Process, S2P)
@@ -131,7 +141,7 @@ public class S2PR extends PTNet {
 			
 			// resource token
 			marking.set(pr, resourceToken);
-		}
+		}  
 		
 		// Marking
 		setInitialMarking(marking);
@@ -143,13 +153,53 @@ public class S2PR extends PTNet {
 	 * @return
 	 */
 	public boolean isS2P() {
+		// 来自S2PR, 不含资源库所(PR)的S2P网
+		AbstractPetriNet<PTPlace, PTTransition, PTFlowRelation, PTMarking, Integer> s2p1 = this.clone();	
+		//Traversable<AbstractPNNode<PTFlowRelation>> s2p1 = this.clone();
+		/***
+		Iterator<PTPlace> iter = PR.iterator();
+		while(iter.hasNext()) {
+		   String p = (iter.next()).getName();
+		   System.out.println("ppp="+p);
+		   //s2p1.removePlace(p);
+		}   ***/
+		s2p1.removePlace("p4");
+		s2p1.removePlace("p5");
+		System.out.println("s2p:"+s2p1);
+		
+		System.out.println("p0:"+ p0);
+		System.out.println("p0:"+s2p1.getPlace("p1"));
+		System.out.println("p0:"+getPlace("p1"));
+		System.out.println("p0==:"+getPlace("p1").equals(p0));
+		System.out.println("p0==:"+s2p1.getPlace("p1").equals(p0));
+		System.out.println("p0==:"+s2p1.getPlace("p1").equals(getPlace("p1")));
+		
+		//Iterator<AbstractPNNode<PTFlowRelation>> iter1 = new Traverser<>(s2p1, p0, TraversalMode.DEPTHFIRST);
+		//Traverser<AbstractPNNode<PTFlowRelation>> iter1 = new Traverser<>(s2p1, s2p1.getPlace("p1"), TraversalMode.DEPTHFIRST);
+		//Traverser<AbstractPNNode<PTFlowRelation>> iter1 = new Traverser<>(s2p1, getPlace("p1"), TraversalMode.DEPTHFIRST);
+		Traverser<AbstractPNNode<PTFlowRelation>> iter1 = new Traverser<>(s2p1, getPlace("p1"), TraversalMode.DEPTHFIRST);
+        while (iter1.hasNext()) {
+        	 AbstractPNNode<PTFlowRelation> v=iter1.next();
+             System.out.println("kkkv="+v);
+        }
+		return true;
+	}
+	
+	/**
+	 * 满足S2P的定义？
+	 * Li. p65, 定义4.2
+	 * @return
+	 */
+	public boolean isS2Pxxx() {
 		boolean isOk = true;
 		// 定义4.2
-		if (PA.isEmpty())  return false;
-		if (PA.contains(p0)) return false;
+		if (PA.isEmpty())  return false;  // 工序库所不能为空
+		if (PA.contains(p0)) return false; // 工序库所中不包含空闲库所
 		
 		// TODO: N是一强连通的状态机
-		
+		//System.out.println("this scc:" + TraversalUtils.isStronglyConnected(this, p0));
+		//System.out.println("s2p scc:" + TraversalUtils.isStronglyConnected(s2p, p0));
+		//System.out.println("s2p scc:" + TraversalUtils.isStronglyConnected(s2p, PA.get(0)));
 		// TODO: N的每一条回路包含闲置库所p0
 		
 		return isOk;
@@ -231,6 +281,62 @@ public class S2PR extends PTNet {
 		return t_prefix + t_suffix;
 	}
 	
+
+	public List<PTPlace> getPA() {
+		return PA;
+	}
+
+	public void setPA(List<PTPlace> pA) {
+		PA = pA;
+	}
+
+	public List<PTPlace> getPR() {
+		return PR;
+	}
+
+	public void setPR(List<PTPlace> pR) {
+		PR = pR;
+	}
+
+	public PTPlace getP0() {
+		return p0;
+	}
+
+	public void setP0(PTPlace p0) {
+		this.p0 = p0;
+	}
+
+	public String getP_prefix() {
+		return p_prefix;
+	}
+
+	public void setP_prefix(String p_prefix) {
+		this.p_prefix = p_prefix;
+	}
+
+	public String getT_prefix() {
+		return t_prefix;
+	}
+
+	public void setT_prefix(String t_prefix) {
+		this.t_prefix = t_prefix;
+	}
+
+	public int getP_suffix() {
+		return p_suffix;
+	}
+
+	public void setP_suffix(int p_suffix) {
+		this.p_suffix = p_suffix;
+	}
+
+	public int getT_suffix() {
+		return t_suffix;
+	}
+
+	public void setT_suffix(int t_suffix) {
+		this.t_suffix = t_suffix;
+	}
 
 	/**
 	 * @param args
