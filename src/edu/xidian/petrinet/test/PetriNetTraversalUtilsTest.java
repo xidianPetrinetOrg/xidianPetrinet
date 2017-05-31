@@ -261,10 +261,9 @@ public class PetriNetTraversalUtilsTest {
 
 		System.out.println("ptnet1：" + ptnet1);
 		
-		int result[] = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
-		System.out.println("是否有符合条件的回路：" + result[0] + ",回路个数：" + result[1]);
-		assertEquals(1, result[0]); // 有符合条件的回路
-		assertEquals(1, result[1]); // 回路个数
+		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
+		System.out.println("回路个数：" + result);
+		assertEquals(1, result); // 回路个数
 	}
 	
 	
@@ -272,7 +271,7 @@ public class PetriNetTraversalUtilsTest {
 	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:2个
 	 */
-	//@Test
+	@Test
 	public void dfsCircuitsTest2() {
 		PTNet ptnet1 = new PTNet();
 		ptnet1.addPlace("p1");
@@ -303,10 +302,9 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		int result[] = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
-		System.out.println("是否有符合条件的回路：" + result[0] + ",回路个数：" + result[1]);
-		assertEquals(1, result[0]); // 有符合条件的回路
-		assertEquals(2, result[1]); // 回路个数
+		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
+		System.out.println("回路个数：" + result);
+		assertEquals(2, result); // 回路个数
 	}
 	
 	/**
@@ -344,9 +342,8 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		int result[] = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("pp2"));
-		System.out.println("是否有符合条件的回路：" + result[0] + ",回路个数：" + result[1]);
-		assertEquals(1, result[0]); // 有符合条件的回路
-		assertEquals(1, result[1]); // 回路个数
+		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("pp2"));
+		System.out.println("回路个数：" + result);
+		assertEquals(1, result); // 回路个数
 	}
 }

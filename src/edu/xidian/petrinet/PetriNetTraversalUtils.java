@@ -88,29 +88,16 @@ public class PetriNetTraversalUtils {
 	 * 含有sNode的回路
 	 * @param petriNet
 	 * @param sNode 
-	 * @return result[0] = 1,表示有符合条件的回路，并且所有回路通过sNode, result[1] = 含有sNode的回路个数;
-	 *         否则，result[1] = 0, 表示没有符合条件的回路
+	 * @return 返回通过的回路个数
 	 */
 	@SuppressWarnings("rawtypes")
-	public static int[] dfsCircuits(AbstractPetriNet petriNet, AbstractPNNode sNode) {
+	public static int dfsCircuits(AbstractPetriNet petriNet, AbstractPNNode sNode) {
 		// 首先初始化以下三个静态变量
 		visited.clear();
 		circuitCount = 0;
 		startNode = sNode;
-		//visited.add(startNode);
 		dfsCircuitsRecursive(petriNet,sNode);
-		System.out.println("visited: "+ visited.size() + ",nodeCount=" + petriNet.nodeCount());
-		
-		int result[] = new int[2];
-		// 如果有回路，并且访问了所有节点
-		if (visited.size() == petriNet.nodeCount() && circuitCount !=0 ) {
-			result[0] = 1;
-		}
-		else {
-			result[0] = 0;
-		}
-		result[1] = circuitCount;
-		return result;
+		return circuitCount;
 	}
 	
 	/**
@@ -137,6 +124,7 @@ public class PetriNetTraversalUtils {
 		for(AbstractPNNode n: nodes) {
 			if (n.equals(startNode)) {  // 如果子节点是startNode，找到一个回路
 				circuitCount++;
+				//return; // 注意直到遍历完所有节点return,因此此语句无意义。未遍历的节点在递归结构的栈中存放
 			}
 			if (!visited.contains(n)) { // 如果子节点还没有访问，递归访问
 				//visited.add(n);
