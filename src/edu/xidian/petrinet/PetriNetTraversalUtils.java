@@ -1,11 +1,10 @@
 package edu.xidian.petrinet;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
-import de.uni.freiburg.iig.telematik.jagal.traverse.Traversable;
 import de.uni.freiburg.iig.telematik.jagal.traverse.algorithms.SCCTarjan;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
@@ -22,11 +21,12 @@ public class PetriNetTraversalUtils {
 	/**
 	 * 记录已经访问的节点
 	 */
-	private static final Set<AbstractPNNode<?>> visited = new HashSet<>();
+	//private static final Set<AbstractPNNode<?>> visited = new HashSet<>();
+	private static final List<AbstractPNNode<?>> visited = new ArrayList<>();  // 方便调试，显示顺序与添加书序一致，但是没有HashSet效率高
 	/**
 	 * 含有startNode的回路个数
 	 */
-	private static int cycleCount = 0;
+	private static int circuitCount = 0;
 	/**
 	 * 从startNode开始到starNode结束的回路
 	 */
@@ -88,44 +88,59 @@ public class PetriNetTraversalUtils {
 	 * 含有sNode的回路
 	 * @param petriNet
 	 * @param sNode 
-	 * @return 含有sNode的回路个数
+	 * @return result[0] = 1,表示有符合条件的回路，并且所有回路通过sNode, result[1] = 含有sNode的回路个数;
+	 *         否则，result[1] = 0, 表示没有符合条件的回路
 	 */
 	@SuppressWarnings("rawtypes")
-	public static int dfsCheckCycles(AbstractPetriNet petriNet, AbstractPNNode sNode) {
+	public static int[] dfsCircuits(AbstractPetriNet petriNet, AbstractPNNode sNode) {
 		// 首先初始化以下三个静态变量
 		visited.clear();
-		cycleCount = 0;
+		circuitCount = 0;
 		startNode = sNode;
-		visited.add(startNode);
-		dfsCycles(petriNet,sNode);
+		//visited.add(startNode);
+		dfsCircuitsRecursive(petriNet,sNode);
 		System.out.println("visited: "+ visited.size() + ",nodeCount=" + petriNet.nodeCount());
-		return cycleCount;
+		
+		int result[] = new int[2];
+		// 如果有回路，并且访问了所有节点
+		if (visited.size() == petriNet.nodeCount() && circuitCount !=0 ) {
+			result[0] = 1;
+		}
+		else {
+			result[0] = 0;
+		}
+		result[1] = circuitCount;
+		return result;
 	}
 	
 	/**
-	 * 深度优先搜素，检查含有startNode的回路，供本类其它函数调用
+	 * 深度优先递归搜索，检查含有startNode的所有回路，供本类其它函数调用
 	 * 已访问的节点记录在本类的静态成员visited
 	 * 回路个数记录在本类静态成员cycleCount
 	 * 开始节点记录在本类静态成员startNode
 	 * 因此调用此递归函数，必须首先初始化这两个静态成员
+	 * 给定无向图G = (V,E)(或有向图D = (V,E))，设v[0], v[1], · · · , v[m] 属于V，边(或弧)e[1], e[2], · · · , e[m] 属于 E，
+	 * 其中v[i-1]和vi是e[i]的端点，交替序列v[0]e[1]v[1]e[2] · · · e[m]v[m]称为连接v[0]到v[m]的路(walk)或链(chain)，通常简记
+     * 为v[0]v[1] · · · v[m]。路上边的数目称为该路的长度。当v[0] = v[m]时，称其为回路(circuit)。
+     * 
+     * 性质：  如果 G=(V,E) 是有向图，那么它是强连通图的必要条件是边的数目大于等于顶点的数目：|E|>=|V|，而反之不成立。
+     * 引理：  有向图G无回路当且仅当对G进行深度优先搜索没有得到反向边。
 	 * @param petriNet
 	 * @param start
 	 * @return 存在包含startNode的回路，返回true；否则返回false
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static void dfsCycles(AbstractPetriNet petriNet, AbstractPNNode node) {
+	private static void dfsCircuitsRecursive(AbstractPetriNet petriNet, AbstractPNNode node) {
+		visited.add(node);
 		System.out.println("visited " + visited);
 		Set<AbstractPNNode> nodes = petriNet.getChildren(node);
 		for(AbstractPNNode n: nodes) {
-			if (n.equals(startNode)) {
-				cycleCount++;
-				if (visited.size() < petriNet.nodeCount()) {
-					dfsCycles(petriNet,n);
-				}
+			if (n.equals(startNode)) {  // 如果子节点是startNode，找到一个回路
+				circuitCount++;
 			}
-			if (!visited.contains(n)) {
-				visited.add(n);
-				dfsCycles(petriNet,n);
+			if (!visited.contains(n)) { // 如果子节点还没有访问，递归访问
+				//visited.add(n);
+				dfsCircuitsRecursive(petriNet,n);
 			}
 		}
 	}

@@ -66,6 +66,7 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
 	 * 获取强连通分量
 	 */
 	//@Test
@@ -119,6 +120,7 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
 	 * 获取强连通分量, S2P(simple sequential process)，一个包含全部节点的连通分量，这里是1个含p1的回路
 	 */
 	//@Test
@@ -171,6 +173,7 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
 	 * 获取强连通分量, S2P(simple sequential process)，一个包含全部节点的连通分量，这里是2个含p1的回路
 	 */
 	//@Test
@@ -236,10 +239,11 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:1个
 	 */
 	//@Test
-	public void cycle1() {
+	public void dfsCircuitsTest1() {
 		PTNet ptnet1 = new PTNet();
 		ptnet1.addPlace("p1");
 		ptnet1.addTransition("t1");
@@ -257,17 +261,19 @@ public class PetriNetTraversalUtilsTest {
 
 		System.out.println("ptnet1：" + ptnet1);
 		
-		int count = PetriNetTraversalUtils.dfsCheckCycles(ptnet1,ptnet1.getPlace("p1"));
-		System.out.println("Cycles：" + count);
-		assertEquals(1, count);
+		int result[] = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
+		System.out.println("是否有符合条件的回路：" + result[0] + ",回路个数：" + result[1]);
+		assertEquals(1, result[0]); // 有符合条件的回路
+		assertEquals(1, result[1]); // 回路个数
 	}
 	
 	
 	/**
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:2个
 	 */
-	@Test
-	public void cycle2() {
+	//@Test
+	public void dfsCircuitsTest2() {
 		PTNet ptnet1 = new PTNet();
 		ptnet1.addPlace("p1");
 		ptnet1.addTransition("t1");
@@ -297,9 +303,50 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		int count = PetriNetTraversalUtils.dfsCheckCycles(ptnet1,ptnet1.getPlace("p1"));
-		System.out.println("Cycles：" + count);
-		assertEquals(2, count);
+		int result[] = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
+		System.out.println("是否有符合条件的回路：" + result[0] + ",回路个数：" + result[1]);
+		assertEquals(1, result[0]); // 有符合条件的回路
+		assertEquals(2, result[1]); // 回路个数
 	}
-
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * 含p1的回路:2个
+	 */
+	@Test
+	public void dfsCircuitsTest3() {
+		PTNet ptnet1 = new PTNet();
+		ptnet1.addPlace("p1");
+		ptnet1.addTransition("t1");
+		ptnet1.addPlace("p2");
+		ptnet1.addTransition("t2");
+		ptnet1.addPlace("p3");
+		ptnet1.addTransition("t3");
+		
+		ptnet1.addFlowRelationPT("p1", "t1");
+		ptnet1.addFlowRelationTP("t1", "p2");
+		ptnet1.addFlowRelationPT("p2", "t2");
+		ptnet1.addFlowRelationTP("t2", "p3");
+		ptnet1.addFlowRelationPT("p3", "t3");
+		ptnet1.addFlowRelationTP("t3", "p1");
+		
+		ptnet1.addTransition("tt1");
+		ptnet1.addPlace("pp2");
+		ptnet1.addTransition("tt2");
+		ptnet1.addPlace("pp3");
+		ptnet1.addTransition("tt3");
+		
+		ptnet1.addFlowRelationPT("p1", "tt1");
+		ptnet1.addFlowRelationTP("tt1", "pp2");
+		ptnet1.addFlowRelationPT("pp2", "tt2");
+		ptnet1.addFlowRelationTP("tt2", "pp3");
+		ptnet1.addFlowRelationPT("pp3", "tt3");
+		ptnet1.addFlowRelationTP("tt3", "p1");
+		System.out.println("ptnet1：" + ptnet1);
+		
+		int result[] = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("pp2"));
+		System.out.println("是否有符合条件的回路：" + result[0] + ",回路个数：" + result[1]);
+		assertEquals(1, result[0]); // 有符合条件的回路
+		assertEquals(1, result[1]); // 回路个数
+	}
 }
