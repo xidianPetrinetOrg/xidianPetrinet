@@ -251,7 +251,7 @@ public class PetriNetTraversalUtilsTest {
 
 		System.out.println("ptnet1：" + ptnet1);
 		
-		System.out.println("含p1的回路：");
+		System.out.println("dfsCircuitsTest1(), 含p1的回路：");
 		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
 		System.out.println("回路个数：" + result);
 		assertEquals(1, result); // 回路个数
@@ -294,7 +294,49 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		System.out.println("含p1的回路：");
+		System.out.println("dfsCircuitsTest2(), 含p1的回路：");
+		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
+		System.out.println("回路个数：" + result);
+		assertEquals(2, result); // 回路个数
+	}
+	
+	/**
+	 * dfs,depth first search
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * 含p1的回路:2个
+	 */
+	@Test
+	public void dfsCircuitsTest22() {
+		PTNet ptnet1 = new PTNet();
+		ptnet1.addPlace("p1");
+		ptnet1.addTransition("t1");
+		ptnet1.addPlace("p2");
+		ptnet1.addTransition("t2");
+		ptnet1.addPlace("p3");
+		ptnet1.addTransition("t3");
+		
+		ptnet1.addFlowRelationPT("p1", "t1");
+		ptnet1.addFlowRelationTP("t1", "p2");
+		ptnet1.addFlowRelationPT("p2", "t2");
+		ptnet1.addFlowRelationTP("t2", "p3");
+		ptnet1.addFlowRelationPT("p3", "t3");
+		ptnet1.addFlowRelationTP("t3", "p1");
+		
+		ptnet1.addTransition("tt1");
+		ptnet1.addPlace("pp2");
+		ptnet1.addTransition("tt2");
+		ptnet1.addPlace("pp3");
+		ptnet1.addTransition("tt3");
+		
+		ptnet1.addFlowRelationPT("p2", "tt1");
+		ptnet1.addFlowRelationTP("tt1", "pp2");
+		ptnet1.addFlowRelationPT("pp2", "tt2");
+		ptnet1.addFlowRelationTP("tt2", "pp3");
+		ptnet1.addFlowRelationPT("pp3", "tt3");
+		ptnet1.addFlowRelationTP("tt3", "p1");
+		System.out.println("ptnet1：" + ptnet1);
+		
+		System.out.println("dfsCircuitsTest22(), 含p1的回路：");
 		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("p1"));
 		System.out.println("回路个数：" + result);
 		assertEquals(2, result); // 回路个数
@@ -336,7 +378,7 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		System.out.println("含pp2的回路：");
+		System.out.println("dfsCircuitsTest3(), 含pp2的回路：");
 		int result = PetriNetTraversalUtils.dfsCircuits(ptnet1,ptnet1.getPlace("pp2"));
 		System.out.println("回路个数：" + result);
 		assertEquals(1, result); // 回路个数
@@ -366,7 +408,7 @@ public class PetriNetTraversalUtilsTest {
 
 		System.out.println("ptnet1：" + ptnet1);
 		
-		System.out.println("含p1的回路：");
+		System.out.println("bfsCircuitsTest1()，含p1的回路：");
 		int result = PetriNetTraversalUtils.bfsCircuits(ptnet1,ptnet1.getPlace("p1"));
 		System.out.println("回路个数：" + result);
 		assertEquals(1, result); // 回路个数
@@ -409,7 +451,49 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		System.out.println("含p1的回路：");
+		System.out.println("bfsCircuitsTest2()，含p1的回路：");
+		int result = PetriNetTraversalUtils.bfsCircuits(ptnet1,ptnet1.getPlace("p1"));
+		System.out.println("回路个数：" + result);
+		assertEquals(2, result); // 回路个数
+	}
+	
+	/**
+	 * bfs,breadth first search
+	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * 含p1的回路:2个
+	 */
+	@Test
+	public void bfsCircuitsTest22() {
+		PTNet ptnet1 = new PTNet();
+		ptnet1.addPlace("p1");
+		ptnet1.addTransition("t1");
+		ptnet1.addPlace("p2");
+		ptnet1.addTransition("t2");
+		ptnet1.addPlace("p3");
+		ptnet1.addTransition("t3");
+		
+		ptnet1.addFlowRelationPT("p1", "t1");
+		ptnet1.addFlowRelationTP("t1", "p2");
+		ptnet1.addFlowRelationPT("p2", "t2");
+		ptnet1.addFlowRelationTP("t2", "p3");
+		ptnet1.addFlowRelationPT("p3", "t3");
+		ptnet1.addFlowRelationTP("t3", "p1");
+		
+		ptnet1.addTransition("tt1");
+		ptnet1.addPlace("pp2");
+		ptnet1.addTransition("tt2");
+		ptnet1.addPlace("pp3");
+		ptnet1.addTransition("tt3");
+		
+		ptnet1.addFlowRelationPT("p2", "tt1");
+		ptnet1.addFlowRelationTP("tt1", "pp2");
+		ptnet1.addFlowRelationPT("pp2", "tt2");
+		ptnet1.addFlowRelationTP("tt2", "pp3");
+		ptnet1.addFlowRelationPT("pp3", "tt3");
+		ptnet1.addFlowRelationTP("tt3", "p1");
+		System.out.println("ptnet1：" + ptnet1);
+		
+		System.out.println("bfsCircuitsTest22(), 含p1的回路：");
 		int result = PetriNetTraversalUtils.bfsCircuits(ptnet1,ptnet1.getPlace("p1"));
 		System.out.println("回路个数：" + result);
 		assertEquals(2, result); // 回路个数
@@ -451,7 +535,7 @@ public class PetriNetTraversalUtilsTest {
 		ptnet1.addFlowRelationTP("tt3", "p1");
 		System.out.println("ptnet1：" + ptnet1);
 		
-		System.out.println("含pp2的回路：");
+		System.out.println("bfsCircuitsTest3(), 含pp2的回路：");
 		int result = PetriNetTraversalUtils.bfsCircuits(ptnet1,ptnet1.getPlace("pp2"));
 		System.out.println("回路个数：" + result);
 		assertEquals(1, result); // 回路个数

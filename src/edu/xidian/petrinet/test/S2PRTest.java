@@ -3,31 +3,12 @@
  */
 package edu.xidian.petrinet.test;
 
-import static org.junit.Assert.*;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.invation.code.toval.validate.ParameterException;
-import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
-import de.uni.freiburg.iig.telematik.jagal.traverse.TraversalUtils;
-import de.uni.freiburg.iig.telematik.jagal.traverse.Traverser;
-import de.uni.freiburg.iig.telematik.jagal.traverse.Traverser.TraversalMode;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPetriNet;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
-import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 import edu.xidian.petrinet.S2PR;
 
 /**
@@ -77,7 +58,7 @@ public class S2PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S2PR#isS2P()}.
 	 */
-	//@Test
+	@Test
 	public void testS2PR1() {
 		//fail("Not yet implemented");
 		S2PR s2pr = new S2PR(2,1,4);
