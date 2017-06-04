@@ -2,6 +2,7 @@ package edu.xidian.petrinet;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +32,11 @@ public class PetriNetTraversalUtils {
 	 * 从startNode开始到starNode结束的回路
 	 */
 	private static AbstractPNNode<?> startNode = null;
+	
+	/**
+	 * queue for bfs(breadth first search)
+	 */
+	private static final LinkedList<AbstractPNNode<?>> queue = new LinkedList<AbstractPNNode<?>>();
 	
 	/** 获取PetriNet中的所有强连通分量
 	 * @param petriNet PetriNet对象 
@@ -85,7 +91,7 @@ public class PetriNetTraversalUtils {
 	}
 	
 	/**
-	 * 含有sNode的回路
+	 * 含有sNode的回路,调用深度优先递归搜索dfsCircuitsRecursive()
 	 * @param petriNet
 	 * @param sNode 
 	 * @return 返回通过的回路个数
@@ -101,11 +107,11 @@ public class PetriNetTraversalUtils {
 	}
 	
 	/**
-	 * 深度优先递归搜索，检查含有startNode的所有回路，供本类其它函数调用
+	 * 深度优先递归搜索(dfs,depth first search)，检查含有startNode的所有回路，供本类其它函数调用
 	 * 已访问的节点记录在本类的静态成员visited
-	 * 回路个数记录在本类静态成员cycleCount
+	 * 回路个数记录在本类静态成员circuitCount
 	 * 开始节点记录在本类静态成员startNode
-	 * 因此调用此递归函数，必须首先初始化这两个静态成员
+	 * 因此调用此递归函数，必须首先初始化这些静态成员
 	 * 给定无向图G = (V,E)(或有向图D = (V,E))，设v[0], v[1], · · · , v[m] 属于V，边(或弧)e[1], e[2], · · · , e[m] 属于 E，
 	 * 其中v[i-1]和vi是e[i]的端点，交替序列v[0]e[1]v[1]e[2] · · · e[m]v[m]称为连接v[0]到v[m]的路(walk)或链(chain)，通常简记
      * 为v[0]v[1] · · · v[m]。路上边的数目称为该路的长度。当v[0] = v[m]时，称其为回路(circuit)。
@@ -119,7 +125,7 @@ public class PetriNetTraversalUtils {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static void dfsCircuitsRecursive(AbstractPetriNet petriNet, AbstractPNNode node) {
 		visited.add(node);
-		System.out.println("visited " + visited);
+		//System.out.println("visited " + visited);
 		Set<AbstractPNNode> nodes = petriNet.getChildren(node);
 		for(AbstractPNNode n: nodes) {
 			if (n.equals(startNode)) {  // 如果子节点是startNode，找到一个回路
@@ -129,6 +135,51 @@ public class PetriNetTraversalUtils {
 			if (!visited.contains(n)) { // 如果子节点还没有访问，递归访问
 				//visited.add(n);
 				dfsCircuitsRecursive(petriNet,n);
+			}
+		}
+	}
+	
+	/**
+	 * 含有sNode的回路,调用广度优先递归搜索bfsCircuitsRecursive()
+	 * @param petriNet
+	 * @param sNode 
+	 * @return 返回通过的回路个数
+	 */
+	@SuppressWarnings("rawtypes")
+	public static int bfsCircuits(AbstractPetriNet petriNet, AbstractPNNode sNode) {
+		// 首先初始化以下三个静态变量
+		visited.clear();
+		circuitCount = 0;
+		startNode = sNode;
+		visited.add(startNode);
+		queue.add(startNode);
+		bfsCircuitsRecursive(petriNet);
+		return circuitCount;
+	}
+	
+	/**
+	 * 广度优先递归搜索(bfs,breadth first search)，检查含有startNode的所有回路，供本类其它函数调用
+	 * 已访问的节点记录在本类的静态成员visited
+	 * 回路个数记录在本类静态成员circuitCount
+	 * 开始节点记录在本类静态成员startNode
+	 * 因此调用此递归函数，必须首先初始化这些静态成员
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void bfsCircuitsRecursive(AbstractPetriNet petriNet) {
+		//System.out.println("visited " + visited);
+		//System.out.println("queue " + queue);
+		if (queue.isEmpty()) return;
+		AbstractPNNode headQueen = queue.poll(); // 取出队列头部
+		Set<AbstractPNNode> nodes = petriNet.getChildren(headQueen);
+		for(AbstractPNNode n: nodes) {
+			if (n.equals(startNode)) {  // 如果子节点是startNode，找到一个回路
+				circuitCount++;
+				//return; // 注意直到遍历完所有节点return,因此此语句无意义。未遍历的节点在递归结构的栈中存放
+			}
+			if (!visited.contains(n)) { // 如果子节点还没有访问，递归访问
+				visited.add(n);
+				queue.addLast(n);
+				bfsCircuitsRecursive(petriNet);
 			}
 		}
 	}
