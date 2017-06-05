@@ -206,14 +206,14 @@ public class S2P extends PTNet {
 	/**
 	 * last Place Name: p_prefix + p_suffix++
 	 */
-	private String lastPlaceName() {
+	protected String lastPlaceName() {
 		return p_prefix + p_suffix++;
 	}
 	
 	/**
 	 * last Transition Name: t_prefix + t_suffix++
 	 */
-	private String lastTransitionName() {
+	protected String lastTransitionName() {
 		return t_prefix + t_suffix++;
 	}
 	
