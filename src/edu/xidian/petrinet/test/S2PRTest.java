@@ -58,7 +58,7 @@ public class S2PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2P#isS2P()}.
+	 * Test method for {@link edu.xidian.petrinet.S2P#isS2PR()}.
 	 */
 	@Test
 	public void testS2PR1() {
@@ -66,8 +66,8 @@ public class S2PRTest {
 		S2PR s2pr = new S2PR(2,1,4);
 		System.out.println(s2pr);
 		
-		boolean isS2P = s2pr.isS2P();
-		System.out.println("由于PR的影响,S2PR不一定满足S2P的定义？ " + isS2P);
-		assertTrue(isS2P);
+		boolean isS2PR = s2pr.isS2PR();
+		System.out.println("由于PR的影响,S2PR不一定满足S2P的定义？ " + isS2PR);
+		assertTrue(isS2PR);
 	}
 }
