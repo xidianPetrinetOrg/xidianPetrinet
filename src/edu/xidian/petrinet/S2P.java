@@ -17,9 +17,11 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 
 /**
  * 	Li. p65, 定义4.2
+ * <pre>
  *  一个简单顺序过程(S2P-Simple Sequential Process)是Petri网N = (PA U {p0},T,F), 这里: 
  * (1) PA是非空库所集合 ;称为工序库所的集合; (2) p0 不属于 PA,称为闲置进程库所或简称闲置库所;
  * (3) N是强连通的状态机;              (4) N的每一条回路包含库所p0。
+ * </pre>
  * @author Jiangtao Duan
  *
  */
@@ -159,9 +161,11 @@ public class S2P extends PTNet {
 	/**
 	 * 满足S2P的定义？
 	 * Li. p65, 定义4.2
+	 * <pre>
 	 * 一个简单顺序过程(S2P-Simple Sequential Process)是Petri网N = (PA U {p0},T,F), 这里: 
 	 * (1) PA是非空库所集合 ;称为工序库所的集合; (2) p0 不属于 PA,称为闲置进程库所或简称闲置库所;
 	 * (3) N是强连通的状态机;              (4) N的每一条回路包含库所p0。
+	 * </pre>
 	 * @return
 	 */
 	public boolean isS2P() {
