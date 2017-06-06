@@ -4,13 +4,18 @@
 package edu.xidian.petrinet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 
 /**
  * 简单顺序过程(Simple Sequential Process, S2P)
@@ -61,7 +66,7 @@ public class S2PR extends S2P {
 		s2p = new S2P(resourceNum,p0Token); 
 				
 		// Initial Marking
-		PTMarking marking = getInitialMarking();
+		PTMarking marking = s2p.getInitialMarking();
 			
 		// PR = { resource places }
 		for(int i = 0; i < resourceNum; i++) {
@@ -84,7 +89,54 @@ public class S2PR extends S2P {
 		// Marking
 		setInitialMarking(marking);
 	}
+	
+	/**
+	 * 根据参数，构造S2PR对象
+	 * @param ptnet
+	 * @param p0   闲置库所名称
+	 * @param PA 工序库所名称集合
+	 * @param PR 资源库所名称集合
+	 */
+	public S2PR(PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
+		// 初始化一个父类对象，S2P对象
+		super(ptnet,p0,PA); 
+		// this S2PR对象对应的S2P对象
+		s2p = new S2P(ptnet,p0,PA); 
 		
+		for (PTTransition t : ptnet.getTransitions()) {
+            this.addTransition(t.getName(), false);
+        }
+        for (PTPlace p : ptnet.getPlaces()) {
+            this.addPlace(p.getName(), false);
+        }
+        for (PTFlowRelation f : ptnet.getFlowRelations()) {
+        	//this.addFlowRelation(f, false);  // 错误的，至少应把f克隆了，
+        	if (f.getDirectionPT()) {
+        		this.addFlowRelationPT(f.getPlace().getName(), f.getTransition().getName(), false);
+        	}
+        	else {
+            	this.addFlowRelationTP(f.getTransition().getName(), f.getPlace().getName(), false);
+        	}
+        }
+        
+        for (String pr: PR) {
+        	this.PR.add(this.getPlace(pr));
+        }
+        
+        this.setInitialMarking(ptnet.getInitialMarking().clone());
+	}
+	
+	/**
+	 *  检查本类(S2PR)对应的父类对象(S2P)是否满足S2P的定义
+	 * @see edu.xidian.petrinet.S2P#isS2P()
+	 */
+	@Override
+	public boolean isS2P() {
+		// this对象（S2PR对象）对应的S2P对象
+		Validate.notNull(s2p);
+		return s2p.isS2P();
+	}
+
 	/**
 	 * 满足S2PR的定义？
 	 * Li. p66, 定义4.3
@@ -100,97 +152,125 @@ public class S2PR extends S2P {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean isS2PR() {
-	   Set<AbstractPNNode> temp1 = new HashSet<>();
-	   Set<AbstractPNNode> temp2 = new HashSet<>();
-	   /** 1. 由X = PA ∪ {p0} ∪ T 生成的子网是S2P */
-       // this对象（S2PR对象）对应的S2P对象
-	   if (s2p == null) return false;
-       if(!s2p.isS2P()) return false;
-       
-       /** 2. PR ≠ ∅ ;, (PA ∪ {p0}) ∩ PR = ∅  */
-       if (PR.isEmpty()) return false;
-       temp1.addAll(PA);
-       temp1.add(p0);
-       temp1.retainAll(PR);  // 交集
-       if (!temp1.isEmpty()) return false;
-       
-       /** 3. 任意p∈PA, 任意t1∈p的前置集, 任意t2∈p的后置集, 存在rp ∈PR, t1的前置集  ∩ PR = t2的后置集 ∩ PR = {rp} **/
-       for (PTPlace p: PA) {
-    	   for (AbstractPNNode t1: p.getParents()) {
-    		   for (AbstractPNNode t2: p.getChildren()) {
-    			   // (1) t1的前置集  ∩ PR
-    			   temp1.clear();
-    			   temp1.addAll(t1.getParents());
-    			   temp1.retainAll(PR); // 交集
-    			   // (2) t2的后置集 ∩ PR
-    			   temp2.clear();
-    			   temp2.addAll(t2.getChildren());
-    			   temp2.retainAll(PR); // 交集
-    	           // (1) = (2) = {1个PR元素}
-    			   if (!temp1.equals(temp2)) return false;
-    			   if (temp1.size() != 1) return false;  // 仅有1个rp
-    			   for (AbstractPNNode node: temp1) {
-    			       if (!PR.contains(node)) return false;
-    			   }
-    		   }
-    	   }
-       }
-       
-       /** 
-        * 4. (a) 任意r∈PR , r的前置集的前置集 ∩ PA = r的后置集的后置集 ∩ PA ≠ ∅; 
-        *    (b) 任意r∈PR, r的前置集 ∩ r后置集 = ∅ 
-        ***/
-       for (PTPlace r: PR) {
-    	   /////////////// (a)
-    	   temp1.clear();
-    	   for (AbstractPNNode node: r.getParents()) {
-    		   temp1.addAll(node.getParents());  
-    	   }
-    	   temp1.retainAll(PA);
-    	   temp2.clear();
-    	   for (AbstractPNNode node: r.getChildren()) {
-    		   temp2.addAll(node.getChildren());  
-    	   }
-    	   temp2.retainAll(PA);
-    	   if (!temp1.equals(temp2)) return false;
-    	   if (temp1.isEmpty() || temp2.isEmpty()) return false;
-    	   ///////////////// (b)
-    	   temp1.clear();
-    	   temp1.addAll(r.getParents());
-    	   temp2.clear();
-    	   temp2.addAll(r.getChildren());
-    	   temp1.retainAll(temp2);
-    	   if (!temp1.isEmpty()) return false;
-       }
-       
-       /** 5. (p0)的前置集的前置集  ∩ PR = (p0)的后置集的后置集  ∩ PR = ∅。 **/
-       temp1.clear();
-       for (AbstractPNNode node: p0.getParents()) {
-		   temp1.addAll(node.getParents());  
-	   }
-       temp1.retainAll(PR);
-       temp2.clear();
-       for (AbstractPNNode node: p0.getChildren()) {
-		   temp2.addAll(node.getChildren());  
-	   }
-	   temp2.retainAll(PR);
-	   if (!temp1.isEmpty() || !temp2.isEmpty()) return false;
-		
-	   return true;
+		Validate.notNull(p0);
+		Validate.notEmpty(PA);
+		Validate.notEmpty(PR);
+		Set<AbstractPNNode> temp1 = new HashSet<>();
+		Set<AbstractPNNode> temp2 = new HashSet<>();
+		/** 1. 由X = PA ∪ {p0} ∪ T 生成的子网是S2P */
+		// this对象（S2PR对象）对应的S2P对象
+		Validate.notNull(s2p);
+		if (!s2p.isS2P())
+			return false;
+
+		/** 2. PR ≠ ∅ ;, (PA ∪ {p0}) ∩ PR = ∅ */
+		if (PR.isEmpty())
+			return false;
+		temp1.addAll(PA);
+		temp1.add(p0);
+		temp1.retainAll(PR); // 交集
+		if (!temp1.isEmpty())
+			return false;
+
+		/**
+		 * 3. 任意p∈PA, 任意t1∈p的前置集, 任意t2∈p的后置集, 存在rp ∈PR, t1的前置集 ∩ PR = t2的后置集 ∩
+		 * PR = {rp}
+		 **/
+		for (PTPlace p : PA) {
+			for (AbstractPNNode t1 : p.getParents()) {
+				for (AbstractPNNode t2 : p.getChildren()) {
+					// (1) t1的前置集 ∩ PR
+					temp1.clear();
+					temp1.addAll(t1.getParents());
+					temp1.retainAll(PR); // 交集
+					// (2) t2的后置集 ∩ PR
+					temp2.clear();
+					temp2.addAll(t2.getChildren());
+					temp2.retainAll(PR); // 交集
+					// (1) = (2) = {1个PR元素}
+					if (!temp1.equals(temp2))
+						return false;
+					if (temp1.size() != 1)
+						return false; // 仅有1个rp
+					for (AbstractPNNode node : temp1) {
+						if (!PR.contains(node))
+							return false;
+					}
+				}
+			}
+		}
+
+		/**
+		 * 4. (a) 任意r∈PR , r的前置集的前置集 ∩ PA = r的后置集的后置集 ∩ PA ≠ ∅; (b) 任意r∈PR,
+		 * r的前置集 ∩ r后置集 = ∅
+		 ***/
+		for (PTPlace r : PR) {
+			/////////////// (a)
+			temp1.clear();
+			for (AbstractPNNode node : r.getParents()) {
+				temp1.addAll(node.getParents());
+			}
+			temp1.retainAll(PA);
+			temp2.clear();
+			for (AbstractPNNode node : r.getChildren()) {
+				temp2.addAll(node.getChildren());
+			}
+			temp2.retainAll(PA);
+			if (!temp1.equals(temp2))
+				return false;
+			if (temp1.isEmpty() || temp2.isEmpty())
+				return false;
+			///////////////// (b)
+			temp1.clear();
+			temp1.addAll(r.getParents());
+			temp2.clear();
+			temp2.addAll(r.getChildren());
+			temp1.retainAll(temp2);
+			if (!temp1.isEmpty())
+				return false;
+		}
+
+		/** 5. (p0)的前置集的前置集 ∩ PR = (p0)的后置集的后置集 ∩ PR = ∅。 **/
+		temp1.clear();
+		for (AbstractPNNode node : p0.getParents()) {
+			temp1.addAll(node.getParents());
+		}
+		temp1.retainAll(PR);
+		temp2.clear();
+		for (AbstractPNNode node : p0.getChildren()) {
+			temp2.addAll(node.getChildren());
+		}
+		temp2.retainAll(PR);
+		if (!temp1.isEmpty() || !temp2.isEmpty())
+			return false;
+
+		return true;
 	}
-	
+
 	/**
 	 * 是否满足许可初始标识
 	 * Li. p66, 定义4.4,
+	 * <pre>
+	 * 令N = (PA ∪ {p0} ∪  PR, T, F)是一个S2PR。初始标识M0称为N的许可初始标识当且仅当: 
+	 * (1) M0(p0) ≥ 1; (2) M0(p) = 0, 任意p∈PA; (3) M0(r) ≥ 1, 任意r ∈ PR。
+	 * </pre>
 	 * @return
 	 */
 	public boolean isInintialMarking() {
-		PTPlace pr1 = PR.get(0);
-		PTPlace pr2 = PR.get(1);
-		pr1 = pr2;
-		boolean isOk = false;
-		if (!PR.isEmpty()) isOk = true;
-		return isOk;
+		Validate.notNull(p0);
+		Validate.notEmpty(PA);
+		Validate.notEmpty(PR);
+		PTMarking marking = getInitialMarking(); 
+		if (marking.get(p0.getName()) < 1) return false;
+		for (PTPlace p: PA) {
+			if (marking.get(p.getName()) != null) {
+			   if (marking.get(p.getName()) != 0) return false;  // M(p)=0时, AbstractPTMarking不记录,即M(p)=null
+			}
+		}
+		for (PTPlace p: PR) {
+			if (marking.get(p.getName()) < 1) return false;
+		}
+		return true;
 	}
 	
 	/**
