@@ -92,7 +92,7 @@ public class S2PR extends S2P {
 	
 	/**
 	 * 根据参数，构造S2PR对象
-	 * @param ptnet
+	 * @param ptnet 符合S2PR定义的Petri网对象
 	 * @param p0   闲置库所名称
 	 * @param PA 工序库所名称集合
 	 * @param PR 资源库所名称集合
@@ -289,6 +289,7 @@ public class S2PR extends S2P {
 	public String toString(){
 		StringBuilder str = new StringBuilder();
 	    String superString = super.toString();
+	    str.append("S2PR --------" + "\n");
 	    //str.append("p0: " + p0.toString() + "\n"); 
 	    str.append("p0: " + p0 + "\n");  // 等效
 	    str.append("PA: " + PA.toString() + "\n");

@@ -206,7 +206,8 @@ public class S2P extends PTNet {
 	public String toString(){
 		StringBuilder str = new StringBuilder();
 	    String superString = super.toString();
-	    str.append("p0: " + p0 + "\n");  // 等效
+	    str.append("S2P --------" + "\n");
+	    str.append("p0: " + p0 + "\n");  
 	    str.append("PA: " + PA.toString() + "\n");
 	    return String.format("%s%n%s", superString, str);
 	}
