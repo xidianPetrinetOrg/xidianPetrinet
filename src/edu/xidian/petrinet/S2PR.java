@@ -272,16 +272,6 @@ public class S2PR extends S2P {
 		}
 		return true;
 	}
-	
-	/**
-	 * 
-	 */
-	public void SetResourceSame() {
-		PTPlace pr1 = PR.get(0);
-		PTPlace pr2 = PR.get(1);
-		pr1 = pr2;  // 不能这样
-		System.out.println("pr1:" + pr1 + ",pr2:" + pr2);
-	}
 
 	@Override
 	public String toString(){
