@@ -5,6 +5,7 @@ package edu.xidian.petrinet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -239,11 +240,15 @@ public class S2P extends PTNet {
 	}
 	
     /**
-     * 获取工序库所集
+     * 获取工序库所名字集
      * @return
      */
-	public List<PTPlace> getPA() {
-		return PA;
+	public Set<String> getPA() {
+		Set<String> pa = new HashSet<>();
+		for (PTPlace p: PA) {
+			pa.add(p.getName());
+		}
+		return pa;
 	}
 
 	/**
@@ -253,7 +258,8 @@ public class S2P extends PTNet {
 	public void setPA(List<PTPlace> pA) {
 		PA = pA;
 	}
-
+	
+	
 	/**
 	 * 获取闲置库所p0
 	 * @return

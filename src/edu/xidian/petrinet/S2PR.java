@@ -31,7 +31,7 @@ public class S2PR extends S2P {
      * A list that contains all resource places of state machine.<br>
      * 资源库所集合
      */
-    protected List<PTPlace>  PR = new ArrayList<>();
+    protected final List<PTPlace>  PR = new ArrayList<>();
     
     /**
      * this S2PR对象对应的S2P对象, 即不含资源库所(PR)的S2P对象
@@ -271,6 +271,18 @@ public class S2PR extends S2P {
 			if (marking.get(p.getName()) < 1) return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * 获取资源库所名字集
+	 * @return
+	 */
+	public Set<String> getPR() {
+		Set<String> pr = new HashSet<>();
+		for (PTPlace p: PR) {
+			pr.add(p.getName());
+		}
+		return pr;
 	}
 
 	@Override
