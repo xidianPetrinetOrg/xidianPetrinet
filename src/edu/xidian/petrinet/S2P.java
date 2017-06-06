@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
@@ -169,6 +170,8 @@ public class S2P extends PTNet {
 	 * @return
 	 */
 	public boolean isS2P() {
+		Validate.notNull(p0);
+		Validate.notEmpty(PA);
 	    // (1) PA是非空库所集合 ;称为工序库所的集合;
 	    if (PA.isEmpty()) return false;
 	    
@@ -283,13 +286,15 @@ public class S2P extends PTNet {
 	 * @param p0Token
 	 */
 	public void setInitialMarking(int p0Token) {
+		Validate.notNull(p0);
+		Validate.notEmpty(PA);
 		// Marking
 		PTMarking marking = new PTMarking();
 		// M0(p0) = p0Token; 
 		marking.set(p0.getName(), p0Token);
 		// M0(p) = 0, p属于PA
-		for(PTPlace p: PA) {
-			marking.set(p.getName(), 0);
+		for(PTPlace p: PA) { 
+			marking.set(p.getName(), 0); // M(p)=0时, AbstractPTMarking不记录,即M(p)=null,此时可以不设定，自然是null
 		}
 		// Marking
 		setInitialMarking(marking);
