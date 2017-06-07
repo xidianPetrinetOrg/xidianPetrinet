@@ -195,7 +195,7 @@ public class S3PR extends S2PR {
 	/**
 	 * Li. p68, 性质4.1
 	 * <pre>
-	 * 令N = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
      * 1. 任何 p∈PAi 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
      * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
      * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
@@ -203,8 +203,10 @@ public class S3PR extends S2PR {
      * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
      * </pre>
 	 */
-	public void I() {
-		
+	public void s3pr4_1() {
+		for (S2PR s2pr: s2prSet) {
+			System.out.println("s2pr====" + s2pr);
+		}
 	}
 	
 	@Override

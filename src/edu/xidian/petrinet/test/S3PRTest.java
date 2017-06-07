@@ -247,5 +247,8 @@ public class S3PRTest {
 		
 		// 直接调用函数，求信标S的补集
 		System.out.println("信标补集：" + s3pr.getSiphonCom(SR, S)); // 信标补集：[p4[p4], p2[p2]]
+		
+		//
+		s3pr.s3pr4_1();
 	}	
 }
