@@ -3,8 +3,10 @@
  */
 package edu.xidian.petrinet.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +20,6 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.PetriNetTraversalUtils;
 import edu.xidian.petrinet.S2P;
-import edu.xidian.petrinet.S2PR;
 
 /**
  * @author Administrator
@@ -78,7 +79,7 @@ public class S2PTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S2P#S2P(PTNet, String, Collection)}.
 	 */
-	@Test
+	//@Test
 	public void testS2P2() {
 		PTNet ptnet1 = new PTNet();
 		ptnet1.addPlace("p1");
@@ -133,7 +134,7 @@ public class S2PTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S2P#isS2P()}.
 	 */
-	//@Test
+	@Test
 	public void isS2P() {
 		//fail("Not yet implemented");
 		S2P s2p = new S2P(2,4);

@@ -3,10 +3,8 @@
  */
 package edu.xidian.petrinet;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
@@ -45,7 +43,7 @@ public class S3PR extends S2PR {
 	/**
      * 闲置库所集合
      */
-    protected final List<PTPlace>  P0 = new ArrayList<>();
+    protected final Collection<PTPlace>  P0 = new HashSet<>();
 
 	/**
 	 * 
@@ -88,12 +86,12 @@ public class S3PR extends S2PR {
 		}
 		
 		// 共享资源库所，已经在本对象中，因此不用添加
-		List<PTPlace> PC = new ArrayList<>();
+		Collection<PTPlace> PC = new HashSet<>();
 		PC.addAll(this.PR);
 		PC.retainAll(s2pr.PR);
 		
 		// s2pr.PR与PC的差集，即s2pr.PR \ PC， 将其加入到本对象中
-		List<PTPlace> PC1 = new ArrayList<>();
+		Collection<PTPlace> PC1 = new HashSet<>();
 		PC1.addAll(s2pr.PR);
 		PC1.removeAll(PC);
 		for (PTPlace p: PC1) {
@@ -119,10 +117,7 @@ public class S3PR extends S2PR {
 		PA.addAll(s2pr.PA); // 不会有重复元素，(PA1 ∪ {p01}) ∩ (PA2 ∪ {p02}) = ∅,
 		
 		// PR = PR1 ∪  PR2;
-		// PR.addAll(s2pr.PR); // 因为有共享资源库所PC，导致重复元素。PR1 ∩ PR2 = PC ≠ ∅;
-		for (PTPlace p: s2pr.PR) {  // 保证没有重复元素
-			if (!PR.contains(p)) PR.add(p);
-		}
+		PR.addAll(s2pr.PR); // 不会有重复元素，因为Set<>中重复元素添加不进去 
 		
 		// P0 = {p01} ∪ {p02};
 		P0.add(s2pr.p0);    // 不会有重复元素，(PA1 ∪ {p01}) ∩ (PA2 ∪ {p02}) = ∅,

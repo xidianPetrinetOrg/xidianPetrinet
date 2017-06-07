@@ -3,10 +3,8 @@
  */
 package edu.xidian.petrinet;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.invation.code.toval.validate.Validate;
@@ -33,7 +31,7 @@ public class S2P extends PTNet {
      * A list that contains all state places of state machine.<br>
      * 工序库所（或称为操作库所）集合, 不包含{p0}
      */
-    protected List<PTPlace>  PA = new ArrayList<>();
+    protected Collection<PTPlace>  PA = new HashSet<>();
     
     /**
      * Idle state place闲置库所
@@ -181,7 +179,7 @@ public class S2P extends PTNet {
 	    
 	    // (3) N是强连通的状态机; 即仅有一个强连通分量，该分量的所有节点是该网的库所和变迁集合
 	    Set<Set<AbstractPNNode<?>>> Components = PetriNetTraversalUtils.getStronglyConnectedComponents(this);
-	    System.out.println("Components: " + Components.size() + ",\n" + Components);
+	    //System.out.println("Components: " + Components.size() + ",\n" + Components);
 	    
 	    if (Components.size() != 1) return false;
 	    if (Components.containsAll(this.getNodes())) return false;
@@ -244,7 +242,7 @@ public class S2P extends PTNet {
      * 获取工序库所名字集
      * @return
      */
-	public Set<String> getPA() {
+	public Collection<String> getPA() {
 		Set<String> pa = new HashSet<>();
 		for (PTPlace p: PA) {
 			pa.add(p.getName());
@@ -256,7 +254,7 @@ public class S2P extends PTNet {
 	 * 设置工序库所集
 	 * @param pA
 	 */
-	public void setPA(List<PTPlace> pA) {
+	public void setPA(Collection<PTPlace> pA) {
 		PA = pA;
 	}
 	

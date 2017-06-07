@@ -61,7 +61,7 @@ public class S3PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR#S3PR(S2PR)}.
 	 */
-	//@Test
+	@Test
 	public void testS3PR() {
 		//fail("Not yet implemented");
 		S2PR s2pr = new S2PR(2,1,4);
@@ -145,7 +145,7 @@ public class S3PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR#getHr(Set)}.
 	 */
-	@Test
+	//@Test
 	public void getHrs() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();

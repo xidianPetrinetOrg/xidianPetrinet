@@ -1,9 +1,8 @@
 package edu.xidian.petrinet;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import de.uni.freiburg.iig.telematik.jagal.traverse.algorithms.SCCTarjan;
@@ -22,8 +21,8 @@ public class PetriNetTraversalUtils {
 	/**
 	 * 记录已经访问的节点
 	 */
-	//private static final Set<AbstractPNNode<?>> visited = new HashSet<>();
-	private static final List<AbstractPNNode<?>> visited = new ArrayList<>();  // 方便调试，显示顺序与添加书序一致，但是没有HashSet效率高
+	private static final Collection<AbstractPNNode<?>> visited = new HashSet<>(); // 更确切，不会有重复元素
+	//private static final List<AbstractPNNode<?>> visited = new ArrayList<>();   // 方便调试，显示顺序与添加书序一致，但是没有HashSet效率高
 	/**
 	 * 含有startNode的回路个数
 	 */

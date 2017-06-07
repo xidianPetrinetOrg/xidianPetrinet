@@ -3,10 +3,8 @@
  */
 package edu.xidian.petrinet;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.invation.code.toval.validate.Validate;
@@ -31,7 +29,7 @@ public class S2PR extends S2P {
      * A list that contains all resource places of state machine.<br>
      * 资源库所集合
      */
-    protected final List<PTPlace>  PR = new ArrayList<>();
+    protected final Collection<PTPlace>  PR = new HashSet<>();
     
     /**
      * this S2PR对象对应的S2P对象, 即不含资源库所(PR)的S2P对象
@@ -68,23 +66,21 @@ public class S2PR extends S2P {
 		// Initial Marking
 		PTMarking marking = s2p.getInitialMarking();
 			
-		// PR = { resource places }
-		for(int i = 0; i < resourceNum; i++) {
+		// PR = { resource places }		
+		for (PTPlace pa : PA) {
 			String pr = lastPlaceName(); // 资源库所name
 			addPlace(pr);
 			PR.add(getPlace(pr));
-			
 			// this pr's transitions: t1,t2
-			for (AbstractPNNode<?> t1: PA.get(i).getParents()) {
-				for (AbstractPNNode<?> t2: PA.get(i).getChildren()) {
-					addFlowRelationPT(pr,t1.getName(),1);
-					addFlowRelationTP(t2.getName(),pr,1);
+			for (AbstractPNNode<?> t1 : pa.getParents()) {
+				for (AbstractPNNode<?> t2 : pa.getChildren()) {
+					addFlowRelationPT(pr, t1.getName(), 1);
+					addFlowRelationTP(t2.getName(), pr, 1);
 				}
 			}
-			
 			// resource token
 			marking.set(pr, resourceToken);
-		}  
+		}
 		
 		// Marking
 		setInitialMarking(marking);
