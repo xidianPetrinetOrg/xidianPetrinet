@@ -5,8 +5,12 @@ package edu.xidian.petrinet.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -208,6 +212,7 @@ public class S3PRTest {
 		System.out.println("s3pr: " + s3pr);
 		
 		//////////////////////////////////////////////////
+		// SR: 信标S中的资源库所集合
 		Set<PTPlace> SR = new HashSet<>();
 		SR.add(s3pr.getPlace("p7"));
 		SR.add(s3pr.getPlace("p8"));
@@ -215,8 +220,29 @@ public class S3PRTest {
 		System.out.println("Hrs: " + Hrs); // Hrs: [p4[p4], p5[p5], p3[p3], p2[p2]]
 		assertEquals(4, Hrs.size());
 		
+		// Hrs = H(p7) ∪ H(p8)
 		System.out.println("H(p7) = " + s3pr.getHr(s3pr.getPlace("p7"))); // H(p7) = [p5[p5], p2[p2]]
 		System.out.println("H(p8) = " + s3pr.getHr(s3pr.getPlace("p8"))); // H(p8) = [p4[p4], p3[p3]]
-	}
-	
+		
+		// 信标S
+		Set<PTPlace> S = new HashSet<>();
+		S.add(s3pr.getPlace("p3"));  S.add(s3pr.getPlace("p5"));
+		S.add(s3pr.getPlace("p7"));  S.add(s3pr.getPlace("p8"));
+		// 信标补集[S] = Hrs \ S
+		Set<PTPlace> SS = new HashSet<>();
+		SS.addAll(Hrs);
+		SS.removeAll(S);
+		System.out.println("信标补集：" + SS); // 信标补集：[p4[p4], p2[p2]]
+		
+		// 排序
+		List<PTPlace> SS1 = new ArrayList<>(SS);
+		Collections.sort(SS1, new Comparator<PTPlace>(){
+			@Override
+			public int compare(PTPlace o1, PTPlace o2) {
+				String s1 = o1.getName();
+				String s2 = o2.getName();
+				return s1.compareTo(s2);
+			}});
+		System.out.println("排序后的信标补集：" + SS1); // 排序后的信标补集：[p2[p2], p4[p4]]
+	}	
 }
