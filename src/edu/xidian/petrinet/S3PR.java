@@ -5,7 +5,6 @@ package edu.xidian.petrinet;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
@@ -137,14 +136,19 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * r∈PR, 使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
+	 * Li. p67, 定义4.7
+	 * <pre>
+	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
+	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, S<sub>A</sub>表示S中的工序库所集合.
+	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
+	 * </pre>
      * @param r 资源库所
-	 * @return r的持有者集合
+	 * @return r的持有者集合,是工序库所PA的子集
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Set<PTPlace> getHr(PTPlace r) {
-		Set<PTPlace> Hr = new HashSet<>();
-		Set<AbstractPNNode<PTFlowRelation>> nodes = r.getParents();
+	public Collection<PTPlace> getHr(PTPlace r) {
+		Collection<PTPlace> Hr = new HashSet<>();
+		Collection<AbstractPNNode<PTFlowRelation>> nodes = r.getParents();
 		for (AbstractPNNode node: nodes) {
 			Hr.addAll(node.getParents());
 		}
@@ -153,16 +157,54 @@ public class S3PR extends S2PR {
 	}
 
 	/**
+	 * Li. p67, 定义4.7
+	 * <pre>
 	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
 	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, S<sub>A</sub>表示S中的工序库所集合.
-	 * @return S3PR网所有资源的持有者集合， ∪<sub>r∈S<sub>R</sub></sub>(H(r))
+	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
+	 * </pre>
+	 * @param SR S<sub>R</sub>表示信标S中的资源库所集合
+	 * @return S3PR网, 信标资源库所集合S<sub>R</sub>的所有资源的持有者集合， ∪<sub>r∈S<sub>R</sub></sub>(H(r))，是工序库所的子集
 	 */
-	public Set<PTPlace> getHr(Set<PTPlace> SR) {
-		Set<PTPlace> Hrs = new HashSet<>();
+	public Collection<PTPlace> getHr(Collection<PTPlace> SR) {
+		Collection<PTPlace> Hrs = new HashSet<>();
 		for (PTPlace r: SR) {
 			Hrs.addAll(getHr(r));
 		}
 		return Hrs;
+	}
+	
+	/**
+	 * Li. p67, 定义4.7
+	 * <pre>
+	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
+	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, S<sub>A</sub>表示S中的工序库所集合.
+	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
+	 * </pre>
+	 * @param SR S<sub>R</sub>表示信标S中的资源库所集合
+	 * @param S 信标(siphon)
+	 * @return 信标S的补集[S]. 
+	 */
+	public Collection<PTPlace> getSiphonCom(Collection<PTPlace> SR, Collection<PTPlace> S) {
+		Collection<PTPlace> SiphonCom = new HashSet<>();
+		SiphonCom.addAll(getHr(SR));
+		SiphonCom.removeAll(S);
+		return SiphonCom;
+	}
+	
+	/**
+	 * Li. p68, 性质4.1
+	 * <pre>
+	 * 令N = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+     * 1. 任何 p∈PAi 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+     * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
+     * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
+     * 4. [S] ∪ S是N的P-半流的支撑;
+     * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+     * </pre>
+	 */
+	public void I() {
+		
 	}
 	
 	@Override

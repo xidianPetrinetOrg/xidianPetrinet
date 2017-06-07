@@ -61,7 +61,7 @@ public class S3PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR#S3PR(S2PR)}.
 	 */
-	@Test
+	//@Test
 	public void testS3PR() {
 		//fail("Not yet implemented");
 		S2PR s2pr = new S2PR(2,1,4);
@@ -145,7 +145,7 @@ public class S3PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR#getHr(Set)}.
 	 */
-	//@Test
+	@Test
 	public void getHrs() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();
@@ -216,7 +216,7 @@ public class S3PRTest {
 		Set<PTPlace> SR = new HashSet<>();
 		SR.add(s3pr.getPlace("p7"));
 		SR.add(s3pr.getPlace("p8"));
-		Set<PTPlace> Hrs = s3pr.getHr(SR);
+		Collection<PTPlace> Hrs = s3pr.getHr(SR);
 		System.out.println("Hrs: " + Hrs); // Hrs: [p4[p4], p5[p5], p3[p3], p2[p2]]
 		assertEquals(4, Hrs.size());
 		
@@ -225,11 +225,11 @@ public class S3PRTest {
 		System.out.println("H(p8) = " + s3pr.getHr(s3pr.getPlace("p8"))); // H(p8) = [p4[p4], p3[p3]]
 		
 		// 信标S
-		Set<PTPlace> S = new HashSet<>();
+		Collection<PTPlace> S = new HashSet<>();
 		S.add(s3pr.getPlace("p3"));  S.add(s3pr.getPlace("p5"));
 		S.add(s3pr.getPlace("p7"));  S.add(s3pr.getPlace("p8"));
 		// 信标补集[S] = Hrs \ S
-		Set<PTPlace> SS = new HashSet<>();
+		Collection<PTPlace> SS = new HashSet<>();
 		SS.addAll(Hrs);
 		SS.removeAll(S);
 		System.out.println("信标补集：" + SS); // 信标补集：[p4[p4], p2[p2]]
@@ -244,5 +244,8 @@ public class S3PRTest {
 				return s1.compareTo(s2);
 			}});
 		System.out.println("排序后的信标补集：" + SS1); // 排序后的信标补集：[p2[p2], p4[p4]]
+		
+		// 直接调用函数，求信标S的补集
+		System.out.println("信标补集：" + s3pr.getSiphonCom(SR, S)); // 信标补集：[p4[p4], p2[p2]]
 	}	
 }
