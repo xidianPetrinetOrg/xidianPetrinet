@@ -3,8 +3,12 @@
  */
 package edu.xidian.petrinet;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.invation.code.toval.validate.Validate;
@@ -280,16 +284,32 @@ public class S2PR extends S2P {
 		}
 		return pr;
 	}
-
+	
 	@Override
 	public String toString(){
 		StringBuilder str = new StringBuilder();
 	    String superString = super.toString();
-	    str.append("S2PR --------" + "\n");
-	    //str.append("p0: " + p0.toString() + "\n"); 
-	    str.append("p0: " + p0 + "\n");  // 等效
-	    str.append("PA: " + PA.toString() + "\n");
-	    str.append("PR: " + PR.toString() + "\n");
+	    str.append("\nS2PR --------" + "\n");
+	    str.append("p0: " + p0 + "\n");
+	    PTPlaceComparator Comparator = new PTPlaceComparator();
+	    List<PTPlace> list = new ArrayList<>(PA); 
+	    Collections.sort(list,Comparator);
+	    str.append("PA: " + list + "\n"); 
+	    list.clear(); list.addAll(PR); 
+	    Collections.sort(list,Comparator);
+	    str.append("PR: " + list + "\n");
 	    return String.format("%s%n%s", superString, str);
+	}
+	
+	/**
+	 * 按照PTPlace的name排序
+	 */
+	private class PTPlaceComparator implements Comparator<PTPlace> {
+		@Override
+		public int compare(PTPlace o1, PTPlace o2) {
+			String s1 = o1.getName();
+			String s2 = o2.getName();
+			return s1.compareTo(s2);
+		}
 	}
 }

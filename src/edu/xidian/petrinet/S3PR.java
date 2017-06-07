@@ -3,8 +3,12 @@
  */
 package edu.xidian.petrinet;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
@@ -213,11 +217,30 @@ public class S3PR extends S2PR {
 	public String toString(){
 		StringBuilder str = new StringBuilder();
 	    String superString = super.toString();
-	    str.append("S3PR --------" + "\n");
-	    str.append("P0: " + P0 + "\n"); 
-	    str.append("PA: " + PA.toString() + "\n");
-	    str.append("PR: " + PR.toString() + "\n");
+	    str.append("\nS3PR --------" + "\n");
+	    PTPlaceComparator Comparator = new PTPlaceComparator();
+	    List<PTPlace> list = new ArrayList<>(P0); 
+	    Collections.sort(list,Comparator);
+	    str.append("P0: " + list + "\n"); 
+	    list.clear(); list.addAll(PA); 
+	    Collections.sort(list,Comparator);
+	    str.append("PA: " + list + "\n");
+	    list.clear(); list.addAll(PR); 
+	    Collections.sort(list,Comparator);
+	    str.append("PR: " + list + "\n");
 	    return String.format("%s%n%s", superString, str);
+	}
+	
+	/**
+	 * 按照PTPlace的name排序
+	 */
+	private class PTPlaceComparator implements Comparator<PTPlace> {
+		@Override
+		public int compare(PTPlace o1, PTPlace o2) {
+			String s1 = o1.getName();
+			String s2 = o2.getName();
+			return s1.compareTo(s2);
+		}
 	}
 }
  
