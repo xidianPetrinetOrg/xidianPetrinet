@@ -307,9 +307,30 @@ public class S2PR extends S2P {
 	private class PTPlaceComparator implements Comparator<PTPlace> {
 		@Override
 		public int compare(PTPlace o1, PTPlace o2) {
-			String s1 = o1.getName();
-			String s2 = o2.getName();
-			return s1.compareTo(s2);
+			int i1 = toInt(o1.getName());
+			int i2 = toInt(o2.getName());
+			return Integer.compare(i1, i2);
+		}
+		
+		/**
+		 * '['以前的字符串转int，例如："p20[20]" ==> 20 
+		 * @param s
+		 * @return
+		 */
+		private int toInt(String s) {
+			char c;
+			StringBuilder str = new StringBuilder(); 
+	        for(int i = 0; i<s.length(); i++){
+	        	c = s.charAt(i);
+	        	if (c == '[') break;
+	        	if (c >= '0' && c <= '9') str.append(c);
+	        }
+	        try {
+				return Integer.parseInt(str.toString());
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				return 0;
+			}
 		}
 	}
 }
