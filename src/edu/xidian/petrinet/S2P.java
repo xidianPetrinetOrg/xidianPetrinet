@@ -218,14 +218,17 @@ public class S2P extends PTNet {
 	}
 	
 	/**
-	 * 按照PTPlace的name排序
+	 * 按照PTPlace的name或其中的数字排序
 	 */
 	private class PTPlaceComparator implements Comparator<PTPlace> {
 		@Override
 		public int compare(PTPlace o1, PTPlace o2) {
-			int i1 = toInt(o1.getName());
-			int i2 = toInt(o2.getName());
-			return Integer.compare(i1, i2);
+			String s1 = o1.getName();
+			String s2 = o2.getName();
+			int i1 = toInt(s1);
+			int i2 = toInt(s2);
+			if (i1 == 0 || i2 == 0) return s1.compareTo(s2);  // 按照字符串比较
+			else return Integer.compare(i1, i2); // 按照字符串中的数字比较
 		}
 		
 		/**
@@ -244,7 +247,7 @@ public class S2P extends PTNet {
 	        try {
 				return Integer.parseInt(str.toString());
 			} catch (NumberFormatException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				return 0;
 			}
 		}
