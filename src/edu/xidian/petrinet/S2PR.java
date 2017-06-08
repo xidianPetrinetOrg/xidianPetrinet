@@ -30,6 +30,13 @@ public class S2PR extends S2P {
 	private static final long serialVersionUID = 4178108327705020803L;
 	
 	/**
+	 * String format for plain output.
+	 * @see #toString()
+	 */
+	private static final String toStringFormat = "Petri-Net: %s%n          places: %s %n     transitions: %s %n   flow-relation: %n%s %n initial marking: %s %n  actual marking: %s %n";
+
+	
+	/**
      * A list that contains all resource places of state machine.<br>
      * 资源库所集合
      */
@@ -288,25 +295,36 @@ public class S2PR extends S2P {
 	@Override
 	public String toString(){
 		StringBuilder str = new StringBuilder();
-	    String superString = super.toString();
-	    str.append("\nS2PR --------" + "\n");
+		StringBuilder relationBuilder = new StringBuilder();
+		PTPlaceComparator Comparator = new PTPlaceComparator();
+	    List<AbstractPNNode<?>> list1 = new ArrayList<>(places.values()); 
+	    List<AbstractPNNode<?>> list2 = new ArrayList<>(transitions.values()); 
+	    Collections.sort(list1,Comparator);
+	    Collections.sort(list2,Comparator);
+		for(PTFlowRelation relation: relations.values()){
+			relationBuilder.append("                  ");
+			relationBuilder.append(relation);
+			relationBuilder.append('\n');
+		}
+		str.append(String.format(toStringFormat, name, list1, list2, relationBuilder.toString(), initialMarking, marking));
+	    
+		str.append("\nS2PR --------" + "\n");
 	    str.append("p0: " + p0 + "\n");
-	    PTPlaceComparator Comparator = new PTPlaceComparator();
-	    List<PTPlace> list = new ArrayList<>(PA); 
-	    Collections.sort(list,Comparator);
-	    str.append("PA: " + list + "\n"); 
-	    list.clear(); list.addAll(PR); 
-	    Collections.sort(list,Comparator);
-	    str.append("PR: " + list + "\n");
-	    return String.format("%s%n%s", superString, str);
+	    list1.clear(); list1.addAll(PA); 
+	    Collections.sort(list1,Comparator);
+	    str.append("PA: " + list1 + "\n"); 
+	    list1.clear(); list1.addAll(PR); 
+	    Collections.sort(list1,Comparator);
+	    str.append("PR: " + list1 + "\n");
+	    return String.format("%s", str);
 	}
 	
 	/**
 	 * 按照PTPlace的name或其中的数字排序
 	 */
-	private class PTPlaceComparator implements Comparator<PTPlace> {
+	private class PTPlaceComparator implements Comparator<AbstractPNNode<?>> {
 		@Override
-		public int compare(PTPlace o1, PTPlace o2) {
+		public int compare(AbstractPNNode<?> o1, AbstractPNNode<?> o2) {
 			String s1 = o1.getName();
 			String s2 = o2.getName();
 			int i1 = toInt(s1);

@@ -39,6 +39,13 @@ public class S3PR extends S2PR {
 	private static final long serialVersionUID = 589520113153525821L;
 	
 	/**
+	 * String format for plain output.
+	 * @see #toString()
+	 */
+	private static final String toStringFormat = "Petri-Net: %s%n          places: %s %n     transitions: %s %n   flow-relation: %n%s %n initial marking: %s %n  actual marking: %s %n";
+
+	
+	/**
 	 * 组成S3PR的各个S2PR对象
 	 */
 	protected final Collection<S2PR> s2prSet = new HashSet<>();
@@ -216,27 +223,38 @@ public class S3PR extends S2PR {
 	@Override
 	public String toString(){
 		StringBuilder str = new StringBuilder();
-	    String superString = super.toString();
+		StringBuilder relationBuilder = new StringBuilder();
+		PTPlaceComparator Comparator = new PTPlaceComparator();
+	    List<AbstractPNNode<?>> list1 = new ArrayList<>(places.values()); 
+	    List<AbstractPNNode<?>> list2 = new ArrayList<>(transitions.values()); 
+	    Collections.sort(list1,Comparator);
+	    Collections.sort(list2,Comparator);
+		for(PTFlowRelation relation: relations.values()){
+			relationBuilder.append("                  ");
+			relationBuilder.append(relation);
+			relationBuilder.append('\n');
+		}
+		str.append(String.format(toStringFormat, name, list1, list2, relationBuilder.toString(), initialMarking, marking));
+		
 	    str.append("\nS3PR --------" + "\n");
-	    PTPlaceComparator Comparator = new PTPlaceComparator();
-	    List<PTPlace> list = new ArrayList<>(P0); 
-	    Collections.sort(list,Comparator);
-	    str.append("P0: " + list + "\n"); 
-	    list.clear(); list.addAll(PA); 
-	    Collections.sort(list,Comparator);
-	    str.append("PA: " + list + "\n");
-	    list.clear(); list.addAll(PR); 
-	    Collections.sort(list,Comparator);
-	    str.append("PR: " + list + "\n");
-	    return String.format("%s%n%s", superString, str);
+	    list1.clear();  list1.addAll(P0); 
+	    Collections.sort(list1,Comparator);
+	    str.append("P0: " + list1 + "\n"); 
+	    list1.clear(); list1.addAll(PA); 
+	    Collections.sort(list1,Comparator);
+	    str.append("PA: " + list1 + "\n");
+	    list1.clear(); list1.addAll(PR); 
+	    Collections.sort(list1,Comparator);
+	    str.append("PR: " + list1 + "\n");
+	    return String.format("%s", str);
 	}
 	
 	/**
 	 * 按照PTPlace的name或其中的数字排序
 	 */
-	private class PTPlaceComparator implements Comparator<PTPlace> {
+	private class PTPlaceComparator implements Comparator<AbstractPNNode<?>> {
 		@Override
-		public int compare(PTPlace o1, PTPlace o2) {
+		public int compare(AbstractPNNode<?> o1, AbstractPNNode<?> o2) {
 			String s1 = o1.getName();
 			String s2 = o2.getName();
 			int i1 = toInt(s1);
