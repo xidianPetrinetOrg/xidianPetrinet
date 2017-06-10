@@ -215,7 +215,7 @@ public class S2P extends PTNet {
 	public String toString(){
 		StringBuilder str = new StringBuilder();
 		StringBuilder relationBuilder = new StringBuilder();
-		PTPlaceComparator Comparator = new PTPlaceComparator();
+		PNNodeComparator Comparator = new PNNodeComparator();
 	    List<AbstractPNNode<?>> list1 = new ArrayList<>(places.values()); 
 	    List<AbstractPNNode<?>> list2 = new ArrayList<>(transitions.values()); 
 	    Collections.sort(list1,Comparator);
@@ -235,9 +235,9 @@ public class S2P extends PTNet {
 	}
 	
 	/**
-	 * 按照PTPlace的name或其中的数字排序
+	 * 按照AbstractPNNode的name或其中的数字排序
 	 */
-	private class PTPlaceComparator implements Comparator<AbstractPNNode<?>> {
+	protected class PNNodeComparator implements Comparator<AbstractPNNode<?>> {
 		@Override
 		public int compare(AbstractPNNode<?> o1, AbstractPNNode<?> o2) {
 			String s1 = o1.getName();
