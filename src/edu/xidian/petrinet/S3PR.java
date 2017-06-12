@@ -90,11 +90,9 @@ public class S3PR extends S2PR {
 	 * (3) 把s2pr的Transitions加入到本对象中, T = T1 ∪ T2
 	 * (4) 共享资源库所集PC = PR1 ∩ PR2，即 PC = this.PR ∩ s2pr.PR
 	 *     s2pr.PR与PC的差集PC1 = s2pr.PR \ PC 
-	 *     把PC1加入到本对象中;
+	 *     把PC1加入到本对象中,同时，将其加入到this.PR中。即PR = PR1  ∪  PR2 = this.PR ∪ PC1
 	 * (5) 把s2pr的FlowRelations加入到本对象中, F = F1 ∪  F2
-	 * (6) 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
-	 * (7) 把s2pr中的PR添加到本对象的PR中，PR = PR1 ∪  PR2 
-	 * (8) 把s2pr对象添加到s2prSet中  
+	 * (6) 把s2pr对象添加到s2prSet中  
 	 * @param s2pr
 	 */
 	public void add(S2PR s2pr) {
@@ -119,7 +117,7 @@ public class S3PR extends S2PR {
 		
 		// (4) 共享资源库所集PC = PR1 ∩ PR2，即 PC = this.PR ∩ s2pr.PR
 	    //     s2pr.PR与PC的差集PC1 = s2pr.PR \ PC 
-		//     把PC1加入到本对象中;
+		//     把PC1加入到本对象中,同时，将其加入到this.PR中。PR = PR1  ∪  PR2 = this.PR ∪ PC1
 		Collection<PTPlace> PC = new HashSet<>();
 		PC.addAll(this.PR);
 		PC.retainAll(s2pr.PR);  // PC = this.PR ∩ s2pr.PR	
@@ -128,7 +126,9 @@ public class S3PR extends S2PR {
 		PC1.addAll(s2pr.PR);
 		PC1.removeAll(PC);
 		for (PTPlace p: PC1) {
-			this.addPlace(p.getName());
+			pName = p.getName();
+			this.addPlace(pName);
+			this.PR.add(this.getPlace(pName));
 		}
 		
 		// (5) 把s2pr的FlowRelations加入到本对象中, F = F1 ∪  F2
@@ -141,16 +141,7 @@ public class S3PR extends S2PR {
         	}
         }
 		
-		// (6) 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
-		for (PTPlace pc: PC) {
-			this.PR.remove(pc);
-			this.PR.add(this.getPlace(pc.getName()));
-		}
-		
-		// (7) PR = PR1 ∪  PR2; 
-		PR.addAll(s2pr.PR); // 不会有重复元素，因为Set<>中重复元素添加不进去 
-	
-		// (8) 把s2pr对象添加到s2prSet中
+		// (6) 把s2pr对象添加到s2prSet中
 		s2prSet.add(s2pr);	
 	}
 	
