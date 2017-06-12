@@ -128,8 +128,8 @@ public class S3PR extends S2PR {
 		
 		// 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
 		for (PTPlace pc: PC) {
-			assert(this.PR.remove(pc) == true); // 断言，一定含有该pc
-			//this.PR.remove(pc);
+			// assert(this.PR.remove(pc) == true); // 断言，一定含有该pc, 注：如果没有打开-ea开关，assert语句不会执行
+			this.PR.remove(pc);
 			this.PR.add(this.getPlace(pc.getName()));
 		}
 		
