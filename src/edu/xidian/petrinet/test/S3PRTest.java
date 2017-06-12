@@ -255,7 +255,7 @@ public class S3PRTest {
 	 * test set, ==, equals
 	 * Set中集合运算的基础：equals判断是否两个元素相同，不是通过"=="判断的
 	 */
-	@Test
+	//@Test
 	public void testSet() {
 		S2PR s2pr = new S2PR();
 		s2pr.addPlace("p1");
@@ -284,10 +284,11 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR#s3pr4_1()}.
 	 * Li. p68, 图4-3
 	 */
-	//@Test
+	@Test
 	public void s3pr4_1() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();
+		ptnet1.setName("s2pr_1");
 		// p0
 		ptnet1.addPlace("p1");
 		// pa
@@ -357,6 +358,7 @@ public class S3PRTest {
 
 		///////////////////// ptnet2
 		PTNet ptnet2 = new PTNet();
+		ptnet2.setName("s2pr_2");
 		// p0
 		ptnet2.addPlace("p7");
 		// pa
@@ -417,6 +419,7 @@ public class S3PRTest {
 		
 		///////////////////// ptnet3
 		PTNet ptnet3 = new PTNet();
+		ptnet1.setName("s2pr_3");
 		// p0
 		ptnet3.addPlace("p12");
 		// pa
@@ -462,5 +465,80 @@ public class S3PRTest {
 		
 		System.out.println("s3pr4_1()===============");
 		s3pr.s3pr4_1();
+		
+		// siphons
+		Collection<PTPlace> S1 = new HashSet<>();
+		S1.add(s3pr.getPlace("p6")); S1.add(s3pr.getPlace("p10")); S1.add(s3pr.getPlace("p11"));
+		S1.add(s3pr.getPlace("p15")); S1.add(s3pr.getPlace("p16")); S1.add(s3pr.getPlace("p17"));
+		S1.add(s3pr.getPlace("p18")); S1.add(s3pr.getPlace("p19"));
+		
+		Collection<PTPlace> S2 = new HashSet<>();
+		S2.add(s3pr.getPlace("p4")); S2.add(s3pr.getPlace("p20")); S2.add(s3pr.getPlace("p21"));
+		
+		Collection<PTPlace> S3 = new HashSet<>();
+		S3.add(s3pr.getPlace("p6")); S3.add(s3pr.getPlace("p9")); S3.add(s3pr.getPlace("p10"));
+		S3.add(s3pr.getPlace("p15")); S3.add(s3pr.getPlace("p16")); S3.add(s3pr.getPlace("p17"));
+		S3.add(s3pr.getPlace("p19"));
+		
+		Collection<PTPlace> S4 = new HashSet<>();
+		S4.add(s3pr.getPlace("p5")); S4.add(s3pr.getPlace("p9")); S4.add(s3pr.getPlace("p15"));
+		S4.add(s3pr.getPlace("p16")); S4.add(s3pr.getPlace("p17")); 
+		
+		Collection<PTPlace> S5 = new HashSet<>();
+		S5.add(s3pr.getPlace("p6")); S5.add(s3pr.getPlace("p8")); S5.add(s3pr.getPlace("p10"));
+		S5.add(s3pr.getPlace("p15")); S5.add(s3pr.getPlace("p16")); S5.add(s3pr.getPlace("p19"));
+		
+		// 信标的补集, 信标补集[S] = Hr(SR) \ S
+		// SR: 信标S中的资源库所集合
+		Collection<PTPlace> SR = new HashSet<>();
+		SR.addAll(s3pr.getPR());
+		SR.retainAll(S1);
+		s3pr.printPNNodes("SR1 = ", SR);
+		Collection<PTPlace> Scom1 = new HashSet<>();
+		Scom1.addAll(s3pr.getHr(SR));
+		Scom1.removeAll(S1);
+		s3pr.printPNNodes("[S1] = ", Scom1);
+		
+		Collection<PTPlace> Scom2 = new HashSet<>();
+		SR.clear();
+		SR.addAll(s3pr.getPR());
+		SR.retainAll(S2);
+		s3pr.printPNNodes("SR2 = ", SR);
+		Scom2.addAll(s3pr.getHr(SR));
+		Scom2.removeAll(S2);
+		s3pr.printPNNodes("[S2] = ", Scom2);
+		
+		Collection<PTPlace> Scom3 = new HashSet<>();
+		SR.clear();
+		SR.addAll(s3pr.getPR());
+		SR.retainAll(S3);
+		s3pr.printPNNodes("SR3 = ", SR);
+		Scom3.addAll(s3pr.getHr(SR));
+		Scom3.removeAll(S3);
+		s3pr.printPNNodes("[S3] = ", Scom3);
+		
+		Collection<PTPlace> Scom4 = new HashSet<>();
+		SR.clear();
+		SR.addAll(s3pr.getPR());
+		SR.retainAll(S4);
+		s3pr.printPNNodes("SR4 = ", SR);
+		Scom4.addAll(s3pr.getHr(SR));
+		Scom4.removeAll(S4);
+		s3pr.printPNNodes("[S4] = ", Scom4);
+		
+		Collection<PTPlace> Scom5 = new HashSet<>();
+		SR.clear();
+		SR.addAll(s3pr.getPR());
+		SR.retainAll(S5);
+		s3pr.printPNNodes("SR5 = ", SR);
+		Scom5.addAll(s3pr.getHr(SR));
+		Scom5.removeAll(S5);
+		s3pr.printPNNodes("[S5] = ", Scom5);
+		
+		Collection<PTPlace> Scom31 = new HashSet<>();
+		Scom31.addAll(Scom1);
+		Scom31.retainAll(s3pr.getS2pr("s2pr_1").getPA());
+		s3pr.printPNNodes("S31", Scom31);
+		
 	}
 }

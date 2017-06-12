@@ -275,7 +275,7 @@ public class S2P extends PTNet {
 	 * @param title 名称
 	 * @param nodes
 	 */
-	protected void printPNNodes(String title, Collection<? extends AbstractPNNode<?>> nodes) {
+	public void printPNNodes(String title, Collection<? extends AbstractPNNode<?>> nodes) {
 		List<? extends AbstractPNNode<?>> list = new ArrayList<>(nodes); 
 		PNNodeComparator Comparator = new PNNodeComparator();
 		Collections.sort(list,Comparator);
@@ -314,13 +314,22 @@ public class S2P extends PTNet {
      * 获取工序库所名字集
      * @return
      */
-	public Collection<String> getPA() {
+	public Collection<String> getPAnames() {
 		Set<String> pa = new HashSet<>();
 		for (PTPlace p: PA) {
 			pa.add(p.getName());
 		}
 		return pa;
 	}
+	
+	/**
+     * 获取工序库所集
+     * @return
+     */
+	public Collection<PTPlace> getPA() {
+		return PA;
+	}
+
 
 	/**
 	 * 设置工序库所集

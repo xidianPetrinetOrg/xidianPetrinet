@@ -6,8 +6,10 @@ package edu.xidian.petrinet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
@@ -43,11 +45,10 @@ public class S3PR extends S2PR {
 	 */
 	private static final String toStringFormat = "Petri-Net: %s%n          places: %s %n     transitions: %s %n   flow-relation: %n%s %n initial marking: %s %n  actual marking: %s %n";
 
-	
 	/**
-	 * 组成S3PR的各个S2PR对象
+	 * 组成S3PR的各个S2PR对象,以petri name索引
 	 */
-	protected final Collection<S2PR> s2prSet = new HashSet<>();
+	protected Map<String, S2PR> s2prSet = new HashMap<>();
 	
 	/**
      * 闲置库所集合
@@ -66,8 +67,8 @@ public class S3PR extends S2PR {
 	 * @param s2pr
 	 */
 	public S3PR(S2PR s2pr) {
-		super(s2pr, s2pr.p0.getName(),s2pr.getPA(),s2pr.getPR());
-		s2prSet.add(s2pr);
+		super(s2pr, s2pr.p0.getName(),s2pr.getPAnames(),s2pr.getPRnames());
+		s2prSet.put(s2pr.getName(),s2pr);
 		P0.add(s2pr.p0);
 	}
 	
@@ -142,7 +143,7 @@ public class S3PR extends S2PR {
         }
 		
 		// (6) 把s2pr对象添加到s2prSet中
-		s2prSet.add(s2pr);	
+		s2prSet.put(s2pr.getName(), s2pr);	
 	}
 	
 	/**
@@ -215,6 +216,15 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
+	 * 以名字获取组成S3PR的S2PR对象
+	 * @param petriNetName
+	 * @return
+	 */
+	public S2PR getS2pr(String petriNetName) {
+		return s2prSet.get(petriNetName);
+	}
+	
+	/**
 	 * Li. p68, 性质4.1
 	 * <pre>
 	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
@@ -233,7 +243,7 @@ public class S3PR extends S2PR {
 		// 1. 任何 p∈PAi(一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
 		System.out.println("1. 任何 p∈PAi(一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0}");
 		int i = 1;
-		for (S2PR s2pr: s2prSet) {
+		for (S2PR s2pr: s2prSet.values()) {
 			places.clear();
 			System.out.println("===S2PR[" + i + "]:");
 			printPNNodes("PA: ",s2pr.PA);

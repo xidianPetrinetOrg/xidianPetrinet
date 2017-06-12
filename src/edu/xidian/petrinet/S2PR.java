@@ -36,7 +36,7 @@ public class S2PR extends S2P {
 
 	
 	/**
-     * A list that contains all resource places of state machine.<br>
+     * A list that contains all resource places.<br>
      * 资源库所集合
      */
     protected final Collection<PTPlace>  PR = new HashSet<>();
@@ -283,12 +283,20 @@ public class S2PR extends S2P {
 	 * 获取资源库所名字集
 	 * @return
 	 */
-	public Set<String> getPR() {
-		Set<String> pr = new HashSet<>();
+	public Collection<String> getPRnames() {
+		Collection<String> pr = new HashSet<>();
 		for (PTPlace p: PR) {
 			pr.add(p.getName());
 		}
 		return pr;
+	}
+	
+	/**
+	 * 获取资源库所集
+	 * @return
+	 */
+	public Collection<PTPlace> getPR() {
+		return PR;
 	}
 	
 	@Override
