@@ -85,21 +85,44 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * 添加S2PR对象到本S3PR对象中
+	 * (1) 把s2pr的闲置库所p0加入到本对象，并且加入到本对象的P0中(P0 = {p01} ∪ {p02})
+	 * (2) 把s2pr的工序库所集PA加入到本对象中，并且添加到本对象的PA中(PA = PA1 ∪ PA2)
+	 * (3) 把s2pr的Transitions加入到本对象中, T = T1 ∪ T2
+	 * (4) 共享资源库所集PC = PR1 ∩ PR2，即 PC = this.PR ∩ s2pr.PR
+	 *     s2pr.PR与PC的差集PC1 = s2pr.PR \ PC 
+	 *     把PC1加入到本对象中;
+	 * (5) 把s2pr的FlowRelations加入到本对象中, F = F1 ∪  F2
+	 * (6) 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
+	 * (7) 把s2pr中的PR添加到本对象的PR中，PR = PR1 ∪  PR2 
+	 * (8) 把s2pr对象添加到s2prSet中  
 	 * @param s2pr
 	 */
 	public void add(S2PR s2pr) {
-		// 把s2pr的闲置库所p0加入到本对象
-		this.addPlace(s2pr.p0.getName());
+		// (1) 把s2pr的闲置库所p0加入到本对象，并且加入到本对象的P0中(P0 = {p01} ∪ {p02})
+		String pName = s2pr.p0.getName();
+		this.addPlace(pName);
+		// P0 = {p01} ∪ {p02};
+		this.P0.add(this.getPlace(pName)); 
+		
+		// (2) 把s2pr的工序库所PA加入到本对象中，并且添加到本对象的PA中(PA = PA1 ∪ PA2)
 		for (PTPlace p: s2pr.PA) {
-			this.addPlace(p.getName());
+			pName = p.getName();
+			this.addPlace(pName);
+			// PA = PA1 ∪ PA2;  
+			this.PA.add(this.getPlace(pName));
 		}
 		
-		// 共享资源库所，已经在本对象中, 因此不用再添加, 
-		// 但是，更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
+		// (3) 把s2pr的Transitions加入到本对象中, T = T1 ∪ T2
+		for (PTTransition t : s2pr.getTransitions()) {
+			this.addTransition(t.getName());
+		}
+		
+		// (4) 共享资源库所集PC = PR1 ∩ PR2，即 PC = this.PR ∩ s2pr.PR
+	    //     s2pr.PR与PC的差集PC1 = s2pr.PR \ PC 
+		//     把PC1加入到本对象中;
 		Collection<PTPlace> PC = new HashSet<>();
 		PC.addAll(this.PR);
-		PC.retainAll(s2pr.PR);  // PC = this.PR ∩ s2pr.PR
-		
+		PC.retainAll(s2pr.PR);  // PC = this.PR ∩ s2pr.PR	
 		// s2pr.PR与PC的差集，即s2pr.PR \ PC， 将其加入到本对象中
 		Collection<PTPlace> PC1 = new HashSet<>();
 		PC1.addAll(s2pr.PR);
@@ -108,12 +131,7 @@ public class S3PR extends S2PR {
 			this.addPlace(p.getName());
 		}
 		
-		// T = T1 ∪ T2, 把s2pr的Transitions加入到本对象
-		for (PTTransition t: s2pr.getTransitions()) {
-			this.addTransition(t.getName());
-		}
-		
-		// F = F1 ∪  F2, 把s2pr的FlowRelations加入到本对象
+		// (5) 把s2pr的FlowRelations加入到本对象中, F = F1 ∪  F2
 		for (PTFlowRelation f : s2pr.getFlowRelations()) {
         	if (f.getDirectionPT()) {
         		this.addFlowRelationPT(f.getPlace().getName(), f.getTransition().getName());
@@ -123,21 +141,16 @@ public class S3PR extends S2PR {
         	}
         }
 		
-		// PA = PA1 ∪ PA2;
-		PA.addAll(s2pr.PA); // 不会有重复元素，(PA1 ∪ {p01}) ∩ (PA2 ∪ {p02}) = ∅,
-		
-		// 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
+		// (6) 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
 		for (PTPlace pc: PC) {
-			// assert(this.PR.remove(pc) == true); // 断言，一定含有该pc, 注：如果没有打开-ea开关，assert语句不会执行
 			this.PR.remove(pc);
 			this.PR.add(this.getPlace(pc.getName()));
 		}
 		
-		// PR = PR1 ∪  PR2;
+		// (7) PR = PR1 ∪  PR2; 
 		PR.addAll(s2pr.PR); // 不会有重复元素，因为Set<>中重复元素添加不进去 
-		
-		// P0 = {p01} ∪ {p02};
-		P0.add(s2pr.p0);    // 不会有重复元素，(PA1 ∪ {p01}) ∩ (PA2 ∪ {p02}) = ∅,
+	
+		// (8) 把s2pr对象添加到s2prSet中
 		s2prSet.add(s2pr);	
 	}
 	
@@ -214,7 +227,7 @@ public class S3PR extends S2PR {
 	 * Li. p68, 性质4.1
 	 * <pre>
 	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
-     * 1. 任何 p∈PAi （一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip）都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+     * 1. 任何 p∈PAi (一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
      * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
      * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
      * 4. [S] ∪ S是N的P-半流的支撑;
@@ -226,8 +239,8 @@ public class S3PR extends S2PR {
 		printPNNodes("P0: ",P0);
 		printPNNodes("PR: " ,PR);
 		
-		// 1. 任何 p∈PAi（一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip） 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
-		System.out.println("1. 任何 p∈PAi（一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip） 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0}");
+		// 1. 任何 p∈PAi(一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+		System.out.println("1. 任何 p∈PAi(一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0}");
 		int i = 1;
 		for (S2PR s2pr: s2prSet) {
 			places.clear();
@@ -244,15 +257,6 @@ public class S3PR extends S2PR {
 			places.clear();
 			places.add(pr);
 			places.addAll(getHr(pr));
-			if (pr.getName().equals("p19")) {
-				printPNNodes("h1=",getHr(pr));
-				printPNNodes("h2=",getHr(this.getPlace("p19")));
-				System.out.println("equals:" + pr.equals(this.getPlace("p19")));
-				boolean b = pr == this.getPlace("p19");
-				System.out.println("==" + b);
-				System.out.println("pr=" + pr);
-				System.out.println("pr=" + this.getPlace("p19"));
-			}
 			printPNNodes("资源库所(" + pr.getName() + ")对应的极小P-半流: ",places);
 		}
 	}
