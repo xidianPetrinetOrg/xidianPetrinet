@@ -94,10 +94,11 @@ public class S3PR extends S2PR {
 			this.addPlace(p.getName());
 		}
 		
-		// 共享资源库所，已经在本对象中，因此不用添加
+		// 共享资源库所，已经在本对象中, 因此不用再添加, 
+		// 但是，更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
 		Collection<PTPlace> PC = new HashSet<>();
 		PC.addAll(this.PR);
-		PC.retainAll(s2pr.PR);
+		PC.retainAll(s2pr.PR);  // PC = this.PR ∩ s2pr.PR
 		
 		// s2pr.PR与PC的差集，即s2pr.PR \ PC， 将其加入到本对象中
 		Collection<PTPlace> PC1 = new HashSet<>();
@@ -124,6 +125,13 @@ public class S3PR extends S2PR {
 		
 		// PA = PA1 ∪ PA2;
 		PA.addAll(s2pr.PA); // 不会有重复元素，(PA1 ∪ {p01}) ∩ (PA2 ∪ {p02}) = ∅,
+		
+		// 更新了PC的相关的F后，不要忘了更新this.PR中的PC, 即用本对象的相应pc，替换this.PR中的place
+		for (PTPlace pc: PC) {
+			assert(this.PR.remove(pc) == true); // 断言，一定含有该pc
+			//this.PR.remove(pc);
+			this.PR.add(this.getPlace(pc.getName()));
+		}
 		
 		// PR = PR1 ∪  PR2;
 		PR.addAll(s2pr.PR); // 不会有重复元素，因为Set<>中重复元素添加不进去 
@@ -206,7 +214,7 @@ public class S3PR extends S2PR {
 	 * Li. p68, 性质4.1
 	 * <pre>
 	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
-     * 1. 任何 p∈PAi 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+     * 1. 任何 p∈PAi （一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip）都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
      * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
      * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
      * 4. [S] ∪ S是N的P-半流的支撑;
@@ -214,8 +222,38 @@ public class S3PR extends S2PR {
      * </pre>
 	 */
 	public void s3pr4_1() {
+		Collection<PTPlace> places = new ArrayList<>();
+		printPNNodes("P0: ",P0);
+		printPNNodes("PR: " ,PR);
+		
+		// 1. 任何 p∈PAi（一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip） 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+		System.out.println("1. 任何 p∈PAi（一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip） 都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0}");
+		int i = 1;
 		for (S2PR s2pr: s2prSet) {
-			System.out.println("========s2pr====" + s2pr);
+			places.clear();
+			System.out.println("===S2PR[" + i + "]:");
+			printPNNodes("PA: ",s2pr.PA);
+			places.addAll(s2pr.PA);
+			places.add(s2pr.p0);
+			printPNNodes("闲置库所(" + s2pr.p0.getName() + ")对应的极小P-半流: ",places);
+			i++;
+		}
+		// 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
+		System.out.println("2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r)");
+		for (PTPlace pr: PR) {
+			places.clear();
+			places.add(pr);
+			places.addAll(getHr(pr));
+			if (pr.getName().equals("p19")) {
+				printPNNodes("h1=",getHr(pr));
+				printPNNodes("h2=",getHr(this.getPlace("p19")));
+				System.out.println("equals:" + pr.equals(this.getPlace("p19")));
+				boolean b = pr == this.getPlace("p19");
+				System.out.println("==" + b);
+				System.out.println("pr=" + pr);
+				System.out.println("pr=" + this.getPlace("p19"));
+			}
+			printPNNodes("资源库所(" + pr.getName() + ")对应的极小P-半流: ",places);
 		}
 	}
 	

@@ -431,6 +431,8 @@ public class S3PRTest {
 		s3pr.add(ptnet3, "p12", pa, pr);
 		System.out.println("3: s3pr: " + s3pr);
 		
+		System.out.println("H(p19): "+ s3pr.getHr(s3pr.getPlace("p19")));
+		System.out.println("s3pr4_1()===============");
 		s3pr.s3pr4_1();
 	}
 }

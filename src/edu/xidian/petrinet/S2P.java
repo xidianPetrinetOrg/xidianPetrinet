@@ -271,6 +271,18 @@ public class S2P extends PTNet {
 	}
 	
 	/**
+	 * 排序打印PNNodes
+	 * @param title 名称
+	 * @param nodes
+	 */
+	protected void printPNNodes(String title, Collection<? extends AbstractPNNode<?>> nodes) {
+		List<? extends AbstractPNNode<?>> list = new ArrayList<>(nodes); 
+		PNNodeComparator Comparator = new PNNodeComparator();
+		Collections.sort(list,Comparator);
+		System.out.println(title + list);
+	}
+	
+	/**
 	 * last Place Name: p_prefix + p_suffix++
 	 */
 	protected String lastPlaceName() {
