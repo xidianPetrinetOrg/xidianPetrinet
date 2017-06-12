@@ -252,10 +252,39 @@ public class S3PRTest {
 	}
 	
 	/**
+	 * test set, ==, equals
+	 * Set中集合运算的基础：equals判断是否两个元素相同，不是通过"=="判断的
+	 */
+	@Test
+	public void testSet() {
+		S2PR s2pr = new S2PR();
+		s2pr.addPlace("p1");
+		s2pr.addPlace("p2");
+		s2pr.addPlace("p3");
+		S3PR s3pr = new S3PR();
+		s3pr.addPlace("p3");
+		s3pr.addPlace("p4");
+		
+		Collection<PTPlace> places = new HashSet<>();
+		// places.add(s3pr.getPlace("p3")))失败，
+		// 因为在此之前,有places.add(s2pr.getPlace("p3")),
+		// places通过equals判断，已经有"p3"对应的place，因此不用增加了。
+		System.out.println("add ok = " + 
+		        places.add(s2pr.getPlace("p1")) + "," +
+				places.add(s2pr.getPlace("p3")) + "," + 
+		        places.add(s3pr.getPlace("p3"))); // add ok = true,true,false
+		System.out.println("places: " + places);  // places: [p1[p1], p3[p3]]
+		boolean b1 = (s2pr.getPlace("p3") == s3pr.getPlace("p3")); // flase
+		boolean b2 = (s2pr.getPlace("p3").equals(s3pr.getPlace("p3"))); // true
+		System.out.println("两个p3  ！==,但是equals： " + b1 + "," + b2);
+		
+	}
+	
+	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR#s3pr4_1()}.
 	 * Li. p68, 图4-3
 	 */
-	@Test
+	//@Test
 	public void s3pr4_1() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();
