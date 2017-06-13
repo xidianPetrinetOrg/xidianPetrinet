@@ -46,7 +46,7 @@ public class S3PR extends S2PR {
 	private static final String toStringFormat = "Petri-Net: %s%n          places: %s %n     transitions: %s %n   flow-relation: %n%s %n initial marking: %s %n  actual marking: %s %n";
 
 	/**
-	 * 组成S3PR的各个S2PR对象,以petri name索引
+	 * 组成S3PR的各个S2PR对象,以S2PR网名称索引
 	 */
 	protected Map<String, S2PR> s2prSet = new HashMap<>();
 	
@@ -64,24 +64,29 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * 由一个S2PR对象构造S3PR对象
+	 * @param name 该S3PR网名称
+	 * @param s2pr_name s2pr网名称
 	 * @param s2pr
 	 */
-	public S3PR(S2PR s2pr) {
-		super(s2pr, s2pr.p0.getName(),s2pr.getPAnames(),s2pr.getPRnames());
-		s2prSet.put(s2pr.getName(),s2pr);
-		P0.add(s2pr.p0);
+	public S3PR(String name, String s2pr_name, S2PR s2pr) {	
+		// 调用另一个构造函数，初始化本类
+		this(name,s2pr_name,s2pr, s2pr.p0.getName(),s2pr.getPAnames(),s2pr.getPRnames());
 	}
 	
 	/**
 	 * 由一个添加符合S2PR定义的Petri网对象构造S3PR对象
+	 * @param name 该S3PR网名称
+	 * @param s2pr_name S2PR网名称
 	 * @param ptnet 符合S2PR定义的Petri网对象
 	 * @param p0   闲置库所名称
 	 * @param PA 工序库所名称集合
 	 * @param PR 资源库所名称集合
 	 */
-	public S3PR(PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
-		S2PR s2pr = new S2PR(ptnet,p0,PA,PR);
-		this.add(s2pr);
+	public S3PR(String name, String s2pr_name, PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
+		// 初始化父类对象
+		super(name,ptnet, p0, PA, PR);
+		S2PR s2pr = new S2PR(s2pr_name,ptnet,p0,PA,PR);
+		this.add(s2pr_name,s2pr);
 	}
 	
 	/**
@@ -93,10 +98,11 @@ public class S3PR extends S2PR {
 	 *     s2pr.PR与PC的差集PC1 = s2pr.PR \ PC 
 	 *     把PC1加入到本对象中,同时，将其加入到this.PR中。即PR = PR1  ∪  PR2 = this.PR ∪ PC1
 	 * (5) 把s2pr的FlowRelations加入到本对象中, F = F1 ∪  F2
-	 * (6) 把s2pr对象添加到s2prSet中  
+	 * (6) 把s2pr对象添加到s2prSet中 
+	 * @param s2pr_name S2PR网名称 
 	 * @param s2pr
 	 */
-	public void add(S2PR s2pr) {
+	public void add(String s2pr_name,S2PR s2pr) {
 		// (1) 把s2pr的闲置库所p0加入到本对象，并且加入到本对象的P0中(P0 = {p01} ∪ {p02})
 		String pName = s2pr.p0.getName();
 		this.addPlace(pName);
@@ -143,19 +149,21 @@ public class S3PR extends S2PR {
         }
 		
 		// (6) 把s2pr对象添加到s2prSet中
-		s2prSet.put(s2pr.getName(), s2pr);	
+		s2prSet.put(s2pr_name, s2pr);	
+		System.out.println("-----"+s2prSet.keySet());
 	}
 	
 	/**
 	 * 添加符合S2PR定义的Petri网对象到本S3PR对象中
+	 * @param name S2PR网名称
 	 * @param ptnet 符合S2PR定义的Petri网对象
 	 * @param p0   闲置库所名称
 	 * @param PA 工序库所名称集合
 	 * @param PR 资源库所名称集合
 	 */
-	public void add(PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
-		S2PR s2pr = new S2PR(ptnet,p0,PA,PR);
-		add(s2pr);
+	public void add(String name,PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
+		S2PR s2pr = new S2PR(name,ptnet,p0,PA,PR);
+		add(name,s2pr);
 	}
 	
 	/**

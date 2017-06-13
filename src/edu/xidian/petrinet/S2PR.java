@@ -63,15 +63,16 @@ public class S2PR extends S2P {
 	 * t1 ----> p2 -----> t2 -----> p3 ----> t3
 	 * |                                     |
 	 * <------------- p1 <-------------------.
+	 * @param name 该网名称
 	 * @param resourceNum   资源库所个数
 	 * @param resourceToken 缺省资源库所的Token
 	 * @param p0Token 缺省闲置库所的Token
 	 */
-	public S2PR(int resourceNum, int resourceToken, int p0Token) {
+	public S2PR(String name,int resourceNum, int resourceToken, int p0Token) {
 		// 初始化一个父类对象，S2P对象
-		super(resourceNum,p0Token); 
+		super(name,resourceNum,p0Token); 
 		// this S2PR对象对应的S2P对象
-		s2p = new S2P(resourceNum,p0Token); 
+		s2p = new S2P(name,resourceNum,p0Token); 
 				
 		// Initial Marking
 		PTMarking marking = s2p.getInitialMarking();
@@ -98,16 +99,18 @@ public class S2PR extends S2P {
 	
 	/**
 	 * 根据参数，构造S2PR对象
+	 * @param name 该网名称
 	 * @param ptnet 符合S2PR定义的Petri网对象
 	 * @param p0   闲置库所名称
 	 * @param PA 工序库所名称集合
 	 * @param PR 资源库所名称集合
 	 */
-	public S2PR(PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
+	public S2PR(String name,PTNet ptnet, String p0, Collection<String> PA, Collection<String> PR) {
 		// 初始化一个父类对象，S2P对象
-		super(ptnet,p0,PA); 
+		super(name,ptnet,p0,PA); 
+		
 		// this S2PR对象对应的S2P对象
-		s2p = new S2P(ptnet,p0,PA); 
+		s2p = new S2P(name,ptnet,p0,PA); 
 		
 		for (PTTransition t : ptnet.getTransitions()) {
             this.addTransition(t.getName(), false);

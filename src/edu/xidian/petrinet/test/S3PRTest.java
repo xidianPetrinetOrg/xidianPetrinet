@@ -64,10 +64,10 @@ public class S3PRTest {
 	//@Test
 	public void testS3PR() {
 		//fail("Not yet implemented");
-		S2PR s2pr = new S2PR(2,1,4);
+		S2PR s2pr = new S2PR("test_s2pr_net",2,1,4);
 		System.out.println("s2pr:" + s2pr);
 		
-		S3PR s3pr = new S3PR(s2pr);
+		S3PR s3pr = new S3PR("test_s3pr_1","s2pr_1",s2pr);
 		System.out.println("s3pr: " + s3pr);
 	}
 	
@@ -131,14 +131,14 @@ public class S3PRTest {
 		ptnet2.addFlowRelationPT("p8", "t4");
 		ptnet2.addFlowRelationTP("t5", "p8");
 		
-		S3PR s3pr = new S3PR(ptnet1,"p1",pa,pr);
+		S3PR s3pr = new S3PR("test_s3pr_1","s2pr_1",ptnet1,"p1",pa,pr);
 		System.out.println("s3pr: " + s3pr);
 		
 		pa.clear();
 		pa.add("p4"); pa.add("p5");
 		pr.clear();
 		pr.add("p7"); pr.add("p8");
-		s3pr.add(ptnet2,"p6",pa,pr);
+		s3pr.add("s2pr_in_s3pr_2",ptnet2,"p6",pa,pr);
 		System.out.println("s3pr: " + s3pr);
 	}
 	
@@ -178,7 +178,7 @@ public class S3PRTest {
 		Set<String> pr = new HashSet<String>();
 		pr.add("p7"); pr.add("p8");
 		
-		S3PR s3pr = new S3PR(ptnet1,"p1",pa,pr);
+		S3PR s3pr = new S3PR("Li. figure3-1_or_4-2","s2pr_in_s3pr_1",ptnet1,"p1",pa,pr);
 		
 		///////////////////// ptnet2
 		PTNet ptnet2 = new PTNet();
@@ -209,7 +209,7 @@ public class S3PRTest {
 		pa.add("p4"); pa.add("p5");
 		pr.clear();
 		pr.add("p7"); pr.add("p8");
-		s3pr.add(ptnet2,"p6",pa,pr);
+		s3pr.add("s2pr_in_s3pr_2",ptnet2,"p6",pa,pr);
 		System.out.println("s3pr: " + s3pr);
 		
 		//////////////////////////////////////////////////
@@ -277,7 +277,6 @@ public class S3PRTest {
 		boolean b1 = (s2pr.getPlace("p3") == s3pr.getPlace("p3")); // flase
 		boolean b2 = (s2pr.getPlace("p3").equals(s3pr.getPlace("p3"))); // true
 		System.out.println("两个p3  ！==,但是equals： " + b1 + "," + b2);
-		
 	}
 	
 	/**
@@ -288,7 +287,6 @@ public class S3PRTest {
 	public void s3pr4_1() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();
-		ptnet1.setName("s2pr_1");
 		// p0
 		ptnet1.addPlace("p1");
 		// pa
@@ -353,12 +351,11 @@ public class S3PRTest {
 		Set<String> pr = new HashSet<String>();
 		pr.add("p16"); pr.add("p19"); pr.add("p20"); pr.add("p21");
 		
-		S3PR s3pr = new S3PR(ptnet1,"p1",pa,pr);
+		S3PR s3pr = new S3PR("Li_p68_figure4-3","s2pr_1",ptnet1,"p1",pa,pr);
 		System.out.println("1: s3pr: " + s3pr);
 
 		///////////////////// ptnet2
 		PTNet ptnet2 = new PTNet();
-		ptnet2.setName("s2pr_2");
 		// p0
 		ptnet2.addPlace("p7");
 		// pa
@@ -414,12 +411,11 @@ public class S3PRTest {
 		pr.clear();
 		pr.add("p16"); 	pr.add("p17"); pr.add("p18");pr.add("p19");
 
-		s3pr.add(ptnet2, "p7", pa, pr);
+		s3pr.add("s2pr_2",ptnet2, "p7", pa, pr);
 		System.out.println("2: s3pr: " + s3pr);
 		
 		///////////////////// ptnet3
 		PTNet ptnet3 = new PTNet();
-		ptnet1.setName("s2pr_3");
 		// p0
 		ptnet3.addPlace("p12");
 		// pa
@@ -460,7 +456,7 @@ public class S3PRTest {
 		pr.clear();
 		pr.add("p16"); 	pr.add("p17"); pr.add("p18");
 
-		s3pr.add(ptnet3, "p12", pa, pr);
+		s3pr.add("s2pr_3",ptnet3, "p12", pa, pr);
 		System.out.println("3: s3pr: " + s3pr);
 		
 		System.out.println("s3pr4_1()===============");

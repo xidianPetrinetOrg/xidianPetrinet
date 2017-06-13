@@ -87,10 +87,11 @@ public class S2P extends PTNet {
 	 * t1 ----> p2 -----> t2 -----> p3 ----> t3
 	 * |                                     |
 	 * <------------- p1 <-------------------.
-	 * 
+	 * @param name 该网名称
 	 * @param PAnum   工序库所个数
 	 */
-	public S2P(int PAnum) {	
+	public S2P(String name, int PAnum) {
+		this.setName(name);
 		String p1,p2,t1,t2;
 		p1 = lastPlaceName();
 		addPlace(p1);    
@@ -128,23 +129,25 @@ public class S2P extends PTNet {
 	 * t1 ----> p2 -----> t2 -----> p3 ----> t3
 	 * |                                     |
 	 * <------------- p1 <-------------------.
-	 * 
+	 * @param name 该网名称
 	 * @param PAnum   工序库所个数
 	 * @param p0Token 闲置库所的Token
 	 */
-	public S2P(int PAnum, int p0Token) {	
-		this(PAnum);
+	public S2P(String name, int PAnum, int p0Token) {	
+		this(name,PAnum);
 		// 设置初始标识
 		setInitialMarking(p0Token);
 	}
 	
 	/**
 	 * 根据参数，构造S2P对象
+	 * @param name 该网名称
 	 * @param ptnet
 	 * @param p0   闲置库所名称
 	 * @param PA 工序库所名称集合
 	 */
-	public S2P(PTNet ptnet, String p0, Collection<String> PA) {
+	public S2P(String name,PTNet ptnet, String p0, Collection<String> PA) {
+		this.setName(name);
 		for (PTTransition t : ptnet.getTransitions()) {
             this.addTransition(t.getName(), false);
         }
