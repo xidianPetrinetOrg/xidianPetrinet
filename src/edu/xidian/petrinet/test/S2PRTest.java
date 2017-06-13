@@ -62,7 +62,7 @@ public class S2PRTest {
 	//@Test
 	public void testS2PR() {
 		//fail("Not yet implemented");
-		S2PR s2pr = new S2PR(2,1,4);
+		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
 		System.out.println(s2pr);
 	}
 	
@@ -72,7 +72,7 @@ public class S2PRTest {
 	//@Test
 	public void isS2P() {
 		//fail("Not yet implemented");
-		S2PR s2pr = new S2PR(2,1,4);
+		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
 		System.out.println(s2pr);
 		
 		boolean isS2P = s2pr.isS2P();
@@ -83,10 +83,11 @@ public class S2PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S2PR#isS2PR()}.
 	 */
-	//@Test
+	@Test
+	// TODO:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	public void isS2PR() {
 		//fail("Not yet implemented");
-		S2PR s2pr = new S2PR(2,1,4);
+		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
 		System.out.println(s2pr);
 		
 		boolean isS2PR = s2pr.isS2PR();
@@ -100,7 +101,7 @@ public class S2PRTest {
 	//@Test
 	public void isInintialMarking() {
 		//fail("Not yet implemented");
-		S2PR s2pr = new S2PR(2,1,4);
+		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
 		System.out.println(s2pr);
 		
 		boolean isInintial = s2pr.isInintialMarking();
@@ -111,7 +112,7 @@ public class S2PRTest {
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S2PR#S2PR(PTNet, String, Collection, Collection)}.
 	 */
-	@Test
+	//@Test
 	public void testS2P2() {
 		PTNet ptnet1 = new PTNet();
 		ptnet1.addPlace("p1");
@@ -173,7 +174,7 @@ public class S2PRTest {
 		pa.add("p2"); pa.add("p3"); pa.add("pp2"); pa.add("pp3");
 		Set<String> pr = new HashSet<String>();
 		pr.add("pr1"); pr.add("pr2");
-		S2PR s2pr = new S2PR(ptnet1,"p1",pa,pr);
+		S2PR s2pr = new S2PR("s2pr_test",ptnet1,"p1",pa,pr);
 		
 		System.out.println("s2pr: " + s2pr);
 		

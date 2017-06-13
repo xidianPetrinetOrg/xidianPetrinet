@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S2PR;
@@ -64,10 +65,10 @@ public class S3PRTest {
 	//@Test
 	public void testS3PR() {
 		//fail("Not yet implemented");
-		S2PR s2pr = new S2PR("test_s2pr_net",2,1,4);
+		S2PR s2pr = new S2PR("test_s2pr",2,1,4);
 		System.out.println("s2pr:" + s2pr);
 		
-		S3PR s3pr = new S3PR("test_s3pr_1","s2pr_1",s2pr);
+		S3PR s3pr = new S3PR("test_s3pr","s2pr_1",s2pr);
 		System.out.println("s3pr: " + s3pr);
 	}
 	
@@ -131,7 +132,7 @@ public class S3PRTest {
 		ptnet2.addFlowRelationPT("p8", "t4");
 		ptnet2.addFlowRelationTP("t5", "p8");
 		
-		S3PR s3pr = new S3PR("test_s3pr_1","s2pr_1",ptnet1,"p1",pa,pr);
+		S3PR s3pr = new S3PR("test_s3pr","s2pr_1",ptnet1,"p1",pa,pr);
 		System.out.println("s3pr: " + s3pr);
 		
 		pa.clear();
@@ -178,7 +179,7 @@ public class S3PRTest {
 		Set<String> pr = new HashSet<String>();
 		pr.add("p7"); pr.add("p8");
 		
-		S3PR s3pr = new S3PR("Li. figure3-1_or_4-2","s2pr_in_s3pr_1",ptnet1,"p1",pa,pr);
+		S3PR s3pr = new S3PR("Li_figure3-1_or_4-2","s2pr_in_s3pr_1",ptnet1,"p1",pa,pr);
 		
 		///////////////////// ptnet2
 		PTNet ptnet2 = new PTNet();
@@ -255,7 +256,7 @@ public class S3PRTest {
 	 * test set, ==, equals
 	 * Set中集合运算的基础：equals判断是否两个元素相同，不是通过"=="判断的
 	 */
-	//@Test
+	@Test
 	public void testSet() {
 		S2PR s2pr = new S2PR();
 		s2pr.addPlace("p1");
@@ -277,13 +278,31 @@ public class S3PRTest {
 		boolean b1 = (s2pr.getPlace("p3") == s3pr.getPlace("p3")); // flase
 		boolean b2 = (s2pr.getPlace("p3").equals(s3pr.getPlace("p3"))); // true
 		System.out.println("两个p3  ！==,但是equals： " + b1 + "," + b2);
+		
+		Collection<PTPlace> ps1 = new HashSet<>();
+		Collection<PTPlace> ps2 = new HashSet<>();
+		s2pr.setName("net1");
+		s3pr.setName("net2");
+		ps1.add(s2pr.getPlace("p3"));
+		ps2.add(s3pr.getPlace("p3"));
+		ps1.retainAll(ps2); 
+		System.out.println("虽然不是同一个place,但是他们的交集相同，因为equals相等，ps1=" + ps1);
+		
+		//Collection<AbstractPNNode> ps11 = new HashSet<>();
+		//Collection<PTPlace> ps22 = new HashSet<>();
+		Set<AbstractPNNode> ps11 = new HashSet<>();
+		Set<PTPlace> ps22 = new HashSet<>();
+		ps11.add(s2pr.getPlace("p3"));
+		ps22.add(s3pr.getPlace("p3"));
+		ps11.retainAll(ps22); 
+		System.out.println("虽然不是同一个place,但是他们的交集相同，因为equals相等，ps11=" + ps11);
 	}
 	
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR#s3pr4_1()}.
 	 * Li. p68, 图4-3
 	 */
-	@Test
+	//@Test
 	public void s3pr4_1() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();

@@ -61,7 +61,7 @@ public class S2PTest {
 	//@Test
 	public void testS2P() {
 		//fail("Not yet implemented");
-		S2P s2p = new S2P(2,4);
+		S2P s2p = new S2P("s2p_test",2,4);
 		System.out.println(s2p);
 	}
 	
@@ -71,7 +71,7 @@ public class S2PTest {
 	//@Test
 	public void testS2P1() {
 		//fail("Not yet implemented");
-		S2P s2p = new S2P(3);
+		S2P s2p = new S2P("s2p_test",3);
 		s2p.setInitialMarking(3);
 		System.out.println(s2p);
 	}
@@ -121,7 +121,7 @@ public class S2PTest {
 		////////////////////////// s2p
 		Set<String> pa = new HashSet<String>();
 		pa.add("p2"); pa.add("p3"); pa.add("pp2"); pa.add("pp3");
-		S2P s2p = new S2P(ptnet1,"p1",pa);
+		S2P s2p = new S2P("s2p_test",ptnet1,"p1",pa);
 		
 		System.out.println(s2p);
 		
@@ -137,7 +137,7 @@ public class S2PTest {
 	@Test
 	public void isS2P() {
 		//fail("Not yet implemented");
-		S2P s2p = new S2P(2,4);
+		S2P s2p = new S2P("s2p_test",2,4);
 		System.out.println(s2p);
 		boolean isS2P = s2p.isS2P();
 		System.out.println("满足S2P的定义？ " + isS2P);

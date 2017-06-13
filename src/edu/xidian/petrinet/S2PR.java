@@ -54,15 +54,17 @@ public class S2PR extends S2P {
 	
 	/**
 	 * 根据资源库所的数量，构造S2PR对象
+	 * <pre>
 	 * resourceNum = 2,
 	 * p0 = {p1}
 	 * PA = {p2,p3}
 	 * PR = {p4,p5}, p5,p6可以是同一个资源库所，示意图如下
-	 * <------ p4 <-------..<------ p5 <-----. 
+	 * <------ p5 <-------..<------ p4 <-----. 
 	 * |                  ||                 |
 	 * t1 ----> p2 -----> t2 -----> p3 ----> t3
 	 * |                                     |
 	 * <------------- p1 <-------------------.
+	 * </pre>
 	 * @param name 该网名称
 	 * @param resourceNum   资源库所个数
 	 * @param resourceToken 缺省资源库所的Token
@@ -182,20 +184,27 @@ public class S2PR extends S2P {
 			return false;
 
 		/**
-		 * 3. 任意p∈PA, 任意t1∈p的前置集, 任意t2∈p的后置集, 存在rp ∈PR, t1的前置集 ∩ PR = t2的后置集 ∩
-		 * PR = {rp}
+		 * 3. 任意p∈PA, 任意t1∈p的前置集, 任意t2∈p的后置集, 
+		 * 存在rp ∈PR, t1的前置集  ∩ PR = t2的后置集  ∩ PR = {rp}
 		 **/
 		for (PTPlace p : PA) {
 			for (AbstractPNNode t1 : p.getParents()) {
 				for (AbstractPNNode t2 : p.getChildren()) {
+					System.out.println("t1,t2="+t1+","+t2);
 					// (1) t1的前置集 ∩ PR
 					temp1.clear();
 					temp1.addAll(t1.getParents());
+					System.out.println("---temp1:"+temp1);
 					temp1.retainAll(PR); // 交集
+					System.out.println("====PR:"+PR);
+					System.out.println("====temp1:"+temp1);
 					// (2) t2的后置集 ∩ PR
 					temp2.clear();
 					temp2.addAll(t2.getChildren());
+					System.out.println("---temp2:"+temp2);
 					temp2.retainAll(PR); // 交集
+					System.out.println("temp1:"+temp1);
+					System.out.println("temp2:"+temp2);
 					// (1) = (2) = {1个PR元素}
 					if (!temp1.equals(temp2))
 						return false;
