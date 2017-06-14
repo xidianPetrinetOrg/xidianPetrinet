@@ -150,7 +150,7 @@ public class S3PR extends S2PR {
 		
 		// (6) 把s2pr对象添加到s2prSet中
 		s2prSet.put(s2pr_name, s2pr);	
-		System.out.println("-----"+s2prSet.keySet());
+		//System.out.println("-----"+s2prSet.keySet());
 	}
 	
 	/**
@@ -169,8 +169,11 @@ public class S3PR extends S2PR {
 	/**
 	 * Li. p67, 定义4.7
 	 * <pre>
-	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
-	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, S<sub>A</sub>表示S中的工序库所集合.
+	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。
+	 * 使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
+	 * H(r)必然是places，不是transitions
+	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, 
+	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
 	 * </pre>
      * @param r 资源库所
@@ -181,7 +184,7 @@ public class S3PR extends S2PR {
 		Collection<PTPlace> Hr = new HashSet<>();
 		Collection<AbstractPNNode<PTFlowRelation>> nodes = r.getParents();
 		for (AbstractPNNode node: nodes) {
-			Hr.addAll(node.getParents());
+			Hr.addAll(node.getParents()); // H(r)必然是places，不是transitions，因此Hr的类型说明正确
 		}
 		Hr.retainAll(PA);
 		return Hr;
@@ -190,8 +193,11 @@ public class S3PR extends S2PR {
 	/**
 	 * Li. p67, 定义4.7
 	 * <pre>
-	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
-	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, S<sub>A</sub>表示S中的工序库所集合.
+	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。
+	 * 使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
+	 * H(r)必然是places，不是transitions
+	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, 
+	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
 	 * </pre>
 	 * @param SR S<sub>R</sub>表示信标S中的资源库所集合
@@ -207,9 +213,12 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * Li. p67, 定义4.7
-	 * <pre>
-	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
-	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, S<sub>A</sub>表示S中的工序库所集合.
+	  * <pre>
+	 * 令r∈PR是S3PR网N = (P0  ∪ PA ∪ PR,T,F)的资源库所, S是N的严格极小信标。
+	 * 使用r的工序库所称为r的持有者, 集合H(r) = ((r的前置集的前置集) ∩ PA) 称为r的持有者的集合.
+	 * H(r)必然是places，不是transitions
+	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, 
+	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
 	 * </pre>
 	 * @param SR S<sub>R</sub>表示信标S中的资源库所集合
@@ -219,7 +228,7 @@ public class S3PR extends S2PR {
 	public Collection<PTPlace> getSiphonCom(Collection<PTPlace> SR, Collection<PTPlace> S) {
 		Collection<PTPlace> SiphonCom = new HashSet<>();
 		SiphonCom.addAll(getHr(SR));
-		SiphonCom.removeAll(S);
+		SiphonCom.removeAll(S); // S与SiphonCom的类型说明一致，因此removeAll()返回正确的值
 		return SiphonCom;
 	}
 	

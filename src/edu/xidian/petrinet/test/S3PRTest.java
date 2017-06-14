@@ -5,12 +5,8 @@ package edu.xidian.petrinet.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -147,7 +143,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR#getHr(Set)}.
 	 * Li. 图3-1或图4-2
 	 */
-	//@Test
+	@Test
 	public void getHrs() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();
@@ -219,12 +215,12 @@ public class S3PRTest {
 		SR.add(s3pr.getPlace("p7"));
 		SR.add(s3pr.getPlace("p8"));
 		Collection<PTPlace> Hrs = s3pr.getHr(SR);
-		System.out.println("Hrs: " + Hrs); // Hrs: [p4[p4], p5[p5], p3[p3], p2[p2]]
+		s3pr.printPNNodes("Hrs: ", Hrs); // Hrs: [p2[p2], p3[p3], p4[p4], p5[p5]]
 		assertEquals(4, Hrs.size());
 		
 		// Hrs = H(p7) ∪ H(p8)
-		System.out.println("H(p7) = " + s3pr.getHr(s3pr.getPlace("p7"))); // H(p7) = [p5[p5], p2[p2]]
-		System.out.println("H(p8) = " + s3pr.getHr(s3pr.getPlace("p8"))); // H(p8) = [p4[p4], p3[p3]]
+		s3pr.printPNNodes("H(p7) = ", s3pr.getHr(s3pr.getPlace("p7"))); // H(p7) = [p2[p2], p5[p5]]
+		s3pr.printPNNodes("H(p8) = ", s3pr.getHr(s3pr.getPlace("p8"))); // H(p8) = [p3[p3], p4[p4]]]
 		
 		// 信标S
 		Collection<PTPlace> S = new HashSet<>();
@@ -233,22 +229,11 @@ public class S3PRTest {
 		// 信标补集[S] = Hrs \ S
 		Collection<PTPlace> SS = new HashSet<>();
 		SS.addAll(Hrs);
-		SS.removeAll(S);
-		System.out.println("信标补集：" + SS); // 信标补集：[p4[p4], p2[p2]]
-		
-		// 排序
-		List<PTPlace> SS1 = new ArrayList<>(SS);
-		Collections.sort(SS1, new Comparator<PTPlace>(){
-			@Override
-			public int compare(PTPlace o1, PTPlace o2) {
-				String s1 = o1.getName();
-				String s2 = o2.getName();
-				return s1.compareTo(s2);
-			}});
-		System.out.println("排序后的信标补集：" + SS1); // 排序后的信标补集：[p2[p2], p4[p4]]
+		SS.removeAll(S);  // S与SS的类型说明一致，因此removeAll()返回正确的值
+		s3pr.printPNNodes("信标补集：", SS); // 信标补集：[p2[p2], p4[p4]]
 		
 		// 直接调用函数，求信标S的补集
-		System.out.println("信标补集：" + s3pr.getSiphonCom(SR, S)); // 信标补集：[p4[p4], p2[p2]]
+		s3pr.printPNNodes("信标补集：" , s3pr.getSiphonCom(SR, S)); // 信标补集：[p2[p2], p4[p4]]
 		
 	}
 	
@@ -257,7 +242,7 @@ public class S3PRTest {
 	 * Set中集合运算的基础：equals判断是否两个元素相同，不是通过"=="判断的
 	 */
 	@SuppressWarnings("rawtypes")
-	@Test
+	//@Test
 	public void testSet() {
 		S2PR s2pr = new S2PR();
 		s2pr.addPlace("p1");
