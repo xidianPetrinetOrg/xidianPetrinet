@@ -180,6 +180,7 @@ public class S2PR extends S2P {
 		if (PR.isEmpty())
 			return false;
 		temp1.clear(); 
+		temp1.addAll(PAs);  // 使用PAs不存在类型转换，优于使用PA
 		temp1.add(p0);
 		temp1.retainAll(PRs); // 交集
 		if (!temp1.isEmpty())
