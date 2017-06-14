@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
@@ -166,8 +165,11 @@ public class S2PR extends S2P {
 		Validate.notNull(p0);
 		Validate.notEmpty(PA);
 		Validate.notEmpty(PR);
-		Set<AbstractPNNode> temp1 = new HashSet<>();
-		Set<AbstractPNNode> temp2 = new HashSet<>();
+	    Collection<AbstractPNNode> temp1 = new HashSet<>();
+		Collection<AbstractPNNode> temp2 = new HashSet<>();
+		// 一定做此转换，否则，由于集合集的元素类型不同，导致以下retainAll()函数的返回结果错误
+		Collection<AbstractPNNode> PAs = new HashSet<>(PA);
+		Collection<AbstractPNNode> PRs = new HashSet<>(PR);
 		/** 1. 由X = PA ∪ {p0} ∪ T 生成的子网是S2P */
 		// this对象（S2PR对象）对应的S2P对象
 		Validate.notNull(s2p);
@@ -177,9 +179,9 @@ public class S2PR extends S2P {
 		/** 2. PR ≠ ∅ ;, (PA ∪ {p0}) ∩ PR = ∅ */
 		if (PR.isEmpty())
 			return false;
-		temp1.addAll(PA);
+		temp1.clear(); 
 		temp1.add(p0);
-		temp1.retainAll(PR); // 交集
+		temp1.retainAll(PRs); // 交集
 		if (!temp1.isEmpty())
 			return false;
 
@@ -190,37 +192,25 @@ public class S2PR extends S2P {
 		for (PTPlace p : PA) {
 			for (AbstractPNNode t1 : p.getParents()) {
 				for (AbstractPNNode t2 : p.getChildren()) {
-					System.out.println("t1,t2="+t1+","+t2);
 					// (1) t1的前置集 ∩ PR
-					temp1.clear();
-					temp1.addAll(t1.getParents());
-					System.out.println("---temp1:"+temp1);
-					temp1.retainAll(PR); // 交集
-					System.out.println("====PR:"+PR);
-					System.out.println("====temp1:"+temp1);
+					temp1.clear(); 
+  					temp1.addAll(t1.getParents());
+					//temp1.retainAll(PR); // 交集, 错误
+	                temp1.retainAll(PRs);  // 交集, 正确, temp1和PRs是相同类型的集合
 					// (2) t2的后置集 ∩ PR
 					temp2.clear();
 					temp2.addAll(t2.getChildren());
-					System.out.println("---temp2:"+temp2);
-					temp2.retainAll(PR); // 交集
-					System.out.println("temp1:"+temp1);
-					System.out.println("temp2:"+temp2);
+					temp2.retainAll(PRs); // 交集
 					// (1) = (2) = {1个PR元素}
-					if (!temp1.equals(temp2))
+					if (!temp1.equals(temp2) || temp1.size() != 1)
 						return false;
-					if (temp1.size() != 1)
-						return false; // 仅有1个rp
-					for (AbstractPNNode node : temp1) {
-						if (!PR.contains(node))
-							return false;
-					}
 				}
 			}
 		}
 
 		/**
-		 * 4. (a) 任意r∈PR , r的前置集的前置集 ∩ PA = r的后置集的后置集 ∩ PA ≠ ∅; (b) 任意r∈PR,
-		 * r的前置集 ∩ r后置集 = ∅
+		 * 4. (a) 任意r∈PR , r的前置集的前置集 ∩ PA = r的后置集的后置集 ∩ PA ≠ ∅; 
+		 *    (b) 任意r∈PR, r的前置集 ∩ r后置集 = ∅
 		 ***/
 		for (PTPlace r : PR) {
 			/////////////// (a)
@@ -228,37 +218,36 @@ public class S2PR extends S2P {
 			for (AbstractPNNode node : r.getParents()) {
 				temp1.addAll(node.getParents());
 			}
-			temp1.retainAll(PA);
+			temp1.retainAll(PAs); // r的前置集的前置集 ∩ PA
+			
 			temp2.clear();
 			for (AbstractPNNode node : r.getChildren()) {
 				temp2.addAll(node.getChildren());
 			}
-			temp2.retainAll(PA);
-			if (!temp1.equals(temp2))
-				return false;
-			if (temp1.isEmpty() || temp2.isEmpty())
-				return false;
+			temp2.retainAll(PAs); // r的后置集的后置集 ∩ PA
+			
+			if (!temp1.equals(temp2)) return false;
+			if (temp1.isEmpty() || temp2.isEmpty()) return false;
+			
 			///////////////// (b)
-			temp1.clear();
+			temp1.clear(); temp2.clear();
 			temp1.addAll(r.getParents());
-			temp2.clear();
 			temp2.addAll(r.getChildren());
 			temp1.retainAll(temp2);
-			if (!temp1.isEmpty())
-				return false;
+			if (!temp1.isEmpty()) return false;
 		}
 
 		/** 5. (p0)的前置集的前置集 ∩ PR = (p0)的后置集的后置集 ∩ PR = ∅。 **/
-		temp1.clear();
+		temp1.clear(); temp2.clear();
 		for (AbstractPNNode node : p0.getParents()) {
 			temp1.addAll(node.getParents());
 		}
-		temp1.retainAll(PR);
-		temp2.clear();
+		temp1.retainAll(PRs);
+		
 		for (AbstractPNNode node : p0.getChildren()) {
 			temp2.addAll(node.getChildren());
 		}
-		temp2.retainAll(PR);
+		temp2.retainAll(PRs);
 		if (!temp1.isEmpty() || !temp2.isEmpty())
 			return false;
 

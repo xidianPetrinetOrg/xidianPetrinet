@@ -256,6 +256,7 @@ public class S3PRTest {
 	 * test set, ==, equals
 	 * Set中集合运算的基础：equals判断是否两个元素相同，不是通过"=="判断的
 	 */
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void testSet() {
 		S2PR s2pr = new S2PR();

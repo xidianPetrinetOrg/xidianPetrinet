@@ -19,6 +19,7 @@ import org.junit.Test;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.PetriNetTraversalUtils;
 import edu.xidian.petrinet.S2PR;
 
@@ -84,7 +85,6 @@ public class S2PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S2PR#isS2PR()}.
 	 */
 	@Test
-	// TODO:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	public void isS2PR() {
 		//fail("Not yet implemented");
 		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
@@ -93,6 +93,76 @@ public class S2PRTest {
 		boolean isS2PR = s2pr.isS2PR();
 		System.out.println("S2PR满足S2PR的定义？ " + isS2PR);
 		assertTrue(isS2PR);
+	}
+	
+	////////////////////// Error retainAll()
+	//@Test
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setTest1() {
+		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
+		System.out.println(s2pr);
+		
+		Collection<AbstractPNNode> temp1 = new HashSet<>();
+		Collection<AbstractPNNode> temp2 = new HashSet<>();
+		System.out.println("PR:"+s2pr.getPR());
+		for (PTPlace p : s2pr.getPA()) {
+			for (AbstractPNNode t1 : p.getParents()) {
+					temp1.clear(); temp2.clear();
+					temp1.addAll(t1.getParents());
+					System.out.println("---temp1:"+temp1);
+					// temp2.addAll(s2pr.getPR());
+					// temp1.retainAll(temp2); // 正确        // temp1和temp2元素类型必须相同
+					temp1.retainAll(s2pr.getPR()); // 错误，temp1与s2pr.getPR()元素类型不同
+					System.out.println("---temp1:"+temp1);
+			}
+		}
+	}
+	
+    //////////////////////OK retainAll()
+	// 集合运算，temp1.retainAll(temp2); temp1和temp2元素类型必须相同
+	//@Test
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setTest2() {
+		S2PR s2pr = new S2PR("s2pr_test",2,1,4);
+		System.out.println(s2pr);
+		
+		Collection<AbstractPNNode> temp1 = new HashSet<>();
+		Collection<AbstractPNNode> temp2 = new HashSet<>();
+		System.out.println("PR:"+s2pr.getPR());
+		for (PTPlace p : s2pr.getPA()) {
+			for (AbstractPNNode t1 : p.getParents()) {
+				temp1.clear();
+				temp2.clear();
+				temp1.addAll(t1.getParents());
+				System.out.println("---temp1:" + temp1);
+
+				temp2.addAll(s2pr.getPR());
+				temp1.retainAll(temp2); // 正确 // temp1和temp2元素类型必须相同
+				/// temp1.retainAll(s2pr.getPR()); //
+				/// 错误，temp1与s2pr.getPR()元素类型不同
+				System.out.println("---temp1:" + temp1);
+			}
+		}
+		
+		System.out.println("---------------");
+		System.out.println("PA"+s2pr.getPA());
+		System.out.println("PR:"+s2pr.getPR());
+		temp1.clear(); temp2.clear();
+		temp1.addAll(s2pr.getPA());
+		temp1.add(s2pr.getPlace("p4"));
+		System.out.println("---temp1:"+temp1);
+		temp1.retainAll(s2pr.getPR()); // 交集, 错误
+		System.out.println("---temp1:"+temp1);
+		
+		System.out.println("---------------");
+		temp1.clear(); temp2.clear();
+		temp1.addAll(s2pr.getPA());
+		temp1.add(s2pr.getPlace("p4"));
+		System.out.println("---temp1:"+temp1);
+		temp2.addAll(s2pr.getPR());
+		temp1.retainAll(temp2);  // 正确
+		//temp1.retainAll(s2pr.getPR()); // 交集, 错误
+		System.out.println("---temp1:"+temp1);
 	}
 	
 	/**
