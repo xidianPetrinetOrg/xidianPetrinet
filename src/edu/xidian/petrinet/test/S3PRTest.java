@@ -840,15 +840,33 @@ public class S3PRTest {
 		SCom.add(SCom1); SCom.add(SCom2); SCom.add(SCom3); SCom.add(SCom4); SCom.add(SCom5); 
 		
 		// 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR \{r}, p ∉ H(r1)
-		// TODO:待补
-		Collection<PTPlace> tmp = new HashSet<>();
+		Collection<PTPlace> tmp1 = new HashSet<>();
 		for (int i = 0; i < S.size(); i++) {
 			Collection<PTPlace> Scom = SCom.get(i);
-			Collection<PTPlace> hrs = s3pr.getHr(SR.get(i));
-			tmp.addAll(Scom);
-			tmp.retainAll(hrs);
-			for (PTPlace p: tmp) {
-				
+			for (PTPlace r: SR.get(i)) {
+				tmp1.clear();
+				tmp1.addAll(Scom);
+				tmp1.retainAll(s3pr.getHr(r));
+				for (PTPlace p: tmp1) {  // p∈[S], p∈H(r)
+					for (PTPlace r1: s3pr.getPR()) {
+						if (r1.equals(r)) continue;
+						Collection<PTPlace> tmp2 = s3pr.getHr(r1);
+						if (tmp2.contains(p)) System.out.println("【不】符合性质4.1，第3项，p = " + p);
+						else System.out.println("符合性质4.1，第3项，p = " + p);
+					}
+				}
 			}
+			
 		}
+		
+		// TODO:
+		///////////////////////////////////////////////
+		System.out.println("\n4. [S] ∪ S是N的P-半流的支撑\n");
+		for (int i = 0; i < S.size(); i++) {
+
+		}
+		
+		///////////////////////////////////////////////
+		System.out.println("\n5. [S] = ∪ <sub>i=1</sub><sup style=\"margin-left:-8px\">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] ∩ PAi\n");
+	}
 }
