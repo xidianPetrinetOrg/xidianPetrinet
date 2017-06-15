@@ -220,16 +220,30 @@ public class S3PR extends S2PR {
 	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, 
 	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
+	 * 即, [S] = getHr(S<sub>R</sub>)\S, S<sub>R</sub>表示信标S中的资源库所集合
 	 * </pre>
-	 * @param SR S<sub>R</sub>表示信标S中的资源库所集合
+	 * @param 
 	 * @param S 信标(siphon)
 	 * @return 信标S的补集[S]. 
 	 */
-	public Collection<PTPlace> getSiphonCom(Collection<PTPlace> SR, Collection<PTPlace> S) {
+	public Collection<PTPlace> getSiphonCom(Collection<PTPlace> S) {
+		Collection<PTPlace> SR = getSR(S); // S<sub>R</sub>表示信标S中的资源库所集合
 		Collection<PTPlace> SiphonCom = new HashSet<>();
 		SiphonCom.addAll(getHr(SR));
 		SiphonCom.removeAll(S); // S与SiphonCom的类型说明一致，因此removeAll()返回正确的值
 		return SiphonCom;
+	}
+	
+	/**
+	 * 信标S中资源库所集合
+	 * @param S 信标
+	 * @return 信标S中资源库所集合
+	 */
+	public Collection<PTPlace> getSR(Collection<PTPlace> S) {
+		Collection<PTPlace> SR = new HashSet<>();
+		SR.addAll(S);
+		SR.retainAll(PR);
+		return SR;
 	}
 	
 	/**
@@ -239,6 +253,15 @@ public class S3PR extends S2PR {
 	 */
 	public S2PR getS2pr(String petriNetName) {
 		return s2prSet.get(petriNetName);
+	}
+	
+	/**
+	 * 组成S3PR的S2PR对象
+	 * @param petriNetName
+	 * @return
+	 */
+	public  Map<String, S2PR> getS2pr() {
+		return s2prSet;
 	}
 	
 	/**
@@ -253,7 +276,7 @@ public class S3PR extends S2PR {
      * </pre>
 	 */
 	public void s3pr4_1() {
-		Collection<PTPlace> places = new ArrayList<>();
+		Collection<PTPlace> places = new HashSet<>();
 		printPNNodes("P0: ",P0);
 		printPNNodes("PR: " ,PR);
 		
@@ -277,6 +300,115 @@ public class S3PR extends S2PR {
 			places.addAll(getHr(pr));
 			printPNNodes("资源库所(" + pr.getName() + ")对应的极小P-半流: ",places);
 		}
+	}
+	
+	/**
+	 * Li. p68, 性质4.1
+	 * <pre>
+	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+     * <b>1. 任何 p∈PAi (一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};</b>
+     * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
+     * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
+     * 4. [S] ∪ S是N的P-半流的支撑;
+     * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+     * </pre>
+     * @return S2PR对应的Ip
+	 */
+	public Collection<PTPlace> getIp(String s2prName) {
+		Collection<PTPlace> places = new HashSet<>();
+		S2PR s2pr = getS2pr(s2prName);
+		places.addAll(s2pr.PA);
+		places.add(s2pr.p0);
+		return places;
+	}
+	
+	/**
+	 * Li. p68, 性质4.1
+	 * <pre>
+	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+     * <b>1. 任何 p∈PAi (一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};</b>
+     * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
+     * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
+     * 4. [S] ∪ S是N的P-半流的支撑;
+     * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+     * </pre>
+     * @retun p0对应的Ip
+	 */
+	public Collection<PTPlace> getIp(PTPlace p0) {
+		Collection<PTPlace> places = new HashSet<>();
+		for (S2PR s2pr: s2prSet.values()) {
+			if ((s2pr.p0).equals(p0)) {
+			   places.addAll(s2pr.PA);
+			   places.add(s2pr.p0);
+			   break;
+			}
+		}
+		return places;
+	}
+	
+	/**
+	 * Li. p68, 性质4.1
+	 * <pre>
+	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+     * <b>1. 任何 p∈PAi (一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};</b>
+     * 2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r);
+     * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
+     * 4. [S] ∪ S是N的P-半流的支撑;
+     * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+     * </pre>
+     * @return 映射集：以p0名字索引的Ip
+	 */
+	public Map<String,Collection<PTPlace>> getIp() {
+		Map<String,Collection<PTPlace>> Ips = new HashMap<>();
+		for (S2PR s2pr: s2prSet.values()) {
+			Collection<PTPlace> Ip = new HashSet<>();
+			Ip.addAll(s2pr.PA);
+			Ip.add(s2pr.p0);
+			Ips.put((s2pr.p0).getName(),Ip);
+		}
+		return Ips;
+	}
+	
+	/**
+	 * Li. p68, 性质4.1
+	 * <pre>
+	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+     * 1. 任何 p∈PAi (一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+     * <b>2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r); </b>
+     * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
+     * 4. [S] ∪ S是N的P-半流的支撑;
+     * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+     * </pre>
+     * @return pr对应的Ir
+	 */
+	public Collection<PTPlace> getIr(PTPlace pr) {
+		Collection<PTPlace> places = new HashSet<>();
+		places.add(pr);
+		places.addAll(getHr(pr));
+		return places;
+	}
+	
+	/**
+	 * Li. p68, 性质4.1
+	 * <pre>
+	 * 令N = O<sub>i=1</sub><sup style="margin-left:-5px">n</sup>N<sub>i</sub> = (P0  ∪ PA  ∪ PR, T, F)是包含n个简单顺序过程的S3PR。
+     * 1. 任何 p∈PAi (一个S2PR对应一个p0，因此确切的说，应该是一个p0或一个S2PR对应一个Ip)都对应着一个极小的P-半流Ip, 使得‖Ip‖ = PAi ∪ {p0};
+     * <b>2. 任何资源r∈PR都对应着一个极小的P-半流Ir, 使得‖Ir‖ = {r} ∪  H(r); </b>
+     * 3. 任意p∈[S], 存在r∈SR, p∈H(r), 任意r1∈PR\{r}, p ∉ H(r1);
+     * 4. [S] ∪ S是N的P-半流的支撑;
+     * 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+     * </pre>
+     * @return 映射集: 以资源库所的名字索引的Ir
+	 */
+	public Map<String, Collection<PTPlace>> getIr() {
+		Map<String,Collection<PTPlace>> Irs = new HashMap<>();	
+		for (PTPlace pr: PR) {
+			Collection<PTPlace> Ir = new HashSet<>();
+			Ir.add(pr);
+			Ir.addAll(getHr(pr));
+			Irs.put(pr.getName(), Ir);
+		}
+		return Irs;
 	}
 	
 	@Override
