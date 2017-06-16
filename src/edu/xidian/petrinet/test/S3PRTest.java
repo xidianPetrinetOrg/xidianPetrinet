@@ -557,7 +557,7 @@ public class S3PRTest {
 		
 		Collection<PTPlace> Scom3U = new HashSet<>();
 		Scom3U.addAll(Scom31); Scom3U.addAll(Scom32); Scom3U.addAll(Scom33);
-		// 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+		// 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] ∩ PAi。
 		assertTrue(Scom3.equals(Scom3U));
 	}
 	
@@ -851,4 +851,42 @@ public class S3PRTest {
 				
 			}
 		}
+		
+		/////////////////////////////////////////////////////////////////
+		System.out.println("\n4. [S] ∪ S是N的P-半流的支撑;"); 
+	    System.out.println("小王，引理4.1, 如果S满足条件：SR ≠ ∅,并且任意p∈SA,存在r∈SR,使得p∈H(r)成立，则");
+	    System.out.println("[S] ∪ S = ‖Is‖, 其中Is = ∑<sub>r∈SR</sub>Ir. SA,SR分别表示S中工序、资源库所集合。\n");
+	    // [S] ∪  S
+	    for (int i = 0; i < S.size(); i++) {
+	    	tmp.clear();
+	    	tmp.addAll(SCom.get(i));
+	    	tmp.addAll(S.get(i));
+	    	s3pr.printPNNodes(i+1 + ": [S] ∪  S  = ", tmp);
+	    }
+		// ‖Is‖
+	    Collection<PTPlace> Is = null;
+	    for (int i = 0; i < S.size(); i++) {
+	    	for (int j = 0; j < SR.get(i).size(); j++) {
+	    		Is = s3pr.getIs(SR.get(i));
+	    	}
+	    	s3pr.printPNNodes(i+1 + ": ‖Is‖   = ", Is);
+	    }
+	    
+	    ///////////////////////////////
+		System.out.println("\n5. [S] = ∪ <sub>i=1</sub><sup>n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] ∩ PAi。\n");
+		Collection<PTPlace> ScomU = new HashSet<>();
+		Collection<PTPlace> Scomi = new HashSet<>(); // [S]<sup>i</sup> = [S] ∩ PAi 
+		for (int i = 0; i < SCom.size(); i++) { 
+			ScomU.clear(); 
+			for (S2PR s2pr: s3pr.getS2pr().values())  { // 3个进程
+				Scomi.clear();
+				Scomi.addAll(SCom.get(i));
+				Scomi.retainAll(s2pr.getPA());
+				ScomU.addAll(Scomi);
+			}
+			s3pr.printPNNodes(i+1 + "[S]  = ", SCom.get(i));
+			s3pr.printPNNodes(i+1 + "[S]u = ", ScomU);
+			assertTrue(SCom.get(i).equals(ScomU));
+		}
+	}
 }
