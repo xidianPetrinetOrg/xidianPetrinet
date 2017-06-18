@@ -10,7 +10,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
+import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
@@ -54,6 +57,11 @@ public class S3PR extends S2PR {
      * 闲置库所集合
      */
     protected final Collection<PTPlace>  P0 = new HashSet<>();
+    
+    /**
+     * 该网对应的资源有向图
+     */
+    protected final Graph<String> Rgraph = new Graph<>();
 
 	/**
 	 * 
@@ -444,6 +452,40 @@ public class S3PR extends S2PR {
 			Is.addAll(getIr(r));
 		}
 		return Is;
+	}
+	
+	/**
+	 * 获取该网的资源有向图
+	 * @return
+	 */
+	public Graph<String> getRgraph() {
+		// 如果已经生成资源有向图, 直接返回, 否则生成之。
+		if (Rgraph.nodeCount() != 0) return Rgraph;
+		
+		for (PTPlace pr_i: PR) {
+			for (PTPlace pr_j: PR) {
+				if (pr_i.equals(pr_j)) continue;
+				// pr_j的前置集
+				Collection<AbstractPNNode<PTFlowRelation>> prePr_j = pr_j.getParents();
+				// pr_i的后置集
+				Collection<AbstractPNNode<PTFlowRelation>> postPr_i = pr_i.getChildren();
+				// 二者的交集
+				Collection<AbstractPNNode<PTFlowRelation>> transitions = new HashSet<>();
+				transitions.addAll(prePr_j);
+				transitions.retainAll(postPr_i);
+				if (!transitions.isEmpty()) {
+					Rgraph.addVertex(pr_i.getName());
+					Rgraph.addVertex(pr_j.getName());
+					try {
+						Rgraph.addEdge(pr_i.getName(), pr_j.getName());
+					} catch (VertexNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return Rgraph;
 	}
 	
 	@Override
