@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
@@ -557,7 +558,7 @@ public class S3PRTest {
 		
 		Collection<PTPlace> Scom3U = new HashSet<>();
 		Scom3U.addAll(Scom31); Scom3U.addAll(Scom32); Scom3U.addAll(Scom33);
-		// 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] \ PAi。
+		// 5. [S] = ∪ <sub>i=1</sub><sup style="margin-left:-8px">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] ∩ PAi。
 		assertTrue(Scom3.equals(Scom3U));
 	}
 	
@@ -565,7 +566,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR#s3pr4_1()}.
 	 * Li. p68, 图4-3，例4.4的分步测试
 	 */
-	@Test
+	//@Test
 	public void s3pr4_1Parts() {
 		///////////////////// ptnet1
 		PTNet ptnet1 = new PTNet();
@@ -859,14 +860,298 @@ public class S3PRTest {
 			
 		}
 		
-		// TODO:
-		///////////////////////////////////////////////
-		System.out.println("\n4. [S] ∪ S是N的P-半流的支撑\n");
-		for (int i = 0; i < S.size(); i++) {
-
+		/////////////////////////////////////////////////////////////////
+		System.out.println("\n4. [S] ∪ S是N的P-半流的支撑;"); 
+	    System.out.println("小王，引理4.1, 如果S满足条件：SR ≠ ∅,并且任意p∈SA,存在r∈SR,使得p∈H(r)成立，则");
+	    System.out.println("[S] ∪ S = ‖Is‖, 其中Is = ∑<sub>r∈SR</sub>Ir. SA,SR分别表示S中工序、资源库所集合。\n");
+	    // [S] ∪  S
+	    for (int i = 0; i < S.size(); i++) {
+	    	tmp1.clear();
+	    	tmp1.addAll(SCom.get(i));
+	    	tmp1.addAll(S.get(i));
+	    	s3pr.printPNNodes(i+1 + ": [S] ∪  S  = ", tmp1);
+	    }
+		// ‖Is‖
+	    Collection<PTPlace> Is = null;
+	    for (int i = 0; i < S.size(); i++) {
+	    	for (int j = 0; j < SR.get(i).size(); j++) {
+	    		Is = s3pr.getIs(SR.get(i));
+	    	}
+	    	s3pr.printPNNodes(i+1 + ": ‖Is‖   = ", Is);
+	    }
+	    
+	    ///////////////////////////////
+		System.out.println("\n5. [S] = ∪ <sub>i=1</sub><sup>n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] ∩ PAi。\n");
+		Collection<PTPlace> ScomU = new HashSet<>();
+		Collection<PTPlace> Scomi = new HashSet<>(); // [S]<sup>i</sup> = [S] ∩ PAi 
+		for (int i = 0; i < SCom.size(); i++) { 
+			ScomU.clear(); 
+			for (S2PR s2pr: s3pr.getS2pr().values())  { // 3个进程
+				Scomi.clear();
+				Scomi.addAll(SCom.get(i));
+				Scomi.retainAll(s2pr.getPA());
+				ScomU.addAll(Scomi);
+			}
+			s3pr.printPNNodes(i+1 + "[S]  = ", SCom.get(i));
+			s3pr.printPNNodes(i+1 + "[S]u = ", ScomU);
+			assertTrue(SCom.get(i).equals(ScomU));
 		}
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR#getRgraph()}.
+	 * Wang, p86,图4-1,对应的S3PR
+	 */
+	@Test
+	public void WangFigure4_1() {
+		S3PR s3pr = getWangFigure4_1();
+		Graph<String> rGraph = s3pr.getRgraph();
+		System.out.println("Rgraph:" + rGraph);
+	}
+	
+	/**
+	 * Wang, p86,图4-1,对应的S3PR对象
+	 */
+	public S3PR getWangFigure4_1() {
+		///////////////////// ptnet1
+		PTNet ptnet1 = new PTNet();
+		// p0
+		ptnet1.addPlace("p21");
+		// pa
+		ptnet1.addTransition("t1");
+		ptnet1.addPlace("p1");
+		ptnet1.addTransition("t2");
+		ptnet1.addPlace("p2");
+		ptnet1.addTransition("t3");
+		ptnet1.addPlace("p3");
+		ptnet1.addTransition("t4");
+		ptnet1.addPlace("p4");
+		ptnet1.addTransition("t5");
+		// pr
+		ptnet1.addPlace("p26");
+		ptnet1.addPlace("p27");
+		ptnet1.addPlace("p28");
+		// relations
+		ptnet1.addFlowRelationTP("t1", "p1");
+		ptnet1.addFlowRelationPT("p1", "t2");
+		ptnet1.addFlowRelationTP("t2", "p2");
+		ptnet1.addFlowRelationPT("p2", "t3");
+		ptnet1.addFlowRelationTP("t3", "p3");
+		ptnet1.addFlowRelationPT("p3", "t4");
+		ptnet1.addFlowRelationTP("t4", "p4");
+		ptnet1.addFlowRelationPT("p4", "t5");
+		ptnet1.addFlowRelationTP("t5", "p21");
+		ptnet1.addFlowRelationPT("p21", "t1");
 		
-		///////////////////////////////////////////////
-		System.out.println("\n5. [S] = ∪ <sub>i=1</sub><sup style=\"margin-left:-8px\">n</sup>[S]<sup>i</sup>, 其中[S]<sup>i</sup> = [S] ∩ PAi\n");
+		ptnet1.addFlowRelationPT("p26", "t3");
+		ptnet1.addFlowRelationTP("t4", "p26");	
+		ptnet1.addFlowRelationPT("p27", "t4");
+		ptnet1.addFlowRelationTP("t5", "p27");
+		ptnet1.addFlowRelationPT("p27", "t1");
+		ptnet1.addFlowRelationTP("t2", "p27");
+		ptnet1.addFlowRelationPT("p28", "t2");
+		ptnet1.addFlowRelationTP("t3", "p28");
+		
+		Collection<String> pa1 = new HashSet<String>();
+		pa1.add("p1"); pa1.add("p2"); pa1.add("p3"); pa1.add("p4");
+		Collection<String> pr1 = new HashSet<String>();
+		pr1.add("p26");
+		pr1.add("p27");
+		pr1.add("p28");
+
+		///////////////////// ptnet2
+		PTNet ptnet2 = new PTNet();
+		// p0
+		ptnet2.addPlace("p22");
+		// pa
+		ptnet2.addTransition("t11");
+		ptnet2.addPlace("p9");
+		ptnet2.addTransition("t10");
+		ptnet2.addPlace("p8");
+		ptnet2.addTransition("t9");
+		ptnet2.addPlace("p7");
+		ptnet2.addTransition("t8");
+		ptnet2.addPlace("p6");
+		ptnet2.addTransition("t7");
+		ptnet2.addPlace("p5");
+		ptnet2.addTransition("t6");
+		// pr
+		ptnet2.addPlace("p26");
+		ptnet2.addPlace("p27");
+		ptnet2.addPlace("p28");
+		ptnet2.addPlace("p29");
+		
+		// relations
+		ptnet2.addFlowRelationTP("t6", "p5");
+		ptnet2.addFlowRelationPT("p5", "t7");
+		ptnet2.addFlowRelationTP("t7", "p6");
+		ptnet2.addFlowRelationPT("p6", "t8");
+		ptnet2.addFlowRelationTP("t8", "p7");
+		ptnet2.addFlowRelationPT("p7", "t9");
+		ptnet2.addFlowRelationTP("t9", "p8");
+		ptnet2.addFlowRelationPT("p8", "t10");
+		ptnet2.addFlowRelationTP("t10", "p9");
+		ptnet2.addFlowRelationPT("p9", "t11");
+
+		ptnet2.addFlowRelationPT("p26", "t8");
+		ptnet2.addFlowRelationTP("t8", "p27");
+		ptnet2.addFlowRelationPT("p27", "t7");
+		ptnet2.addFlowRelationTP("t7", "p28");
+		ptnet2.addFlowRelationPT("p28", "t6");
+		ptnet2.addFlowRelationTP("t10", "p28");
+		ptnet2.addFlowRelationPT("p28", "t9");
+		ptnet2.addFlowRelationTP("t11", "p29");
+		ptnet2.addFlowRelationPT("p29", "t10");
+		
+
+		Collection<String> pa2 = new HashSet<String>();
+		pa2.add("p5"); pa2.add("p6"); pa2.add("p7"); pa2.add("p8");
+		pa2.add("p9");
+		Collection<String> pr2 = new HashSet<String>();
+		pr2.add("p26"); pr2.add("p27"); pr2.add("p28"); pr2.add("p29");
+		
+		
+		///////////////////// ptnet3
+		PTNet ptnet3 = new PTNet();
+		// p0
+		ptnet3.addPlace("p23");
+		// pa
+		ptnet3.addTransition("t12");
+		ptnet3.addPlace("p10");
+		ptnet3.addTransition("t13");
+		ptnet3.addPlace("p11");
+		ptnet3.addTransition("t14");
+		ptnet3.addPlace("p12");
+		ptnet3.addTransition("t15");
+		ptnet3.addPlace("p13");
+		ptnet3.addTransition("t16");
+		// pr
+		ptnet3.addPlace("p29");
+		ptnet3.addPlace("p30");
+		ptnet3.addPlace("p31");
+		ptnet3.addPlace("p32");
+		
+		// relations
+		ptnet3.addFlowRelationTP("t12", "p10");
+		ptnet3.addFlowRelationPT("p10", "t13");
+		ptnet3.addFlowRelationTP("t13", "p11");
+		ptnet3.addFlowRelationPT("p11", "t14");
+		ptnet3.addFlowRelationTP("t14", "p12");
+		ptnet3.addFlowRelationPT("p12", "t15");
+		ptnet3.addFlowRelationTP("t15", "p13");
+		ptnet3.addFlowRelationPT("p13", "t16");
+
+		ptnet3.addFlowRelationPT("p29", "t12");
+		ptnet3.addFlowRelationTP("t13", "p29");
+		ptnet3.addFlowRelationPT("p30", "t13");
+		ptnet3.addFlowRelationTP("t14", "p30");
+		ptnet3.addFlowRelationPT("p31", "t15");
+		ptnet3.addFlowRelationTP("t16", "p31");
+		ptnet3.addFlowRelationPT("p32", "t14");
+		ptnet3.addFlowRelationTP("t15", "p32");
+		
+
+		Collection<String> pa3 = new HashSet<String>();
+		pa3.add("p10"); pa3.add("p11"); pa3.add("p12"); pa3.add("p13");
+		Collection<String> pr3 = new HashSet<String>();
+		pr3.add("p29"); pr3.add("p30"); pr3.add("p31"); pr3.add("p32");
+		
+		///////////////////// ptnet4
+		PTNet ptnet4 = new PTNet();
+		// p0
+		ptnet4.addPlace("p24");
+		// pa
+		ptnet4.addTransition("t17");
+		ptnet4.addPlace("p14");
+		ptnet4.addTransition("t18");
+		ptnet4.addPlace("p15");
+		ptnet4.addTransition("t19");
+		ptnet4.addPlace("p16");
+		ptnet4.addTransition("t20");
+		// pr
+		ptnet4.addPlace("p29");
+		ptnet4.addPlace("p30");
+		ptnet4.addPlace("p32");
+
+		// relations
+		ptnet4.addFlowRelationTP("t17", "p14");
+		ptnet4.addFlowRelationPT("p14", "t18");
+		ptnet4.addFlowRelationTP("t18", "p15");
+		ptnet4.addFlowRelationPT("p15", "t19");
+		ptnet4.addFlowRelationTP("t19", "p16");
+		ptnet4.addFlowRelationPT("p16", "t20");
+		ptnet4.addFlowRelationTP("t20", "p24");
+		ptnet4.addFlowRelationPT("p24", "t17");
+
+		ptnet4.addFlowRelationPT("p29", "t19");
+		ptnet4.addFlowRelationTP("t20", "p29");
+		ptnet4.addFlowRelationPT("p32", "t18");
+		ptnet4.addFlowRelationTP("t19", "p32");
+		ptnet4.addFlowRelationPT("p30", "t17");
+		ptnet4.addFlowRelationTP("t18", "p30");
+
+		Collection<String> pa4 = new HashSet<String>();
+		pa4.add("p14");	pa4.add("p15");	pa4.add("p16");
+		Collection<String> pr4 = new HashSet<String>();
+		pr4.add("p29");	pr4.add("p30");	pr4.add("p32");			
+		
+		///////////////////// ptnet5
+		PTNet ptnet5 = new PTNet();
+		// p0
+		ptnet5.addPlace("p25");
+		// pa
+		ptnet5.addTransition("t21");
+		ptnet5.addPlace("p17");
+		ptnet5.addTransition("t22");
+		ptnet5.addPlace("p18");
+		ptnet5.addTransition("t23");
+		ptnet5.addPlace("p19");
+		ptnet5.addTransition("t24");
+		ptnet5.addPlace("p20");
+		ptnet5.addTransition("t25");
+		// pr
+		ptnet5.addPlace("p29");
+		ptnet5.addPlace("p30");
+		ptnet5.addPlace("p31");
+		ptnet5.addPlace("p32");
+
+		// relations
+		ptnet5.addFlowRelationTP("t21", "p17");
+		ptnet5.addFlowRelationPT("p17", "t22");
+		ptnet5.addFlowRelationTP("t22", "p18");
+		ptnet5.addFlowRelationPT("p18", "t23");
+		ptnet5.addFlowRelationTP("t23", "p19");
+		ptnet5.addFlowRelationPT("p19", "t24");
+		ptnet5.addFlowRelationTP("t24", "p20");
+		ptnet5.addFlowRelationPT("p20", "t25");
+		ptnet5.addFlowRelationTP("t25", "p25");
+		ptnet5.addFlowRelationPT("p25", "t21");
+
+		ptnet5.addFlowRelationPT("p29", "t24");
+		ptnet5.addFlowRelationTP("t25", "p29");
+		ptnet5.addFlowRelationPT("p31", "t23");
+		ptnet5.addFlowRelationTP("t24", "p31");
+		ptnet5.addFlowRelationPT("p30", "t22");
+		ptnet5.addFlowRelationTP("t23", "p30");
+		ptnet5.addFlowRelationPT("p32", "t21");
+		ptnet5.addFlowRelationTP("t22", "p32");
+
+		Collection<String> pa5 = new HashSet<String>();
+		pa5.add("p17");	pa5.add("p18");	pa5.add("p19"); pa5.add("p20");
+		Collection<String> pr5 = new HashSet<String>();
+		pr5.add("p29");	pr5.add("p30");	pr5.add("p31"); pr5.add("p32");			
+		
+		//////////////////////// S3PR对象
+		S3PR s3pr = new S3PR("wang_p86_figure4-3","s2pr_1",ptnet1,"p21",pa1,pr1);
+		s3pr.add("s2pr_2", ptnet2,"p22",pa2,pr2);
+		s3pr.add("s2pr_3", ptnet3,"p23",pa3,pr3);
+		s3pr.add("s2pr_4", ptnet4,"p24",pa4,pr4);
+		s3pr.add("s2pr_5", ptnet5,"p25",pa5,pr5);
+		System.out.println("1: s3pr: " + s3pr);
+		
+		//S2PR s2pr2 = new S2PR("s2pr_2", ptnet2, "", pa2, pr2);
+		
+		
+		return s3pr;
 	}
 }
