@@ -1049,15 +1049,100 @@ public class S3PRTest {
 		Collection<String> pr3 = new HashSet<String>();
 		pr3.add("p29"); pr3.add("p30"); pr3.add("p31"); pr3.add("p32");
 		
+		///////////////////// ptnet4
+		PTNet ptnet4 = new PTNet();
+		// p0
+		ptnet4.addPlace("p24");
+		// pa
+		ptnet4.addTransition("t17");
+		ptnet4.addPlace("p14");
+		ptnet4.addTransition("t18");
+		ptnet4.addPlace("p15");
+		ptnet4.addTransition("t19");
+		ptnet4.addPlace("p16");
+		ptnet4.addTransition("t20");
+		// pr
+		ptnet4.addPlace("p29");
+		ptnet4.addPlace("p30");
+		ptnet4.addPlace("p32");
+
+		// relations
+		ptnet4.addFlowRelationTP("t17", "p14");
+		ptnet4.addFlowRelationPT("p14", "t18");
+		ptnet4.addFlowRelationTP("t18", "p15");
+		ptnet4.addFlowRelationPT("p15", "t19");
+		ptnet4.addFlowRelationTP("t19", "p16");
+		ptnet4.addFlowRelationPT("p16", "t20");
+		ptnet4.addFlowRelationTP("t20", "p24");
+		ptnet4.addFlowRelationPT("p24", "t17");
+
+		ptnet4.addFlowRelationPT("p29", "t19");
+		ptnet4.addFlowRelationTP("t20", "p29");
+		ptnet4.addFlowRelationPT("p32", "t18");
+		ptnet4.addFlowRelationTP("t19", "p32");
+		ptnet4.addFlowRelationPT("p30", "t17");
+		ptnet4.addFlowRelationTP("t18", "p30");
+
+		Collection<String> pa4 = new HashSet<String>();
+		pa4.add("p14");	pa4.add("p15");	pa4.add("p16");
+		Collection<String> pr4 = new HashSet<String>();
+		pr4.add("p29");	pr4.add("p30");	pr4.add("p32");			
+		
+		///////////////////// ptnet5
+		PTNet ptnet5 = new PTNet();
+		// p0
+		ptnet5.addPlace("p25");
+		// pa
+		ptnet5.addTransition("t21");
+		ptnet5.addPlace("p17");
+		ptnet5.addTransition("t22");
+		ptnet5.addPlace("p18");
+		ptnet5.addTransition("t23");
+		ptnet5.addPlace("p19");
+		ptnet5.addTransition("t24");
+		ptnet5.addPlace("p20");
+		ptnet5.addTransition("t25");
+		// pr
+		ptnet5.addPlace("p29");
+		ptnet5.addPlace("p30");
+		ptnet5.addPlace("p31");
+		ptnet5.addPlace("p32");
+
+		// relations
+		ptnet5.addFlowRelationTP("t21", "p17");
+		ptnet5.addFlowRelationPT("p17", "t22");
+		ptnet5.addFlowRelationTP("t22", "p18");
+		ptnet5.addFlowRelationPT("p18", "t23");
+		ptnet5.addFlowRelationTP("t23", "p19");
+		ptnet5.addFlowRelationPT("p19", "t24");
+		ptnet5.addFlowRelationTP("t24", "p20");
+		ptnet5.addFlowRelationPT("p20", "t25");
+		ptnet5.addFlowRelationTP("t25", "p25");
+		ptnet5.addFlowRelationPT("p25", "t21");
+
+		ptnet5.addFlowRelationPT("p29", "t24");
+		ptnet5.addFlowRelationTP("t25", "p29");
+		ptnet5.addFlowRelationPT("p31", "t23");
+		ptnet5.addFlowRelationTP("t24", "p31");
+		ptnet5.addFlowRelationPT("p30", "t22");
+		ptnet5.addFlowRelationTP("t23", "p30");
+		ptnet5.addFlowRelationPT("p32", "t21");
+		ptnet5.addFlowRelationTP("t22", "p32");
+
+		Collection<String> pa5 = new HashSet<String>();
+		pa5.add("p17");	pa5.add("p18");	pa5.add("p19"); pa5.add("p20");
+		Collection<String> pr5 = new HashSet<String>();
+		pr5.add("p29");	pr5.add("p30");	pr5.add("p31"); pr5.add("p32");			
 		
 		//////////////////////// S3PR对象
 		S3PR s3pr = new S3PR("wang_p86_figure4-3","s2pr_1",ptnet1,"p21",pa1,pr1);
 		s3pr.add("s2pr_2", ptnet2,"p22",pa2,pr2);
 		s3pr.add("s2pr_3", ptnet3,"p23",pa3,pr3);
+		s3pr.add("s2pr_4", ptnet4,"p24",pa4,pr4);
+		s3pr.add("s2pr_5", ptnet5,"p25",pa5,pr5);
 		System.out.println("1: s3pr: " + s3pr);
 		
 		//S2PR s2pr2 = new S2PR("s2pr_2", ptnet2, "", pa2, pr2);
-		
 		
 		
 		return s3pr;

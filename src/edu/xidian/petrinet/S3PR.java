@@ -61,7 +61,7 @@ public class S3PR extends S2PR {
     /**
      * 该网对应的资源有向图
      */
-    protected final Graph<String> Rgraph = new Graph<>();
+    protected final RGraph<String> Rgraph = new RGraph<>();
 
 	/**
 	 * 
@@ -458,7 +458,7 @@ public class S3PR extends S2PR {
 	 * 获取该网的资源有向图
 	 * @return
 	 */
-	public Graph<String> getRgraph() {
+	public RGraph<String> getRgraph() {
 		// 如果已经生成资源有向图, 直接返回, 否则生成之。
 		if (Rgraph.nodeCount() != 0) return Rgraph;
 		
@@ -474,13 +474,17 @@ public class S3PR extends S2PR {
 				transitions.addAll(prePr_j);
 				transitions.retainAll(postPr_i);
 				if (!transitions.isEmpty()) {
-					Rgraph.addVertex(pr_i.getName());
-					Rgraph.addVertex(pr_j.getName());
-					try {
-						Rgraph.addEdge(pr_i.getName(), pr_j.getName());
-					} catch (VertexNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					// TODO: if (transitions.size() != 1) throw new Exception();
+					for (AbstractPNNode<PTFlowRelation> t: transitions) {
+						Rgraph.addVertex(pr_i.getName());
+						Rgraph.addVertex(pr_j.getName());
+						try {
+							Rgraph.addEdge(t.getName(),pr_i.getName(), pr_j.getName());
+						} catch (VertexNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break; // 仅有一条边
 					}
 				}
 			}
