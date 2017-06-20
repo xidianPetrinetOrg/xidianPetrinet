@@ -21,7 +21,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.PetriNetTraversalUtils;
-import edu.xidian.petrinet.S2PR;
+import edu.xidian.petrinet.S3PR.S3PR.S2PR;
 
 /**
  * @author Administrator
@@ -58,7 +58,7 @@ public class S2PRTest {
 	}
 
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2PR#S2PR(int, int, int)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2PR#S2PR(int, int, int)}.
 	 */
 	//@Test
 	public void testS2PR() {
@@ -68,7 +68,7 @@ public class S2PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2PR#isS2P()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2PR#isS2P()}.
 	 */
 	//@Test
 	public void isS2P() {
@@ -82,7 +82,7 @@ public class S2PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2PR#isS2PR()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2PR#isS2PR()}.
 	 */
 	@Test
 	public void isS2PR() {
@@ -176,7 +176,7 @@ public class S2PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2PR#isInintialMarking()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2PR#isInintialMarking()}.
 	 */
 	//@Test
 	public void isInintialMarking() {
@@ -190,7 +190,7 @@ public class S2PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2PR#S2PR(PTNet, String, Collection, Collection)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2PR#S2PR(PTNet, String, Collection, Collection)}.
 	 */
 	//@Test
 	public void testS2P2() {

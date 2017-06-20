@@ -19,7 +19,7 @@ import org.junit.Test;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.PetriNetTraversalUtils;
-import edu.xidian.petrinet.S2P;
+import edu.xidian.petrinet.S3PR.S3PR.S2P;
 
 /**
  * @author Administrator
@@ -56,7 +56,7 @@ public class S2PTest {
 	}
 
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2P#S2P(int, int)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2P#S2P(int, int)}.
 	 */
 	//@Test
 	public void testS2P() {
@@ -66,7 +66,7 @@ public class S2PTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2P#S2P(int)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2P#S2P(int)}.
 	 */
 	//@Test
 	public void testS2P1() {
@@ -77,7 +77,7 @@ public class S2PTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2P#S2P(PTNet, String, Collection)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2P#S2P(PTNet, String, Collection)}.
 	 */
 	//@Test
 	public void testS2P2() {
@@ -132,7 +132,7 @@ public class S2PTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S2P#isS2P()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S2P#isS2P()}.
 	 */
 	@Test
 	public void isS2P() {

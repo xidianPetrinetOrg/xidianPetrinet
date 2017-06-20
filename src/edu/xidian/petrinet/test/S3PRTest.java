@@ -19,12 +19,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
-import edu.xidian.petrinet.S2PR;
-import edu.xidian.petrinet.S3PR;
+import edu.xidian.petrinet.RGraph.RGraph;
+import edu.xidian.petrinet.S3PR.S2PR;
+import edu.xidian.petrinet.S3PR.S3PR;
 
 /**
  * @author Administrator
@@ -61,7 +61,7 @@ public class S3PRTest {
 	}
 
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR#S3PR(S2PR)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#S3PR(S2PR)}.
 	 */
 	//@Test
 	public void testS3PR() {
@@ -74,7 +74,7 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR#S3PR(PTNet, String, Collection, Collection)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#S3PR(PTNet, String, Collection, Collection)}.
 	 */
 	//@Test
 	public void testS3PR1() {
@@ -145,7 +145,7 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR#getHr(Set)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#getHr(Set)}.
 	 * Li. 图3-1或图4-2
 	 */
 	//@Test
@@ -290,7 +290,7 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR#s3pr4_1()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#s3pr4_1()}.
 	 * Li. p68, 图4-3，例4.4完整测试
 	 */
 	//@Test
@@ -563,7 +563,7 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR#s3pr4_1()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#s3pr4_1()}.
 	 * Li. p68, 图4-3，例4.4的分步测试
 	 */
 	//@Test
@@ -899,14 +899,20 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR#getRgraph()}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#getRgraph()}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
 	@Test
 	public void WangFigure4_1() {
 		S3PR s3pr = getWangFigure4_1();
-		Graph<String> rGraph = s3pr.getRgraph();
-		System.out.println("Rgraph:" + rGraph);
+		try {
+			RGraph rGraph = s3pr.getRgraph();
+			System.out.println(rGraph);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
@@ -1147,6 +1153,15 @@ public class S3PRTest {
 		s3pr.add("s2pr_3", ptnet3,"p23",pa3,pr3);
 		s3pr.add("s2pr_4", ptnet4,"p24",pa4,pr4);
 		s3pr.add("s2pr_5", ptnet5,"p25",pa5,pr5);
+		
+		s3pr.getPlace("p26").setLabel("r1");
+		s3pr.getPlace("p27").setLabel("r2");
+		s3pr.getPlace("p28").setLabel("r3");
+		s3pr.getPlace("p29").setLabel("r4");
+		s3pr.getPlace("p30").setLabel("r5");
+		s3pr.getPlace("p31").setLabel("r6");
+		s3pr.getPlace("p32").setLabel("r7");
+		
 		System.out.println("1: s3pr: " + s3pr);
 		
 		//S2PR s2pr2 = new S2PR("s2pr_2", ptnet2, "", pa2, pr2);

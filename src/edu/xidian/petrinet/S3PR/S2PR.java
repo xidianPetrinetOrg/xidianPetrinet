@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.xidian.petrinet;
+package edu.xidian.petrinet.S3PR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,7 +138,7 @@ public class S2PR extends S2P {
 	
 	/**
 	 *  检查本类(S2PR)对应的父类对象(S2P)是否满足S2P的定义
-	 * @see edu.xidian.petrinet.S2P#isS2P()
+	 * @see edu.xidian.petrinet.S3PR.S2P#isS2P()
 	 */
 	@Override
 	public boolean isS2P() {

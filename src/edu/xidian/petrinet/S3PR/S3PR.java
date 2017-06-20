@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.xidian.petrinet;
+package edu.xidian.petrinet.S3PR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +17,8 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
+import edu.xidian.petrinet.RGraph.RGraph;
+import edu.xidian.petrinet.S3PR.S2PR;
 
 /**
  * <pre>
@@ -59,7 +61,7 @@ public class S3PR extends S2PR {
     /**
      * 该网对应的资源有向图
      */
-    protected final RGraph<String> Rgraph = new RGraph<>();
+    protected final RGraph Rgraph = new RGraph("Resource Directed Graph");
 
 	/**
 	 * 
@@ -455,8 +457,10 @@ public class S3PR extends S2PR {
 	/**
 	 * 获取该网的资源有向图
 	 * @return
+	 * @throws Exception "非预设值，含有多边！"
 	 */
-	public RGraph<String> getRgraph() {
+	//public RGraph<String> getRgraph() throws Exception {
+	public RGraph getRgraph() throws Exception {
 		// 如果已经生成资源有向图, 直接返回, 否则生成之。
 		if (Rgraph.nodeCount() != 0) return Rgraph;
 		
@@ -472,17 +476,18 @@ public class S3PR extends S2PR {
 				transitions.addAll(prePr_j);
 				transitions.retainAll(postPr_i);
 				if (!transitions.isEmpty()) {
-					// TODO: if (transitions.size() != 1) throw new Exception();
+					//if (transitions.size() != 1) throw new Exception("非预设值，含有多边！" + transitions);
 					for (AbstractPNNode<PTFlowRelation> t: transitions) {
-						Rgraph.addVertex(pr_i.getName());
-						Rgraph.addVertex(pr_j.getName());
+						// Rgraph.addVertex(pr_i.getName()); // 使用此函数，在graph中无vertex对象
+						Rgraph.addVertex(pr_i.getName(),pr_i);
+						Rgraph.addVertex(pr_j.getName(),pr_j);
 						try {
-							Rgraph.addEdge(t.getName(),pr_i.getName(), pr_j.getName());
+							Rgraph.addREdge(t.getName(),pr_i.getName(), pr_j.getName());
 						} catch (VertexNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						break; // 仅有一条边
+						//break; // 仅有一条边
 					}
 				}
 			}
