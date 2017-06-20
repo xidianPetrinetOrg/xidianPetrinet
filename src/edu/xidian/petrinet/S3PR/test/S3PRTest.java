@@ -905,8 +905,13 @@ public class S3PRTest {
 	@Test
 	public void WangFigure4_1() {
 		S3PR s3pr = getWangFigure4_1();
+		// 资源有向图
 		RGraph rGraph = s3pr.getRgraph();
 		System.out.println(rGraph);
+		// 强连通块
+		// Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(false);
+		// System.out.println(Components);
+		rGraph.getStronglyConnectedComponents(true);
 	}
 	
 	/**

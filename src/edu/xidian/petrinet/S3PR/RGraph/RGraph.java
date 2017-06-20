@@ -3,11 +3,13 @@ package edu.xidian.petrinet.S3PR.RGraph;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.jagal.graph.abstr.AbstractGraph;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
+import de.uni.freiburg.iig.telematik.jagal.traverse.algorithms.SCCTarjan;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.Utils.PNNodeComparator;
 import edu.xidian.petrinet.Utils.StringComparator;
@@ -102,6 +104,34 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	 */
 	public List<REdge> getParallelEdges() {
 		return parallelEdges;
+	}
+	
+	/**
+	 * 计算强连通块
+	 * @param verbose 是否打印输出
+	 * @return 资源有向图中的强连通块
+	 */
+	public Set<Set<Vertex<PTPlace>>> getStronglyConnectedComponents(boolean verbose) {
+		Set<Set<Vertex<PTPlace>>> Components = null;
+		SCCTarjan<Vertex<PTPlace>> tarjan = new SCCTarjan<>();
+		Components = tarjan.execute(this);
+		
+		if (verbose) {
+			System.out.println("Strongly Connected Components:");
+			List<PTPlace> places = new ArrayList<>();
+			PNNodeComparator comparator = new PNNodeComparator();
+			int i = 1;
+			for (Set<Vertex<PTPlace>> vertices: Components) {
+				places.clear();
+				for (Vertex<PTPlace> v: vertices) {
+					places.add(v.getElement());
+				}
+				Collections.sort(places, comparator);
+				System.out.println("Component[" + i + "]: " + places);
+				i++;
+			}
+		}
+		return Components;
 	}
 
 	@Override

@@ -481,7 +481,6 @@ public class S3PR extends S2PR {
 						// Rgraph.addVertex(pr_i.getName()); // 使用此函数，在graph中无vertex对象
 						Rgraph.addVertex(pr_i.getName(),pr_i);
 						Rgraph.addVertex(pr_j.getName(),pr_j);
-						System.out.println("====" + t.getName() +","+pr_i.getName()+","+pr_j.getName());
 						try {
 							Rgraph.addREdge(t.getName(),pr_i.getName(), pr_j.getName());
 						} catch (VertexNotFoundException e) {
