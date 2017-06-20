@@ -1,4 +1,4 @@
-package edu.xidian.petrinet;
+package edu.xidian.petrinet.Utils;
 
 import java.util.Collection;
 import java.util.HashSet;

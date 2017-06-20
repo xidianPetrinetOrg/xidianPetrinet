@@ -16,6 +16,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
+import edu.xidian.petrinet.Utils.PNNodeComparator;
 
 /**
  * 简单顺序过程(Simple Sequential Process, S2P)

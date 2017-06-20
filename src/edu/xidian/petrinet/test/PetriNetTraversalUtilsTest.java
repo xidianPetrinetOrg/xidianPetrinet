@@ -18,7 +18,7 @@ import org.junit.Test;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPetriNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
-import edu.xidian.petrinet.PetriNetTraversalUtils;
+import edu.xidian.petrinet.Utils.PetriNetTraversalUtils;
 
 /**
  * @author Administrator
@@ -55,7 +55,7 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
 	 * 获取强连通分量
 	 */
 	//@Test
@@ -109,7 +109,7 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
 	 * 获取强连通分量, S2P(simple sequential process)，一个包含全部节点的连通分量，这里是1个含p1的回路
 	 */
 	//@Test
@@ -162,7 +162,7 @@ public class PetriNetTraversalUtilsTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#getStronglyConnectedComponents(AbstractPetriNet)}.
 	 * 获取强连通分量, S2P(simple sequential process)，一个包含全部节点的连通分量，这里是2个含p1的回路
 	 */
 	//@Test
@@ -229,7 +229,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * dfs,depth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:1个
 	 */
 	//@Test
@@ -260,7 +260,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * dfs,depth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:2个
 	 */
 	//@Test
@@ -302,7 +302,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * dfs,depth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:2个
 	 */
 	@Test
@@ -344,7 +344,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * dfs,depth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#dfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含pp2的回路:1个
 	 */
 	//@Test
@@ -386,7 +386,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * bfs,breadth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:1个
 	 */
 	@Test
@@ -417,7 +417,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * bfs,breadth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:2个
 	 */
 	@Test
@@ -459,7 +459,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * bfs,breadth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含p1的回路:2个
 	 */
 	@Test
@@ -501,7 +501,7 @@ public class PetriNetTraversalUtilsTest {
 	
 	/**
 	 * bfs,breadth first search
-	 * Test method for {@link edu.xidian.petrinet.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
+	 * Test method for {@link edu.xidian.petrinet.Utils.PetriNetTraversalUtils#bfsCircuits(AbstractPetriNet, AbstractPNNode)}.
 	 * 含pp2的回路:1个
 	 */
 	@Test

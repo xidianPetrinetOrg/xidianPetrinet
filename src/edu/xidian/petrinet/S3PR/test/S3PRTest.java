@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.xidian.petrinet.test;
+package edu.xidian.petrinet.S3PR.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,9 +22,9 @@ import org.junit.Test;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
-import edu.xidian.petrinet.RGraph.RGraph;
 import edu.xidian.petrinet.S3PR.S2PR;
 import edu.xidian.petrinet.S3PR.S3PR;
+import edu.xidian.petrinet.S3PR.RGraph.RGraph;
 
 /**
  * @author Administrator
@@ -905,14 +905,8 @@ public class S3PRTest {
 	@Test
 	public void WangFigure4_1() {
 		S3PR s3pr = getWangFigure4_1();
-		try {
-			RGraph rGraph = s3pr.getRgraph();
-			System.out.println(rGraph);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		RGraph rGraph = s3pr.getRgraph();
+		System.out.println(rGraph);
 	}
 	
 	/**
@@ -1006,6 +1000,7 @@ public class S3PRTest {
 		ptnet2.addFlowRelationPT("p28", "t6");
 		ptnet2.addFlowRelationTP("t10", "p28");
 		ptnet2.addFlowRelationPT("p28", "t9");
+		ptnet2.addFlowRelationTP("t9", "p26");
 		ptnet2.addFlowRelationTP("t11", "p29");
 		ptnet2.addFlowRelationPT("p29", "t10");
 		

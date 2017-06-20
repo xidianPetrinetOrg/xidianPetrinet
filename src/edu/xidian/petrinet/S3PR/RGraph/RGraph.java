@@ -1,4 +1,4 @@
-package edu.xidian.petrinet.RGraph;
+package edu.xidian.petrinet.S3PR.RGraph;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,9 +9,21 @@ import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.jagal.graph.abstr.AbstractGraph;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
-import edu.xidian.petrinet.S3PR.StringComparator;
+import edu.xidian.petrinet.Utils.PNNodeComparator;
+import edu.xidian.petrinet.Utils.StringComparator;
 
+/**
+ * 资源有向图，本身不含平行边.<br>
+ * 可以使用函数{@link #getParallelEdges()}获取平行边
+ * @author Jiangtao Duan
+ *
+ */
 public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
+	
+	/**
+	 * 记录平行边
+	 */
+	protected final List<REdge> parallelEdges = new ArrayList<>();
 	
 	public RGraph(){
 		super();
@@ -73,6 +85,8 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 		}
 
 		if (containsEdge(sourceVertexName, targetVertexName)) {
+			REdge pEdge = createNewREdge(edgeName, getVertex(sourceVertexName), getVertex(targetVertexName));
+			parallelEdges.add(pEdge);
 			return null;
 		}
 
@@ -83,14 +97,41 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 		return newEdge;
 	}
 	
+	/**
+	 * @return the parallelEdges
+	 */
+	public List<REdge> getParallelEdges() {
+		return parallelEdges;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		str.append("Graph: " + name + "\n");
-		str.append("Vertex: " + vertexMap.keySet());
-		str.append("\nEdge:\n");
+		
+		str.append("Vertices(" + vertexMap.size() + "):\n");
+		List<PTPlace> places = new ArrayList<>();
+		for (Vertex<PTPlace> v: getVertices()) {
+			places.add(v.getElement());
+		}
+		Collections.sort(places,new PNNodeComparator());
+		str.append(places);
+		
+		// 不含平行边的集合
+		str.append("\nEdges(" + edgeList.size() + "):\n");
 		List<String> list = new ArrayList<>();
 		for (REdge e: getEdges()) {
+			list.add(e.toString());
+		}
+		Collections.sort(list,new StringComparator());
+		for (String s: list) {
+			str.append(s+"\n");
+		}
+		
+		// 平行边集合
+		list.clear();
+		str.append("Parallel edges(" + parallelEdges.size() + "):\n");
+		for (REdge e: parallelEdges) {
 			list.add(e.toString());
 		}
 		Collections.sort(list,new StringComparator());

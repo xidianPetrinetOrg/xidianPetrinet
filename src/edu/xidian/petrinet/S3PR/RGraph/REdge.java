@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.xidian.petrinet.RGraph;
+package edu.xidian.petrinet.S3PR.RGraph;
 
 import de.uni.freiburg.iig.telematik.jagal.graph.Edge;
 import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
@@ -38,6 +38,16 @@ public class REdge extends Edge<Vertex<PTPlace>> {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		return result;
 	}
 
 	/**

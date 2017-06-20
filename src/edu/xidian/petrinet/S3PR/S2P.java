@@ -17,7 +17,8 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
-import edu.xidian.petrinet.PetriNetTraversalUtils;
+import edu.xidian.petrinet.Utils.PNNodeComparator;
+import edu.xidian.petrinet.Utils.PetriNetTraversalUtils;
 
 /**
  * 	Li. p65, 定义4.2
