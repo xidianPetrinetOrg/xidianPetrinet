@@ -19,7 +19,7 @@ import org.junit.Test;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.PetriNetTraversalUtils;
-import edu.xidian.petrinet.S3PR.S3PR.S2P;
+import edu.xidian.petrinet.S3PR.S2P;
 
 /**
  * @author Administrator

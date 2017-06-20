@@ -82,7 +82,7 @@ public class REdge extends Edge<Vertex<PTPlace>> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return name + "(" + s.getLabel() + " -> " + t.getLabel() + ")";
+		return name + "(" + s + " -> " + t + ")";
 	}
 
 }

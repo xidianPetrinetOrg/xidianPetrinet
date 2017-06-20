@@ -3,8 +3,6 @@
  */
 package edu.xidian.petrinet.test;
 
-import static org.junit.Assert.*;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +26,6 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
-import edu.xidian.petrinet.S3PR.S3PR.S2PR;
 
 /**
  * @author Administrator
