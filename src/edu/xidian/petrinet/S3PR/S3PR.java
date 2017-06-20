@@ -10,14 +10,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import de.invation.code.toval.types.HashList;
+import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
-import edu.xidian.petrinet.S3PR.S2PR;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
 import edu.xidian.petrinet.Utils.PNNodeComparator;
 
@@ -457,10 +459,10 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * 获取该网的资源有向图
+	 * @param verbose 是否打印输出
 	 * @return
-	 * @throws Exception "非预设值，含有多边！"
 	 */
-	public RGraph getRgraph() {
+	public RGraph getRgraph(boolean verbose) {
 		// 如果已经生成资源有向图, 直接返回, 否则生成之。
 		if (Rgraph.nodeCount() != 0) return Rgraph;
 		
@@ -492,7 +494,53 @@ public class S3PR extends S2PR {
 				}
 			}
 		}
+		
+		if (verbose) {
+			System.out.println(Rgraph);
+		}
 		return Rgraph;
+	}
+	
+	/**
+	 * 计算严格极小信标
+	 * @param verbose 是否打印输出
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void SMS(boolean verbose) {
+		// 资源有向图
+		RGraph rGraph = getRgraph(verbose);
+		// 强连通块
+		Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(verbose);
+		
+		Collection<PTPlace> omega = new HashList<>();
+		for (Set<Vertex<PTPlace>> vertices: Components) {
+			omega.clear();
+			for (Vertex<PTPlace> v: vertices) {
+				omega.add(v.getElement());
+			}
+			Collection<PTPlace> hrs = getHr(omega);
+			printPNNodes("hrs:", hrs);
+			
+			Collection<PTPlace> sms = new HashList<>();
+			
+			for (PTPlace p: hrs) {
+				Collection<PTPlace> p0_pa = new HashList<>(P0);
+				p0_pa.addAll(PA);
+				Collection<PTPlace> prePreSet = new HashList<>();
+				Collection<AbstractPNNode<PTFlowRelation>> nodes = p.getParents();
+				for (AbstractPNNode node: nodes) {
+					prePreSet.addAll(node.getParents()); 
+				}
+				prePreSet.retainAll(p0_pa);
+				
+				if (!prePreSet.contains(p)) {
+					sms.add(p);
+				}
+			}
+			
+			printPNNodes("sms:", sms);
+			
+		}
 	}
 	
 	@Override

@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
@@ -902,16 +903,24 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#getRgraph()}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	@Test
+	//@Test
 	public void WangFigure4_1() {
 		S3PR s3pr = getWangFigure4_1();
 		// 资源有向图
-		RGraph rGraph = s3pr.getRgraph();
-		System.out.println(rGraph);
+		RGraph rGraph = s3pr.getRgraph(true);
 		// 强连通块
-		// Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(false);
-		// System.out.println(Components);
-		rGraph.getStronglyConnectedComponents(true);
+		@SuppressWarnings("unused")
+		Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(true);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#SMS(boolean)}.
+	 * Wang, p86,图4-1,对应的S3PR
+	 */
+	@Test
+	public void WangFigure4_1SMS() {
+		S3PR s3pr = getWangFigure4_1();
+		s3pr.SMS(true);
 	}
 	
 	/**
