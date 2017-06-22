@@ -26,6 +26,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S3PR.S2PR;
 import edu.xidian.petrinet.S3PR.S3PR;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
+import edu.xidian.petrinet.S3PR.RGraph.RGraph.Component;
 
 /**
  * @author Administrator
@@ -910,7 +911,7 @@ public class S3PRTest {
 		RGraph rGraph = s3pr.getRgraph(true);
 		// 强连通块
 		@SuppressWarnings("unused")
-		Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(true);
+		List<Component> Components = rGraph.getStronglyConnectedComponents(true);
 	}
 	
 	/**
@@ -972,7 +973,7 @@ public class S3PRTest {
 		pr1.add("p26");
 		pr1.add("p27");
 		pr1.add("p28");
-
+		
 		///////////////////// ptnet2
 		PTNet ptnet2 = new PTNet();
 		// p0
@@ -1174,7 +1175,6 @@ public class S3PRTest {
 		System.out.println("1: s3pr: " + s3pr);
 		
 		//S2PR s2pr2 = new S2PR("s2pr_2", ptnet2, "", pa2, pr2);
-		
 		
 		return s3pr;
 	}

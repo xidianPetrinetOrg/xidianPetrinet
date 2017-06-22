@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.invation.code.toval.types.HashList;
 import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
@@ -21,6 +20,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
+import edu.xidian.petrinet.S3PR.RGraph.RGraph.Component;
 import edu.xidian.petrinet.Utils.PNNodeComparator;
 
 /**
@@ -186,6 +186,8 @@ public class S3PR extends S2PR {
 	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, 
 	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
+	 * 即, [S] = getHr(S<sub>R</sub>)\S, S<sub>R</sub>表示信标S中的资源库所集合
+	 * 信标的补集是由工序库所组成的，具有明确的物理含义。信标补集中的库所和信标中的工序库所竞争信标中的资源
 	 * </pre>
      * @param r 资源库所
 	 * @return r的持有者集合,是工序库所PA的子集
@@ -210,6 +212,8 @@ public class S3PR extends S2PR {
 	 * S = S<sub>R</sub> ∪ S<sub>A</sub>, 其中S<sub>R</sub>表示S中的资源库所集合，且|S<sub>R</sub>|≥2, 
 	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
+	 * 即, [S] = getHr(S<sub>R</sub>)\S, S<sub>R</sub>表示信标S中的资源库所集合
+	 * 信标的补集是由工序库所组成的，具有明确的物理含义。信标补集中的库所和信标中的工序库所竞争信标中的资源
 	 * </pre>
 	 * @param SR S<sub>R</sub>表示信标S中的资源库所集合
 	 * @return S3PR网, 信标资源库所集合S<sub>R</sub>的所有资源的持有者集合， ∪<sub>r∈S<sub>R</sub></sub>(H(r))，是工序库所的子集
@@ -232,6 +236,7 @@ public class S3PR extends S2PR {
 	 * S<sub>A</sub>表示S中的工序库所集合.
 	 * 令[S] = ∪<sub>r∈S<sub>R</sub></sub>(H(r))\S,[S]称为信标S的补集(complementary set of siphon S)
 	 * 即, [S] = getHr(S<sub>R</sub>)\S, S<sub>R</sub>表示信标S中的资源库所集合
+	 * 信标的补集是由工序库所组成的，具有明确的物理含义。信标补集中的库所和信标中的工序库所竞争信标中的资源。
 	 * </pre>
 	 * @param 
 	 * @param S 信标(siphon)
@@ -505,43 +510,78 @@ public class S3PR extends S2PR {
 	 * 计算严格极小信标
 	 * @param verbose 是否打印输出
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public void SMS(boolean verbose) {
-		// 资源有向图
-		RGraph rGraph = getRgraph(verbose);
-		// 强连通块
-		Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(verbose);
+		getRgraph(verbose);
+		List<Component> components = Rgraph.getStronglyConnectedComponents(verbose);
 		
-		Collection<PTPlace> omega = new HashList<>();
-		for (Set<Vertex<PTPlace>> vertices: Components) {
-			omega.clear();
-			for (Vertex<PTPlace> v: vertices) {
-				omega.add(v.getElement());
-			}
-			Collection<PTPlace> hrs = getHr(omega);
-			printPNNodes("hrs:", hrs);
-			
-			Collection<PTPlace> sms = new HashList<>();
-			
-			for (PTPlace p: hrs) {
-				Collection<PTPlace> p0_pa = new HashList<>(P0);
-				p0_pa.addAll(PA);
-				Collection<PTPlace> prePreSet = new HashList<>();
-				Collection<AbstractPNNode<PTFlowRelation>> nodes = p.getParents();
-				for (AbstractPNNode node: nodes) {
-					prePreSet.addAll(node.getParents()); 
+		Collection<PTPlace> Scom = new HashSet<>();
+		Collection<PTPlace> SR = new HashSet<>();
+		Collection<PTPlace> intersection = new HashSet<>();
+		for (Component com: components) {
+			Scom.clear(); intersection.clear();
+			SR.clear();
+			for (String t: com.edges) {
+				for(AbstractPNNode p: getTransition(t).getParents()) {
+					intersection.add((PTPlace) p);
 				}
-				prePreSet.retainAll(p0_pa);
-				
-				if (!prePreSet.contains(p)) {
-					sms.add(p);
-				}
+				intersection.retainAll(PA);  
+				Scom.addAll(intersection);  // wang (4-7)
 			}
 			
-			printPNNodes("sms:", sms);
+			for (Vertex<PTPlace> v: com.vertexes) {
+				SR.add(v.getElement());
+			}
+			Collection<PTPlace> Is = getIs(SR);
 			
-		}
+			printPNNodes("Wang, (4-7) Scom:", Scom);
+			Is.removeAll(Scom);
+			printPNNodes("Wang, (4-2) S:", Is);
+		}	
 	}
+		
+	/**
+	 * 计算严格极小信标
+	 * @param verbose 是否打印输出
+	 */
+//	@SuppressWarnings({ "rawtypes", "unchecked" })
+//	public void SMS3(boolean verbose) {
+//		// 资源有向图
+//		RGraph rGraph = getRgraph(verbose);
+//		// 强连通块
+//		Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(verbose);
+//		
+//		Collection<PTPlace> omega = new HashList<>();  // omega = SR,即信标中资源库所的集合
+//		for (Set<Vertex<PTPlace>> vertices: Components) {
+//			omega.clear();
+//			for (Vertex<PTPlace> v: vertices) {
+//				omega.add(v.getElement());
+//			}
+//			Collection<PTPlace> hrs = getHr(omega);
+//			printPNNodes("omega:", omega);
+//			printPNNodes("hrs:", hrs);
+//			
+//			Collection<PTPlace> sms = new HashList<>();
+//			
+//			for (PTPlace p: hrs) {
+//				Collection<PTPlace> p0_pa = new HashList<>(P0);
+//				p0_pa.addAll(PA);
+//				Collection<PTPlace> prePreSet = new HashList<>();
+//				Collection<AbstractPNNode<PTFlowRelation>> nodes = p.getParents();
+//				for (AbstractPNNode node: nodes) {
+//					prePreSet.addAll(node.getParents()); 
+//				}
+//				prePreSet.retainAll(p0_pa);
+//				
+//				if (!prePreSet.contains(p)) {
+//					sms.add(p);
+//				}
+//			}
+//			
+//			printPNNodes("sms:", sms);
+//			
+//		}
+//	}
 	
 	@Override
 	public String toString(){

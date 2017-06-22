@@ -1,7 +1,10 @@
 package edu.xidian.petrinet.S3PR.RGraph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +29,11 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	 * 记录平行边
 	 */
 	protected final List<REdge> parallelEdges = new ArrayList<>();
+	
+	/**
+	 * 强连通分量
+	 */
+	protected List<Component> Components = null; 
 	
 	public RGraph(){
 		super();
@@ -107,27 +115,61 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	}
 	
 	/**
-	 * 计算强连通块
+	 * 计算强连通块(内部可以有平行边)
 	 * @param verbose 是否打印输出
 	 * @return 资源有向图中的强连通块
 	 */
-	public Set<Set<Vertex<PTPlace>>> getStronglyConnectedComponents(boolean verbose) {
-		Set<Set<Vertex<PTPlace>>> Components = null;
+	public List<Component> getStronglyConnectedComponents(boolean verbose) {
+		if (this.Components != null) return Components;
+		
+		Components = new ArrayList<>();
+		Set<Set<Vertex<PTPlace>>> coms = null;
 		SCCTarjan<Vertex<PTPlace>> tarjan = new SCCTarjan<>();
-		Components = tarjan.execute(this);
+		coms = tarjan.execute(this); // 强连通分量
+		
+		// 构造this.Components成员
+		Iterator<Set<Vertex<PTPlace>>> it = coms.iterator();
+		while(it.hasNext()) {
+			Component com = new Component();
+			com.vertexes = it.next();
+			this.Components.add(com);
+		}
+		for (REdge edge: getEdges()) {
+			Vertex<PTPlace> s = edge.getSource();
+			Vertex<PTPlace> t = edge.getTarget();
+			for(Component com: this.Components) {
+				if (com.vertexes.contains(s) && com.vertexes.contains(t)) {
+					com.edges.add(edge.getName());
+				}
+			}
+		}
+		for (REdge edge: parallelEdges) { // 平行边
+			Vertex<PTPlace> s = edge.getSource();
+			Vertex<PTPlace> t = edge.getTarget();
+			for(Component com: this.Components) {
+				if (com.vertexes.contains(s) && com.vertexes.contains(t)) {
+					com.edges.add(edge.getName());
+				}
+			}
+		}
 		
 		if (verbose) {
 			System.out.println("Strongly Connected Components:");
 			List<PTPlace> places = new ArrayList<>();
+			List<String> edges = new ArrayList<>();
 			PNNodeComparator comparator = new PNNodeComparator();
+			StringComparator stringComparator = new StringComparator();
 			int i = 1;
-			for (Set<Vertex<PTPlace>> vertices: Components) {
-				places.clear();
-				for (Vertex<PTPlace> v: vertices) {
+			for(Component com: this.Components) {
+				places.clear(); edges.clear();
+				for (Vertex<PTPlace> v: com.vertexes) {
 					places.add(v.getElement());
 				}
 				Collections.sort(places, comparator);
+				edges.addAll(com.edges);
+				Collections.sort(edges, stringComparator);
 				System.out.println("Component[" + i + "]: " + places);
+				System.out.println("edges: " + edges);
 				i++;
 			}
 		}
@@ -169,6 +211,17 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 			str.append(s+"\n");
 		}
 		return str.toString();
+	}
+	
+	/**
+	 * 每个强连通分量的顶点集和边集（包含平行边）
+	 * @author Jiangtao Duan
+	 *
+	 */
+	public class Component {
+		public Collection<String> edges = new HashSet<>();
+		// TODO: vertexes ==> SR
+		public Collection<Vertex<PTPlace>> vertexes = new HashSet<>();
 	}
 
 }
