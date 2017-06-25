@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -115,9 +114,9 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	}
 	
 	/**
-	 * 计算强连通块(内部可以有平行边)
+	 * 计算强连通块
 	 * @param verbose 是否打印输出
-	 * @return 资源有向图中的强连通块
+	 * @return 资源有向图中的强连通块（含平行边）
 	 */
 	public List<Component> getStronglyConnectedComponents(boolean verbose) {
 		if (this.Components != null) return Components;
@@ -128,24 +127,28 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 		coms = tarjan.execute(this); // 强连通分量
 		
 		// 构造this.Components成员
-		Iterator<Set<Vertex<PTPlace>>> it = coms.iterator();
-		while(it.hasNext()) {
+		// 顶点集
+		for (Set<Vertex<PTPlace>> vs: coms) {
 			Component com = new Component();
-			com.vertexes = it.next();
+			for (Vertex<PTPlace> v: vs) {
+				com.vertexes.add(v.getElement());
+			}
 			this.Components.add(com);
 		}
+		// 边集
 		for (REdge edge: getEdges()) {
-			Vertex<PTPlace> s = edge.getSource();
-			Vertex<PTPlace> t = edge.getTarget();
+			PTPlace s = edge.getSource().getElement();
+			PTPlace t = edge.getTarget().getElement();
 			for(Component com: this.Components) {
 				if (com.vertexes.contains(s) && com.vertexes.contains(t)) {
 					com.edges.add(edge.getName());
 				}
 			}
 		}
-		for (REdge edge: parallelEdges) { // 平行边
-			Vertex<PTPlace> s = edge.getSource();
-			Vertex<PTPlace> t = edge.getTarget();
+		// 平行边
+		for (REdge edge: parallelEdges) { 
+			PTPlace s = edge.getSource().getElement();
+			PTPlace t = edge.getTarget().getElement();
 			for(Component com: this.Components) {
 				if (com.vertexes.contains(s) && com.vertexes.contains(t)) {
 					com.edges.add(edge.getName());
@@ -162,14 +165,12 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 			int i = 1;
 			for(Component com: this.Components) {
 				places.clear(); edges.clear();
-				for (Vertex<PTPlace> v: com.vertexes) {
-					places.add(v.getElement());
-				}
+				places.addAll(com.vertexes);
 				Collections.sort(places, comparator);
 				edges.addAll(com.edges);
 				Collections.sort(edges, stringComparator);
 				System.out.println("Component[" + i + "]: " + places);
-				System.out.println("edges: " + edges);
+				System.out.println("Edges: " + edges);
 				i++;
 			}
 		}
@@ -219,9 +220,10 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	 *
 	 */
 	public class Component {
+		/** 边的名字集合(含平行边) */
 		public Collection<String> edges = new HashSet<>();
-		// TODO: vertexes ==> SR
-		public Collection<Vertex<PTPlace>> vertexes = new HashSet<>();
+		/** 顶点集合  */
+		public Collection<PTPlace> vertexes = new HashSet<>();
 	}
 
 }

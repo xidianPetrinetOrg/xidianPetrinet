@@ -11,8 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import de.invation.code.toval.types.HashList;
-import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
@@ -507,36 +505,46 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * 计算严格极小信标
+	 * <pre>
+	 * 计算严格极小信标（SMS）
+	 * Wang p91, 定理4.7： 设N是一个LS3PR网，D0[Ω] = (Ω,E)
+	 * 信标的补集：式（4-7） [S] = {p | {p}=(t的前置集) ∩ PA ∧ e<sub>t</sub> ∈ E}
+	 * 其中：PA是工序库所集合
+	 * 信标：式（4-2） S = ‖Is‖ \ [S]
+	 * 其中：Is = ∑<sub>r∈SR</sub>Ir. SR是S中资源库所集合，SR = Ω;
+	 * Is由getIs(SR)函数求取。
+	 * 定理4.9：D0[Ω]=(V,E)是D0的Ω导出子图，S是D0[Ω]对应的信标。S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
+	 * </pre>
 	 * @param verbose 是否打印输出
 	 */
 	@SuppressWarnings({ "rawtypes" })
 	public void SMS(boolean verbose) {
+		// 获取资源有向图
 		getRgraph(verbose);
+		// 计算强连通分量
 		List<Component> components = Rgraph.getStronglyConnectedComponents(verbose);
 		
-		Collection<PTPlace> Scom = new HashSet<>();
-		Collection<PTPlace> SR = new HashSet<>();
+		// 每个强连通分量对应一个信标补集和信标
+		Collection<PTPlace> Scom = new HashSet<>();  // 信标补集
 		Collection<PTPlace> intersection = new HashSet<>();
 		for (Component com: components) {
+			int num = com.vertexes.size();
+			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
+		
 			Scom.clear(); intersection.clear();
-			SR.clear();
 			for (String t: com.edges) {
 				for(AbstractPNNode p: getTransition(t).getParents()) {
 					intersection.add((PTPlace) p);
 				}
 				intersection.retainAll(PA);  
-				Scom.addAll(intersection);  // wang (4-7)
+				Scom.addAll(intersection);  // wang (4-7)，信标补集
 			}
-			
-			for (Vertex<PTPlace> v: com.vertexes) {
-				SR.add(v.getElement());
-			}
-			Collection<PTPlace> Is = getIs(SR);
+			// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
+			Collection<PTPlace> Is = getIs(com.vertexes);
+			Is.removeAll(Scom); // wang (4-2)，信标
 			
 			printPNNodes("Wang, (4-7) Scom:", Scom);
-			Is.removeAll(Scom);
-			printPNNodes("Wang, (4-2) S:", Is);
+			printPNNodes("Wang, (4-2) S:", Is); 
 		}	
 	}
 		
