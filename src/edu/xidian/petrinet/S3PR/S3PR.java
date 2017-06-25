@@ -524,7 +524,7 @@ public class S3PR extends S2PR {
 		// 计算强连通分量
 		List<Component> components = Rgraph.getStronglyConnectedComponents(verbose);
 		
-		// 每个强连通分量对应一个信标补集和信标
+		// 每个强连通分量对应一个信标补集和信标,边集是变迁的名字，顶点集是SR
 		Collection<PTPlace> Scom = new HashSet<>();  // 信标补集
 		Collection<PTPlace> intersection = new HashSet<>();
 		for (Component com: components) {
