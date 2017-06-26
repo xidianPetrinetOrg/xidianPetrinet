@@ -514,11 +514,18 @@ public class S3PR extends S2PR {
 	 * 其中：Is = ∑<sub>r∈SR</sub>Ir. SR是S中资源库所集合，SR = Ω;
 	 * Is由getIs(SR)函数求取。
 	 * 定理4.9：D0[Ω]=(V,E)是D0的Ω导出子图，S是D0[Ω]对应的信标。S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
+	 * 定理4.11：C-矩阵中的非全0列数α是由D0中的所有强分图-D0<sup>1</sup>,D0<sup>2</sup>,...,D0<sup>k</sup>共同确定的，且满足以下关系式：
+	 * α = ∑|E(D0<sup>i</sup>)|,i=1,2,...k
+	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
+	 * 算法4.1：删除0点法（确定α）
+	 * 算法4.2：删除1点法（确定δ）
 	 * </pre>
 	 * @param verbose 是否打印输出
 	 */
 	@SuppressWarnings({ "rawtypes" })
 	public void SMS(boolean verbose) {
+		// 矩阵[C]中的非全0列数α
+		int alpha = 0;
 		// 获取资源有向图
 		getRgraph(verbose);
 		// 计算强连通分量
@@ -530,6 +537,7 @@ public class S3PR extends S2PR {
 		for (Component com: components) {
 			int num = com.vertexes.size();
 			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
+			if (num <= 1) continue; // 非SMS 
 		
 			Scom.clear(); intersection.clear();
 			for (String t: com.edges) {
@@ -544,8 +552,10 @@ public class S3PR extends S2PR {
 			Is.removeAll(Scom); // wang (4-2)，信标
 			
 			printPNNodes("Wang, (4-7) Scom:", Scom);
-			printPNNodes("Wang, (4-2) S:", Is); 
-		}	
+			printPNNodes("Wang, (4-2) S:", Is);
+			alpha += com.edges.size();
+		}
+		System.out.println("alpha = " + alpha);
 	}
 		
 	/**
