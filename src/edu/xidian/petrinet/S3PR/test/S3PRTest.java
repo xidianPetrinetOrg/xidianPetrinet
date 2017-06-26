@@ -904,7 +904,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#getRgraph()}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	@Test
+	//@Test
 	public void WangFigure4_1() {
 		S3PR s3pr = getWangFigure4_1();
 		// 资源有向图
@@ -919,13 +919,33 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#SMS(boolean)}.
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_1(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	// @Test
-	public void WangFigure4_1SMS() {
+	//@Test
+	public void algorithm4_1() {
 		S3PR s3pr = getWangFigure4_1();
-		s3pr.SMS(true);
+		s3pr.algorithm4_1(true);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_1Graph(boolean)}.
+	 * Wang, p86,图4-1,对应的S3PR
+	 */
+	@Test
+	public void algorithm4_1Graph() {
+		S3PR s3pr = getWangFigure4_1();
+		s3pr.algorithm4_1Graph(true);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_2(boolean)}.
+	 * Wang, p86,图4-1,对应的S3PR
+	 */
+	//@Test
+	public void algorithm4_2() {
+		S3PR s3pr = getWangFigure4_1();
+		s3pr.algorithm4_2(true);
 	}
 	
 	/**

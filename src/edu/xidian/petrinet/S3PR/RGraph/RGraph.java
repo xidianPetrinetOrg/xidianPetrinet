@@ -175,8 +175,9 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 		
 		// 构造连通分量的RGraph元素
 		// 顶点集
+		int i = 1;
 		for (Set<Vertex<PTPlace>> vs: coms) {
-			RGraph com = new RGraph();
+			RGraph com = new RGraph("ComponentGraph(" + i + ")");
 			for (Vertex<PTPlace> v: vs) {
 				com.addVertex(v.getName(),v.getElement());
 			}
@@ -203,11 +204,12 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 			}
 				
 			ComGraphs.add(com);
+			i++;
 		}
 		
 		if (verbose) {
 			System.out.println("Strongly Connected Components:");
-			int i = 1;
+			i = 1;
 			for(RGraph com: ComGraphs) {
 				System.out.println("Component[" + i + "]: " + com);
 				i++;
