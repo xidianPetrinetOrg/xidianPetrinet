@@ -592,7 +592,7 @@ public class S3PR extends S2PR {
 			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
 			if (num <= 1) continue; // 非SMS,至少资源库所个数>=2 
 		
-			SandSCom(com,S,SCom);			
+			Siphon_Com(com,S,SCom);			
 			printPNNodes("Wang, (4-2) S:   ", S);
 			printPNNodes("Wang, (4-7) SCom:", SCom);
 			
@@ -633,7 +633,7 @@ public class S3PR extends S2PR {
 			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
 			if (num <= 1) continue; //  非SMS,至少资源库所个数>=2 
 
-			SandSCom(com, S, SCom);
+			Siphon_Com(com, S, SCom);
 			printPNNodes("Wang, (4-2) S:   ", S);
 			printPNNodes("Wang, (4-7) SCom:", SCom);
 		}
@@ -646,7 +646,7 @@ public class S3PR extends S2PR {
 	 * @param SCom 返回信标的补集
 	 */
 	@SuppressWarnings("rawtypes")
-	public void SandSCom(RGraph component, Collection<PTPlace> S, Collection<PTPlace> SCom) {		 
+	public void Siphon_Com(RGraph component, Collection<PTPlace> S, Collection<PTPlace> SCom) {		 
 		int num = component.getVertexCount();
 		if (num <= 1) return; // 非SMS,至少资源库所个数>=2 
 	
