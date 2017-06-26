@@ -462,6 +462,7 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * 获取该网的资源有向图
+	 * Wang. p88, 定理4.4 初始资源有向图D0 = （V0，E0）
 	 * @param verbose 是否打印输出
 	 * @return
 	 */
@@ -481,7 +482,6 @@ public class S3PR extends S2PR {
 				transitions.addAll(prePr_j);
 				transitions.retainAll(postPr_i);
 				if (!transitions.isEmpty()) {
-					//if (transitions.size() != 1) throw new Exception("非预设值，含有多边！" + transitions);
 					for (AbstractPNNode<PTFlowRelation> t: transitions) {
 						// Rgraph.addVertex(pr_i.getName()); // 使用此函数，在graph中无vertex对象
 						Rgraph.addVertex(pr_i.getName(),pr_i);
@@ -492,7 +492,6 @@ public class S3PR extends S2PR {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						//break; // 仅有一条边
 					}
 				}
 			}
@@ -529,7 +528,7 @@ public class S3PR extends S2PR {
 		// 获取资源有向图
 		getRgraph(verbose);
 		// 计算强连通分量
-		List<Component> components = Rgraph.getStronglyConnectedComponents(verbose);
+		Collection<Component> components = Rgraph.getStronglyConnectedComponents(verbose);
 		
 		// 每个强连通分量对应一个信标补集和信标,边集是变迁的名字，顶点集是SR
 		Collection<PTPlace> Scom = new HashSet<>();  // 信标补集

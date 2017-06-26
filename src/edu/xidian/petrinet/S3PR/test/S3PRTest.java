@@ -904,21 +904,25 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#getRgraph()}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	//@Test
+	@Test
 	public void WangFigure4_1() {
 		S3PR s3pr = getWangFigure4_1();
 		// 资源有向图
 		RGraph rGraph = s3pr.getRgraph(true);
 		// 强连通块
 		@SuppressWarnings("unused")
-		List<Component> Components = rGraph.getStronglyConnectedComponents(true);
+		Collection<Component> Components = rGraph.getStronglyConnectedComponents(true);
+		
+		System.out.println("==========================");
+		@SuppressWarnings("unused")
+		Collection<RGraph> Components1 = rGraph.getStronglyConnectedComponentGraphs(true);
 	}
 	
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#SMS(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	@Test
+	// @Test
 	public void WangFigure4_1SMS() {
 		S3PR s3pr = getWangFigure4_1();
 		s3pr.SMS(true);
