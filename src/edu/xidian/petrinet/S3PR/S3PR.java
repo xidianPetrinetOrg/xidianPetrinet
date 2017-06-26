@@ -522,8 +522,8 @@ public class S3PR extends S2PR {
 	 * @param verbose 是否打印输出
 	 */
 	@SuppressWarnings({ "rawtypes" })
-	public void SMS(boolean verbose) {
-		// 矩阵[C]中的非全0列数α
+	public void algorithm4_1(boolean verbose) {
+		// C-矩阵中的非全0列数α
 		int alpha = 0;
 		// 获取资源有向图
 		getRgraph(verbose);
@@ -557,48 +557,6 @@ public class S3PR extends S2PR {
 		System.out.println("alpha = " + alpha);
 	}
 		
-	/**
-	 * 计算严格极小信标
-	 * @param verbose 是否打印输出
-	 */
-//	@SuppressWarnings({ "rawtypes", "unchecked" })
-//	public void SMS3(boolean verbose) {
-//		// 资源有向图
-//		RGraph rGraph = getRgraph(verbose);
-//		// 强连通块
-//		Set<Set<Vertex<PTPlace>>> Components = rGraph.getStronglyConnectedComponents(verbose);
-//		
-//		Collection<PTPlace> omega = new HashList<>();  // omega = SR,即信标中资源库所的集合
-//		for (Set<Vertex<PTPlace>> vertices: Components) {
-//			omega.clear();
-//			for (Vertex<PTPlace> v: vertices) {
-//				omega.add(v.getElement());
-//			}
-//			Collection<PTPlace> hrs = getHr(omega);
-//			printPNNodes("omega:", omega);
-//			printPNNodes("hrs:", hrs);
-//			
-//			Collection<PTPlace> sms = new HashList<>();
-//			
-//			for (PTPlace p: hrs) {
-//				Collection<PTPlace> p0_pa = new HashList<>(P0);
-//				p0_pa.addAll(PA);
-//				Collection<PTPlace> prePreSet = new HashList<>();
-//				Collection<AbstractPNNode<PTFlowRelation>> nodes = p.getParents();
-//				for (AbstractPNNode node: nodes) {
-//					prePreSet.addAll(node.getParents()); 
-//				}
-//				prePreSet.retainAll(p0_pa);
-//				
-//				if (!prePreSet.contains(p)) {
-//					sms.add(p);
-//				}
-//			}
-//			
-//			printPNNodes("sms:", sms);
-//			
-//		}
-//	}
 	
 	@Override
 	public String toString(){
