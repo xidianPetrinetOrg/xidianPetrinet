@@ -109,9 +109,11 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	
 	/**
 	 * 计算强连通块
+	 * 强联通分量也是一个RGraph，因此该函数被废弃，替代函数：getStronglyConnectedComponentGraphs()
 	 * @param verbose 是否打印输出
 	 * @return 资源有向图中的强连通块（含平行边）集合
 	 */
+	@Deprecated
 	public Collection<Component> getStronglyConnectedComponents(boolean verbose) {	
 		
 		Collection<Component> Components = new HashSet<>();
@@ -257,9 +259,11 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	
 	/**
 	 * 每个强连通分量的顶点集和边集（包含平行边）
+	 * 强联通分量也是一个RGraph，因此该类被废弃
 	 * @author Jiangtao Duan
 	 *
 	 */
+	@Deprecated
 	public class Component {
 		/** 边的名字集合(含平行边) */
 		public Collection<String> edges = new HashSet<>();
