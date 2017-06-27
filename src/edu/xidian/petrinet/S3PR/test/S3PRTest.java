@@ -19,14 +19,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S3PR.S2PR;
 import edu.xidian.petrinet.S3PR.S3PR;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
-import edu.xidian.petrinet.S3PR.RGraph.RGraph.Component;
 
 /**
  * @author Administrator
@@ -909,13 +907,11 @@ public class S3PRTest {
 		S3PR s3pr = getWangFigure4_1();
 		// 资源有向图
 		RGraph rGraph = s3pr.getRgraph(true);
-		// 强连通块
-		@SuppressWarnings("unused")
-		Collection<Component> Components = rGraph.getStronglyConnectedComponents(true);
 		
 		System.out.println("==========================");
-		@SuppressWarnings("unused")
 		Collection<RGraph> Components1 = rGraph.getStronglyConnectedComponentGraphs(true);
+		//Collection<RGraph> Components1 = rGraph.getStronglyConnectedComponentGraphs(false);
+		System.out.println(Components1);
 	}
 	
 	/**
@@ -925,27 +921,39 @@ public class S3PRTest {
 	//@Test
 	public void algorithm4_1() {
 		S3PR s3pr = getWangFigure4_1();
-		s3pr.algorithm4_1(true);
-	}
-	
-	/**
-	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_1Graph(boolean)}.
-	 * Wang, p86,图4-1,对应的S3PR
-	 */
-	@Test
-	public void algorithm4_1Graph() {
-		S3PR s3pr = getWangFigure4_1();
-		s3pr.algorithm4_1Graph(true);
+		//s3pr.algorithm4_1(true);
+		s3pr.algorithm4_1(false);
+		int i = 1;
+		for (Collection<PTPlace> s: s3pr.getSiphons()) {
+			s3pr.printPNNodes("s[" + i + "] = ", s);
+			i++;
+		}
+		i = 1;
+		for (Collection<PTPlace> s: s3pr.getSiphonComs()) {
+			s3pr.printPNNodes("SCom[" + i + "] = ", s);
+			i++;
+		}
 	}
 	
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_2(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	//@Test
+	@Test
 	public void algorithm4_2() {
 		S3PR s3pr = getWangFigure4_1();
 		s3pr.algorithm4_2(true);
+//		s3pr.algorithm4_2(false);
+//		int i = 1;
+//		for (Collection<PTPlace> s: s3pr.getSiphons()) {
+//			s3pr.printPNNodes("s[" + i + "] = ", s);
+//			i++;
+//		}
+//		i = 1;
+//		for (Collection<PTPlace> s: s3pr.getSiphonComs()) {
+//			s3pr.printPNNodes("SCom[" + i + "] = ", s);
+//			i++;
+//		}
 	}
 	
 	/**

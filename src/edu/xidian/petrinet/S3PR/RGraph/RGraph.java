@@ -28,6 +28,7 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	 * 记录平行边
 	 */
 	protected final Collection<REdge> parallelEdges = new HashSet<>();
+	//protected final List<REdge> parallelEdges = new HashList<>();
 	
 	public RGraph(){
 		super();
@@ -35,6 +36,29 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	
 	public RGraph(String name) throws ParameterException{
 		super(name);
+	}
+	
+	@Override
+	public RGraph clone(){
+		RGraph cloneGraph = new RGraph();
+		// clone Vertexes
+		for (Vertex<PTPlace> v: getVertices()) {
+			cloneGraph.addVertex(v.getName(), v.getElement());	
+		}
+		
+		// clone edges, 包含平行边
+		Collection<REdge> edges = new HashSet<>(getEdges());
+		edges.addAll(getParallelEdges());
+		for (REdge edge: edges) {
+			try {
+				cloneGraph.addREdge(edge.getName(), edge.getSource().getName(), edge.getTarget().getName());
+			} catch (VertexNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return cloneGraph;
 	}
 	
 	@Override
@@ -105,62 +129,6 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 	 */
 	public Collection<REdge> getParallelEdges() {
 		return parallelEdges;
-	}
-	
-	/**
-	 * 计算强连通块
-	 * 强联通分量也是一个RGraph，因此该函数被废弃，替代函数：getStronglyConnectedComponentGraphs()
-	 * @param verbose 是否打印输出
-	 * @return 资源有向图中的强连通块（含平行边）集合
-	 */
-	@Deprecated
-	public Collection<Component> getStronglyConnectedComponents(boolean verbose) {	
-		
-		Collection<Component> Components = new HashSet<>();
-		
-		Set<Set<Vertex<PTPlace>>> coms = null;
-		SCCTarjan<Vertex<PTPlace>> tarjan = new SCCTarjan<>();
-		coms = tarjan.execute(this); // 强连通分量
-		
-		// 构造this.Components成员
-		// 顶点集
-		for (Set<Vertex<PTPlace>> vs: coms) {
-			Component com = new Component();
-			for (Vertex<PTPlace> v: vs) {
-				com.vertexes.add(v.getElement());
-			}
-			Components.add(com);
-		}
-		// 边集
-		for (REdge edge: this.getEdges()) {
-			PTPlace s = edge.getSource().getElement();
-			PTPlace t = edge.getTarget().getElement();
-			for(Component com: Components) {
-				if (com.vertexes.contains(s) && com.vertexes.contains(t)) {
-					com.edges.add(edge.getName());
-				}
-			}
-		}
-		// 平行边
-		for (REdge edge: parallelEdges) { 
-			PTPlace s = edge.getSource().getElement();
-			PTPlace t = edge.getTarget().getElement();
-			for(Component com: Components) {
-				if (com.vertexes.contains(s) && com.vertexes.contains(t)) {
-					com.edges.add(edge.getName());
-				}
-			}
-		}
-		
-		if (verbose) {
-			System.out.println("Strongly Connected Components:");
-			int i = 1;
-			for(Component com: Components) {
-				System.out.println("Component[" + i + "]: " + com);
-				i++;
-			}
-		}
-		return Components;
 	}
 	
 	/**
@@ -255,30 +223,6 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 			str.append(s+"\n");
 		}
 		return str.toString();
-	}
-	
-	/**
-	 * 每个强连通分量的顶点集和边集（包含平行边）
-	 * 强联通分量也是一个RGraph，因此该类被废弃
-	 * @author Jiangtao Duan
-	 *
-	 */
-	@Deprecated
-	public class Component {
-		/** 边的名字集合(含平行边) */
-		public Collection<String> edges = new HashSet<>();
-		/** 顶点集合  */
-		public Collection<PTPlace> vertexes = new HashSet<>();
-		
-		@Override
-		public String toString() {
-			List<PTPlace> ps = new ArrayList<>(vertexes);
-			List<String> es = new ArrayList<>(edges);
-			Collections.sort(ps,new PNNodeComparator());
-			Collections.sort(es,new StringComparator());
-			return "[vertexes=" + vertexes + "]\n" + 
-			       "[edges=" + edges + "]";
-		}
 	}
 
 }

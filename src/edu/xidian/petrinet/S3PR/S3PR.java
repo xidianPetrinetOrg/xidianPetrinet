@@ -19,7 +19,6 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 import edu.xidian.petrinet.S3PR.RGraph.REdge;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
-import edu.xidian.petrinet.S3PR.RGraph.RGraph.Component;
 import edu.xidian.petrinet.Utils.PNNodeComparator;
 
 /**
@@ -64,6 +63,17 @@ public class S3PR extends S2PR {
      * 该网对应的资源有向图
      */
     protected final RGraph Rgraph = new RGraph("Resource Directed Graph");
+    
+    /**
+     * 信标集合，为了与补集对应，必须是有序列表
+     */
+    protected final List<Collection<PTPlace>> Siphons = new ArrayList<>();
+    
+    /**
+     * 信标的补集集合，为了与信标对应，必须是有序列表
+     */
+    protected final List<Collection<PTPlace>> SiphonComs = new ArrayList<>();
+
 
 	/**
 	 * 
@@ -504,59 +514,6 @@ public class S3PR extends S2PR {
 		return Rgraph;
 	}
 	
-	/**
-	 * <pre>
-	 * 计算严格极小信标（SMS）
-	 * Wang p91, 定理4.7： 设N是一个LS3PR网，D0[Ω] = (Ω,E)
-	 * 信标的补集：式（4-7） [S] = {p | {p}=(t的前置集) ∩ PA ∧ e<sub>t</sub> ∈ E}
-	 * 其中：PA是工序库所集合
-	 * 信标：式（4-2） S = ‖Is‖ \ [S]
-	 * 其中：Is = ∑<sub>r∈SR</sub>Ir. SR是S中资源库所集合，SR = Ω;
-	 * Is由getIs(SR)函数求取。
-	 * 定理4.9：D0[Ω]=(V,E)是D0的Ω导出子图，S是D0[Ω]对应的信标。S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
-	 * 定理4.11：C-矩阵中的非全0列数α是由D0中的所有强分图-D0<sup>1</sup>,D0<sup>2</sup>,...,D0<sup>k</sup>共同确定的，且满足以下关系式：
-	 * α = ∑|E(D0<sup>i</sup>)|,i=1,2,...k
-	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
-	 * 算法4.1：删除0点法（确定α）
-	 * 算法4.2：删除1点法（确定δ）
-	 * </pre>
-	 * @param verbose 是否打印输出
-	 */
-	@SuppressWarnings({ "rawtypes" })
-	public void algorithm4_1(boolean verbose) {
-		// C-矩阵中的非全0列数α
-		int alpha = 0;
-		// 获取资源有向图
-		getRgraph(verbose);
-		// 计算强连通分量
-		Collection<Component> components = Rgraph.getStronglyConnectedComponents(verbose);
-		
-		// 每个强连通分量对应一个信标补集和信标,边集是变迁的名字，顶点集是SR
-		Collection<PTPlace> Scom = new HashSet<>();  // 信标补集
-		Collection<PTPlace> intersection = new HashSet<>();
-		for (Component com: components) {
-			int num = com.vertexes.size();
-			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
-			if (num <= 1) continue; //  非SMS,至少资源库所个数>=2 
-		
-			Scom.clear(); intersection.clear();
-			for (String t: com.edges) {
-				for(AbstractPNNode p: getTransition(t).getParents()) {
-					intersection.add((PTPlace) p);
-				}
-				intersection.retainAll(PA);  
-				Scom.addAll(intersection);  // wang (4-7)，信标补集
-			}
-			// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
-			Collection<PTPlace> Is = getIs(com.vertexes);
-			Is.removeAll(Scom); // wang (4-2)，信标
-			
-			printPNNodes("Wang, (4-7) Scom:", Scom);
-			printPNNodes("Wang, (4-2) S:", Is);
-			alpha += com.edges.size();
-		}
-		System.out.println("alpha = " + alpha);
-	}
 	
 	/**
 	 * <pre>
@@ -576,7 +533,7 @@ public class S3PR extends S2PR {
 	 * </pre>
 	 * @param verbose 是否打印输出
 	 */
-	public void algorithm4_1Graph(boolean verbose) {
+	public void algorithm4_1(boolean verbose) {
 		// C-矩阵中的非全0列数α
 		int alpha = 0;
 		// 获取资源有向图
@@ -587,18 +544,19 @@ public class S3PR extends S2PR {
 		for (RGraph com: components) {
 			Collection<PTPlace> S = new HashSet<>();  // 信标
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
-			
-			int num = com.getVertexCount();
-			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
-			if (num <= 1) continue; // 非SMS,至少资源库所个数>=2 
-		
-			Siphon_Com(com,S,SCom);			
-			printPNNodes("Wang, (4-2) S:   ", S);
-			printPNNodes("Wang, (4-7) SCom:", SCom);
-			
-			alpha += com.getEdgeCount() + com.getParallelEdges().size();
+			if (Siphon_Com(com,S,SCom)) {
+				Siphons.add(S);
+				SiphonComs.add(SCom);
+				if (verbose) {
+					printPNNodes("Siphon:      ", S);
+					printPNNodes("SiphonCom:   ", SCom);
+				}
+				alpha += com.getEdgeCount() + com.getParallelEdges().size();
+			}
 		}
-		System.out.println("alpha = " + alpha);
+		if (verbose) {
+			System.out.println("alpha = " + alpha);
+		}
 	}
 	
 	/**
@@ -620,23 +578,63 @@ public class S3PR extends S2PR {
 	 * @param verbose 是否打印输出
 	 */
 	public void algorithm4_2(boolean verbose) {
-		// 获取资源有向图
-		getRgraph(verbose);
-		// 计算强连通分量
-		Collection<RGraph> components = Rgraph.getStronglyConnectedComponentGraphs(verbose);
-
+		// 算法4.1：删除0点法（确定α）
+		System.out.println(" 算法4.1：删除0点法（确定α）");
+		Collection<RGraph> components = Component(getRgraph(verbose),verbose);
+		
+		// 算法4.2：删除1点法（确定δ）
+		System.out.println(" 算法4.2：删除1点法（确定δ）");
+		for (RGraph com : components) {
+			if (com.getVertexCount() >= 2) {
+				for (String v: com.getVertexNames()) {
+					RGraph cloneCom = com.clone();
+					try {
+						cloneCom.removeVertex(v); // 删除1点
+						Component(cloneCom,verbose);
+					} catch (VertexNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		if (verbose) {
+			System.out.println("=======================");
+			int i = 1;
+			for (Collection<PTPlace> siphon: Siphons) {
+				printPNNodes("Siphons[" + i + "]    = ", siphon);
+				i++;
+			}
+			i = 1;
+			for (Collection<PTPlace> siphonCom: SiphonComs) {
+				printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
+				i++;
+			}
+		}
+	}
+	
+	/**
+	 * 计算资源有向图或他的强联通分量的信标及其补集
+	 * @param component 资源有向图或他的强联通分量
+	 * @param verbose 是否打印输出
+	 * @return 强联通分量
+	 */
+	protected Collection<RGraph> Component(RGraph component, boolean verbose) {
+		Collection<RGraph> components = component.getStronglyConnectedComponentGraphs(verbose);
 		for (RGraph com : components) {
 			Collection<PTPlace> S = new HashSet<>(); // 信标
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
-
-			int num = com.getVertexCount();
-			System.out.println("|Ω| = " + num); // S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
-			if (num <= 1) continue; //  非SMS,至少资源库所个数>=2 
-
-			Siphon_Com(com, S, SCom);
-			printPNNodes("Wang, (4-2) S:   ", S);
-			printPNNodes("Wang, (4-7) SCom:", SCom);
+			if (Siphon_Com(com, S, SCom)) {
+				Siphons.add(S);
+				SiphonComs.add(SCom);
+				if (verbose) {
+					printPNNodes("Siphon:      ", S);
+					printPNNodes("SiphonCom:   ", SCom);
+				}
+			}
 		}
+		return components;
 	}
 
 	/**
@@ -644,11 +642,12 @@ public class S3PR extends S2PR {
 	 * @param component 强连通分量
 	 * @param S 返回信标
 	 * @param SCom 返回信标的补集
+	 * @return true: 有信标及其补集; false：无，强连通分量的的顶点个数<2
 	 */
 	@SuppressWarnings("rawtypes")
-	public void Siphon_Com(RGraph component, Collection<PTPlace> S, Collection<PTPlace> SCom) {		 
+	protected boolean Siphon_Com(RGraph component, Collection<PTPlace> S, Collection<PTPlace> SCom) {		 
 		int num = component.getVertexCount();
-		if (num <= 1) return; // 非SMS,至少资源库所个数>=2 
+		if (num < 2) return false; // 非SMS,至少资源库所个数>=2 
 	
 		Collection<PTPlace> intersection = new HashSet<>();
 		// 边集，包含平行边
@@ -665,9 +664,25 @@ public class S3PR extends S2PR {
 		Collection<PTPlace> Is = getIs(component.getElementSet());
 		S.addAll(Is);
 		S.removeAll(SCom); // wang (4-2)，信标
+		return true;
 	}
 		
-	
+	/**
+	 * 信标集合
+	 * @return
+	 */
+	public List<Collection<PTPlace>> getSiphons() {
+		return Siphons;
+	}
+
+	/**
+	 * 信标的补集集合
+	 * @return
+	 */
+	public List<Collection<PTPlace>> getSiphonComs() {
+		return SiphonComs;
+	}
+
 	@Override
 	public String toString(){
 		StringBuilder str = new StringBuilder();
