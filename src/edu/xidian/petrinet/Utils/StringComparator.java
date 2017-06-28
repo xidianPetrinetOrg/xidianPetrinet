@@ -15,7 +15,7 @@ public class StringComparator implements Comparator<String> {
 	}
 	
 	/**
-	 * '['以前的字符串转int，例如："p20[20]" ==> 20 
+	 * '['以前的字符串转int，例如："p20[p20]" ==> 20 
 	 * @param s
 	 * @return
 	 */

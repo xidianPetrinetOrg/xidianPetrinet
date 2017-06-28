@@ -19,7 +19,7 @@ public class PNNodeComparator implements Comparator<AbstractPNNode<?>> {
 	}
 	
 	/**
-	 * '['以前的字符串转int，例如："p20[20]" ==> 20 
+	 * '['以前的字符串转int，例如："p20[p20]" ==> 20 
 	 * @param s
 	 * @return
 	 */
@@ -28,7 +28,7 @@ public class PNNodeComparator implements Comparator<AbstractPNNode<?>> {
 		StringBuilder str = new StringBuilder(); 
         for(int i = 0; i<s.length(); i++){
         	c = s.charAt(i);
-        	if (c == '[') break;
+        	if (c == '[' || c == '(' || c == '\r' || c == '\n') break;
         	if (c >= '0' && c <= '9') str.append(c);
         }
         try {
