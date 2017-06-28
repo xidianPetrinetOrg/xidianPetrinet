@@ -697,9 +697,9 @@ public class InvariantMatrix extends Matrix {
     		
     		// 对于非0行，一定不等于0
 	    	//assert a[k][k] != 0; // pivot must not be 0
-    		if (a[k][k] == 0) { // 说明本行及其以下全为0，不用计算非0行数了。 秩就是k
-    		   return k;
-    		}
+//    		if (a[k][k] == 0) { // 说明本行及其以下全为0，不用计算非0行数了。 秩就是k
+//    		   return k;
+//    		}
     		
     		if (a[k][k] != 0 && k == maxCol) { // 不用计算非0行数了。 秩就是k
         	   return k;	
