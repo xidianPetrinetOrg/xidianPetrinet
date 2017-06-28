@@ -17,6 +17,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
+import edu.xidian.math.InvariantMatrix;
 import edu.xidian.petrinet.S3PR.RGraph.REdge;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
 import edu.xidian.petrinet.Utils.PNNodeComparator;
@@ -557,6 +558,14 @@ public class S3PR extends S2PR {
 		if (verbose) {
 			System.out.println("alpha = " + alpha);
 		}
+		InvariantMatrix Cmatrix = CMatrix();
+		Cmatrix.print(2, 0);
+		int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
+		//System.out.println("Cmatrix rank,alpha,delta = " + 
+		//  rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+		//Cmatrix.print(2, 0);
+		//Cmatrix.rank();
+		//Cmatrix.print(2, 0);
 	}
 	
 	/**
@@ -681,6 +690,107 @@ public class S3PR extends S2PR {
 	 */
 	public List<Collection<PTPlace>> getSiphonComs() {
 		return SiphonComs;
+	}
+	
+	/**
+	 * <pre>
+	 * 补集矩阵（C矩阵，[C]矩阵
+	 * Li. p44, 定义3.1  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
+	 * P-向量λs称为S的特征P-向量，当且仅当任意p∈S, λs(p) = 1, 否则λs(p) = 0。
+	 * 定义3.2  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
+	 * [N]<sup>T</sup>是Petri网关联矩阵[N]的转置。
+	 * η<sub>s</sub>=[N]<sup>T</sup>λs称为S的特征T-向量。
+	 * wang. p83, 定义4.3: 设N = 是一个S3PR网，Π是网N的严格极小信标集合，则称
+	 * [C]<sub>|Π|×|P|</sub>= [λs1|λs2|...]<sup>T</sup>
+	 * 是网N的严格极小信标的补集的特征P−向量矩阵，简称为补集矩阵，或C−矩阵，其中P = P0∪PA∪PR。
+	 * </pre>
+	 */
+	public InvariantMatrix CMatrix() {
+		int m,n; // 行，列，|Π|，|P|
+		m = SiphonComs.size(); 
+		n = getPlaceCount();
+		InvariantMatrix cmatrix = new InvariantMatrix(m,n);
+		int i = 0;
+		for(Collection<PTPlace> sCom: SiphonComs) {
+			for (PTPlace p: sCom) {
+				int lambda = toInt(p.getName().toString()) - 1; // toString()形成，如p20[p20]
+				cmatrix.set(i, lambda, 1);
+			}
+			i++;
+		}
+		return cmatrix;
+	}
+	
+	/**
+	 *  C-矩阵中的非全0列数α(alpha), C-矩阵中互不相同的非全0列的个数记作δ(delta),
+	 *  rank([C])<=δ<=α
+	 *  @return result[0],result[1],result[2]代表矩阵a的秩,alpha,delta;
+	 */
+	public int[] rank_alpha_delta(InvariantMatrix a) {
+		int result[] = new int[3];
+		result[0] = a.rank();
+		int m = a.getRowDimension();    
+		int n = a.getColumnDimension();
+		
+		// 全0列
+		int zeroColumn[] = new int[n];
+		for (int j = 0; j < n; j++) { zeroColumn[j] = 0; }
+		// 标记是否该列已经比较，并且是相同的列
+		int computedColumn[] = new int[n];
+		for (int j = 0; j < n; j++) { computedColumn[j] = 0; }
+		
+		result[1] = 0;  // alpha
+		for (int j = 0; j < n; j++) {
+			for (int i = 0; i < m; i++) {
+				if (a.get(i,j) != 0) {
+					result[1]++;
+					zeroColumn[j] = 1;
+					break;
+				}
+			}
+		}
+		
+		result[2] = result[1];  // delta初值 = alpha
+		for (int j = 0; j < n; j++) {
+			if (zeroColumn[j] == 0) continue;
+			if (computedColumn[j] == 1) continue;
+			for (int j1 = j + 1; j1 < n; j1++) {
+				if (zeroColumn[j1] == 0) continue;
+				boolean same = true;  // 相同列
+				for (int i = 0; i < m; i++) {
+					if (a.get(i,j) != a.get(i, j1)) {
+						same = false;
+						break;
+					}
+				}
+				System.out.println(j+","+j1);
+				if (same) { computedColumn[j1] = 1; result[2]--; }
+			}
+		}
+		System.out.println("---Cmatrix rank,alpha,delta = " + 
+				  result[0] + "," + result[1] + "," + result[2]);
+		return result;
+	}
+	
+	/**
+	 * '['以前的字符串转int，例如："p20[p20]" ==> 20 
+	 * @param s
+	 * @return
+	 */
+	private int toInt(String s) {
+		char c;
+		StringBuilder str = new StringBuilder(); 
+        for(int i = 0; i<s.length(); i++){
+        	c = s.charAt(i);
+        	if (c == '[' || c == '(' || c == '\r' || c == '\n') break;
+        	if (c >= '0' && c <= '9') str.append(c);
+        }
+        try {
+			return Integer.parseInt(str.toString());
+		} catch (NumberFormatException e) {
+			//e.printStackTrace();
+			return 0;
+		}
 	}
 
 	@Override
