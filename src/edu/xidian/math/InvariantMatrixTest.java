@@ -639,6 +639,9 @@ public class InvariantMatrixTest {
 		assertEquals(r,2);
 		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
 		
+		System.out.println("注意，经修改，求秩后，矩阵没有发生变化!");
+		m.print(4, 0);  
+		
 		///////////////////////////////////////
 		int incidence1[][] = {
 				{4, 3, -5, 6},

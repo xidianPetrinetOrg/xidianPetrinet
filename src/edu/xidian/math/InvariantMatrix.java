@@ -572,12 +572,18 @@ public class InvariantMatrix extends Matrix {
      * 0 0 2 * * * *   row=1  pivot=2;
      * 0 0 0 0 3 * *   row=2  pivot=4;
      */
-    public int rank(int a[][]) {
+    public int rank(int b[][]) {
     	int m,n,tmp;
     	int row,pivot;  // pivot所在的行和列
     	boolean pivotOk = false;
-    	m = a.length;     // row dimension
-    	n = a[0].length;  // column dimension
+    	m = b.length;     // row dimension
+    	n = b[0].length;  // column dimension
+    	
+    	// copy,函数内部对b的修改，不能影响到函数外
+    	int[][] a = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            System.arraycopy(b[i], 0, a[i], 0, n);
+        }
     	
     	// 最大迭代次数为m,n中的小者,即下面k的最大取值
     	int maxCol;
@@ -668,10 +674,16 @@ public class InvariantMatrix extends Matrix {
      * 0 0 2 * * * *   row=1  pivot=2;
      * 0 0 0 0 3 * *   row=2  pivot=4;
      */
-    public int rankE(int a[][]) {
+    public int rankE(int b[][]) {
     	int m,n,tmp;
-    	m = a.length;     // row dimension
-    	n = a[0].length;  // column dimension
+    	m = b.length;     // row dimension
+    	n = b[0].length;  // column dimension
+    	
+    	// copy,函数内部对b的修改，不能影响到函数外
+    	int[][] a = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            System.arraycopy(b[i], 0, a[i], 0, n);
+        }
     	
     	// 处理列数为m,n中的小者,即下面k的最大取值
     	int maxCol;
@@ -705,7 +717,7 @@ public class InvariantMatrix extends Matrix {
 	    		}
 	    	}
 	    	
-	    	//printArray(a);
+	    	printArray(a);
     	}
     	
     	// 计算不全为零的行数，秩
