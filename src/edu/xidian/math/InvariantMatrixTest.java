@@ -634,10 +634,10 @@ public class InvariantMatrixTest {
 		m.print(4, 0);
 		
 		int r;
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		System.out.println("注意，经修改，求秩后，矩阵没有发生变化!");
 		m.print(4, 0);  
@@ -651,10 +651,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence1);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence2[][] = {
@@ -665,10 +665,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence2);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence3[][] = {
@@ -679,10 +679,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence3);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence4[][] = {
@@ -692,10 +692,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence4);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,1);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence5[][] = {
@@ -706,10 +706,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence5);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence6[][] = {
@@ -721,10 +721,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence6);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence7[][] = {
@@ -736,10 +736,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence7);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence8[][] = {
@@ -751,10 +751,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence8);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,2);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence9[][] = {
@@ -769,10 +769,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence9);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,5);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence10[][] = {
@@ -784,10 +784,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence10);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence11[][] = {
@@ -799,10 +799,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence11);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence12[][] = {
@@ -817,10 +817,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence12);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,3);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 
 		///////////////////////////////////////
 		int incidence13[][] = {
@@ -835,10 +835,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence13);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,4);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 		
 		///////////////////////////////////////
 		int incidence14[][] = {
@@ -851,10 +851,10 @@ public class InvariantMatrixTest {
 		m = new InvariantMatrix(incidence14);
 		m.print(4, 0);
 		
-		r = m.rank(m);
+		r = m.rank();
 		System.out.println("rank=" + r);
 		assertEquals(r,4);
-		assertEquals(r,m.rankE(m));  // 测试rank()和rankE()两个函数的求秩一致
+		assertEquals(r,m.rankE());  // 测试rank()和rankE()两个函数的求秩一致
 	
 	}
 }

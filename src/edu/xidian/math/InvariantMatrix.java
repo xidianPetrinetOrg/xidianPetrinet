@@ -539,20 +539,20 @@ public class InvariantMatrix extends Matrix {
     }
     
     /**
-     * rank of this matrix,调用rank()
+     * rank of this matrix,调用rank(a[][])
      * 此函数速度优于rankE()
      */
-    public int rank(InvariantMatrix a) {
-    	int c[][] = a.getArray();
+    public int rank() {
+    	int c[][] = getArray();
     	return rank(c);
     }
     
     /**
-     * rank of this matrix,调用rankE()
+     * rank of this matrix,调用rankE(a[][])
      * 此函数速度慢于rank()
      */
-    public int rankE(InvariantMatrix a) {
-    	int c[][] = a.getArray();
+    public int rankE() {
+    	int c[][] = getArray();
     	return rankE(c);
     }
     
@@ -717,7 +717,7 @@ public class InvariantMatrix extends Matrix {
 	    		}
 	    	}
 	    	
-	    	printArray(a);
+	    	//printArray(a);
     	}
     	
     	// 计算不全为零的行数，秩
