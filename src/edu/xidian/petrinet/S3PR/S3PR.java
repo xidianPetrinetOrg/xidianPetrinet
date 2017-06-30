@@ -529,10 +529,11 @@ public class S3PR extends S2PR {
 	 * 定理4.11：C-矩阵中的非全0列数α是由D0中的所有强分图-D0<sup>1</sup>,D0<sup>2</sup>,...,D0<sup>k</sup>共同确定的，且满足以下关系式：
 	 * α = ∑|E(D0<sup>i</sup>)|,i=1,2,...k
 	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
-	 * <b>算法4.1：删除0点法（确定α）
-	 *    计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
-	 *    [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
+	 * 算法4.1：删除0点法（确定α）
 	 * 算法4.2：删除1点法（确定δ）
+	 * 
+	 *  计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
+	 *  [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
 	 * </pre>
 	 * @param verbose 是否打印输出
 	 */
@@ -585,6 +586,9 @@ public class S3PR extends S2PR {
 	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
 	 * 算法4.1：删除0点法（确定α）
 	 * 算法4.2：删除1点法（确定δ）
+	 * 
+	 *  计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
+	 *  [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
 	 * </pre>
 	 * @param verbose 是否打印输出
 	 */
@@ -596,7 +600,7 @@ public class S3PR extends S2PR {
 		// 算法4.2：删除1点法（确定δ）
 		System.out.println(" 算法4.2：删除1点法（确定δ）");
 		for (RGraph com : components) {
-			if (com.getVertexCount() >= 2) {
+			if (com.getVertexCount() > 2) {
 				for (String v: com.getVertexNames()) {
 					RGraph cloneCom = com.clone();
 					try {
@@ -622,6 +626,14 @@ public class S3PR extends S2PR {
 				printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
 				i++;
 			}
+			// 信标补集矩阵
+			InvariantMatrix Cmatrix = CMatrix();
+			int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
+			System.out.println("C-Matrix:");
+			Cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+				   rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+			
 		}
 	}
 	
