@@ -22,6 +22,7 @@ import org.junit.Test;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
+import edu.xidian.math.InvariantMatrix;
 import edu.xidian.petrinet.S3PR.S2PR;
 import edu.xidian.petrinet.S3PR.S3PR;
 import edu.xidian.petrinet.S3PR.RGraph.RGraph;
@@ -933,6 +934,13 @@ public class S3PRTest {
 			s3pr.printPNNodes("SCom[" + i + "] = ", s);
 			i++;
 		}
+		// 信标补集矩阵
+		InvariantMatrix Cmatrix = s3pr.CMatrix();
+		int rank_alpha_delta[] = s3pr.rank_alpha_delta(Cmatrix);
+		System.out.println("C-Matrix:");
+		Cmatrix.print(2, 0);
+		System.out.println("Cmatrix rank,alpha,delta = " + 
+					   rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 	}
 	
 	/**

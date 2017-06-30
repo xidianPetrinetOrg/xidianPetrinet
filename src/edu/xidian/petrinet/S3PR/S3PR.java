@@ -529,14 +529,16 @@ public class S3PR extends S2PR {
 	 * 定理4.11：C-矩阵中的非全0列数α是由D0中的所有强分图-D0<sup>1</sup>,D0<sup>2</sup>,...,D0<sup>k</sup>共同确定的，且满足以下关系式：
 	 * α = ∑|E(D0<sup>i</sup>)|,i=1,2,...k
 	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
-	 * 算法4.1：删除0点法（确定α）
+	 * <b>算法4.1：删除0点法（确定α）
+	 *    计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
+	 *    [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
 	 * 算法4.2：删除1点法（确定δ）
 	 * </pre>
 	 * @param verbose 是否打印输出
 	 */
 	public void algorithm4_1(boolean verbose) {
-		// C-矩阵中的非全0列数α
-		int alpha = 0;
+		// [C]-矩阵中的非全0列数α, 与rank_alpha_delta(Cmatrix)的返回值一致
+		// int alpha = 0;
 		// 获取资源有向图
 		getRgraph(verbose);
 		// 计算强连通分量
@@ -552,20 +554,20 @@ public class S3PR extends S2PR {
 					printPNNodes("Siphon:      ", S);
 					printPNNodes("SiphonCom:   ", SCom);
 				}
-				alpha += com.getEdgeCount() + com.getParallelEdges().size();
+				// [C]-矩阵中的非全0列数α, 与rank_alpha_delta(Cmatrix)的返回值一致
+				// alpha += com.getEdgeCount() + com.getParallelEdges().size();
 			}
 		}
+		
 		if (verbose) {
-			System.out.println("alpha = " + alpha);
+			// 信标补集矩阵
+			InvariantMatrix Cmatrix = CMatrix();
+			int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
+			System.out.println("C-Matrix:");
+			Cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+			   rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
-		InvariantMatrix Cmatrix = CMatrix();
-		Cmatrix.print(2, 0);
-		int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
-		//System.out.println("Cmatrix rank,alpha,delta = " + 
-		//  rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
-		//Cmatrix.print(2, 0);
-		//Cmatrix.rank();
-		//Cmatrix.print(2, 0);
 	}
 	
 	/**
@@ -702,7 +704,9 @@ public class S3PR extends S2PR {
 	 * η<sub>s</sub>=[N]<sup>T</sup>λs称为S的特征T-向量。
 	 * wang. p83, 定义4.3: 设N = 是一个S3PR网，Π是网N的严格极小信标集合，则称
 	 * [C]<sub>|Π|×|P|</sub>= [λs1|λs2|...]<sup>T</sup>
-	 * 是网N的严格极小信标的补集的特征P−向量矩阵，简称为补集矩阵，或C−矩阵，其中P = P0∪PA∪PR。
+	 * 是网N的严格极小信标的补集的特征P−向量矩阵，简称为补集矩阵，或[C]−矩阵，其中P = P0∪PA∪PR。
+	 * 
+	 * 根据algorithm4_1()或algorithm4_2计算所得的SiphonComs，生成[C]矩阵
 	 * </pre>
 	 */
 	public InvariantMatrix CMatrix() {
@@ -732,43 +736,41 @@ public class S3PR extends S2PR {
 		int m = a.getRowDimension();    
 		int n = a.getColumnDimension();
 		
-		// 全0列
+		// 标记全0列，不参与比较
 		int zeroColumn[] = new int[n];
 		for (int j = 0; j < n; j++) { zeroColumn[j] = 0; }
-		// 标记是否该列已经比较，并且是相同的列
-		int computedColumn[] = new int[n];
-		for (int j = 0; j < n; j++) { computedColumn[j] = 0; }
 		
-		result[1] = 0;  // alpha
+		// alpha
+		result[1] = 0;  
 		for (int j = 0; j < n; j++) {
 			for (int i = 0; i < m; i++) {
 				if (a.get(i,j) != 0) {
 					result[1]++;
-					zeroColumn[j] = 1;
+					zeroColumn[j] = 1;  // 置为非全0列
 					break;
 				}
 			}
 		}
 		
-		result[2] = result[1];  // delta初值 = alpha
+		// delta初值 = alpha
+		result[2] = result[1];  
 		for (int j = 0; j < n; j++) {
-			if (zeroColumn[j] == 0) continue;
-			if (computedColumn[j] == 1) continue;
+			if (zeroColumn[j] == 0) continue; // 全0列不参与比较
 			for (int j1 = j + 1; j1 < n; j1++) {
-				if (zeroColumn[j1] == 0) continue;
+				if (zeroColumn[j1] == 0) continue; // 全0列不参与比较
 				boolean same = true;  // 相同列
 				for (int i = 0; i < m; i++) {
 					if (a.get(i,j) != a.get(i, j1)) {
-						same = false;
+						same = false; // 非相同列
 						break;
 					}
 				}
-				System.out.println(j+","+j1);
-				if (same) { computedColumn[j1] = 1; result[2]--; }
+				if (same) { // 相同列
+					zeroColumn[j1] = 0;  // 标记为全0列，目的是下一次该列不作为j,参与上层循环再进行比较。
+					result[2]--;         // 相同列delta--
+				}  
 			}
 		}
-		System.out.println("---Cmatrix rank,alpha,delta = " + 
-				  result[0] + "," + result[1] + "," + result[2]);
 		return result;
 	}
 	
