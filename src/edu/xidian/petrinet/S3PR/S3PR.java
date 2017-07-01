@@ -529,13 +529,21 @@ public class S3PR extends S2PR {
 	 * 定理4.11：C-矩阵中的非全0列数α是由D0中的所有强分图-D0<sup>1</sup>,D0<sup>2</sup>,...,D0<sup>k</sup>共同确定的，且满足以下关系式：
 	 * α = ∑|E(D0<sup>i</sup>)|,i=1,2,...k
 	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
-	 * 算法4.1：删除0点法（确定α）
-	 * 算法4.2：删除1点法（确定δ）
+	 * 算法4.1：删除0点法（确定α）,求D0的所有强分图，每个强分图对应一个SMS及其信标补集，构造补集矩阵[C],得到alpha
+	 * 算法4.2：删除1点法（确定δ）,在算法4.1的强分图中，删除一个顶点，求其强分图，构造补集矩阵[C],得到delta
+	 * 算法4.3：删除2点法（确定信标数目）,在算法4.1和算法4.2的基础上, 通过一次从D0中删除2个顶点来计算出更多的SMS.
+	 *       从而确定在LS3PR网的补集矩阵[C]中是否确实存在线性相关的非全0列. 也就是说, 算法4.3可以确定出LS3PR网的|Π<sub>E</sub>|,即信标的数目
 	 * 
 	 *  计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
 	 *  [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
 	 * </pre>
 	 * @param verbose 是否打印输出
+	 * @see#CMatrix()
+	 * @see#rank_alpha_delta()
+	 * @see#getSiphonsComs()
+	 * @see#getSiphons()
+	 * @see#Siphons
+	 * @see#Siphons
 	 */
 	public void algorithm4_1(boolean verbose) {
 		// [C]-矩阵中的非全0列数α, 与rank_alpha_delta(Cmatrix)的返回值一致
@@ -572,33 +580,18 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * <pre>
-	 * 计算严格极小信标（SMS）
-	 * Wang p91, 定理4.7： 设N是一个LS3PR网，D0[Ω] = (Ω,E)
-	 * 信标的补集：式（4-7） [S] = {p | {p}=(t的前置集) ∩ PA ∧ e<sub>t</sub> ∈ E}
-	 * 其中：PA是工序库所集合
-	 * 信标：式（4-2） S = ‖Is‖ \ [S]
-	 * 其中：Is = ∑<sub>r∈SR</sub>Ir. SR是S中资源库所集合，SR = Ω;
-	 * Is由getIs(SR)函数求取。
-	 * 定理4.9：D0[Ω]=(V,E)是D0的Ω导出子图，S是D0[Ω]对应的信标。S是一个SMS当且仅当D0[Ω]强连通且|Ω|>=2.
-	 * 定理4.11：C-矩阵中的非全0列数α是由D0中的所有强分图-D0<sup>1</sup>,D0<sup>2</sup>,...,D0<sup>k</sup>共同确定的，且满足以下关系式：
-	 * α = ∑|E(D0<sup>i</sup>)|,i=1,2,...k
-	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
-	 * 算法4.1：删除0点法（确定α）
-	 * 算法4.2：删除1点法（确定δ）
-	 * 
-	 *  计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
-	 *  [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
-	 * </pre>
+	 * 算法4.2：删除1点法（确定δ）,在算法4.1的强分图中，删除一个顶点，求其强分图，构造补集矩阵[C],得到delta
 	 * @param verbose 是否打印输出
+	 * @see#algorithm4_1()
+	 * 
 	 */
 	public void algorithm4_2(boolean verbose) {
 		// 算法4.1：删除0点法（确定α）
-		System.out.println(" 算法4.1：删除0点法（确定α）");
+		if (verbose) System.out.println(" 算法4.1：删除0点法（确定α）");
 		Collection<RGraph> components = Component(getRgraph(verbose),verbose);
 		
 		// 算法4.2：删除1点法（确定δ）
-		System.out.println(" 算法4.2：删除1点法（确定δ）");
+		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
 		for (RGraph com : components) {
 			if (com.getVertexCount() > 2) {
 				for (String v: com.getVertexNames()) {
@@ -638,10 +631,58 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
+	 * <pre>
+	 * 算法4.3：删除2点法（确定信标数目），在算法4.1和算法4.2的基础上, 通过一次从D0中删除2个顶点来计算出更多的SMS.
+	 *       从而确定在LS3PR网的补集矩阵[C]中是否确实存在线性相关的非全0列. 
+	 *       也就是说, 算法4.3可以确定出LS3PR网的|Π<sub>E</sub>|,即信标的数目.
+	 * </pre>
+	 * @param verbose 是否打印输出
+	 * @see#algorithm4_1()
+	 * 
+	 */
+	public void algorithm4_3(boolean verbose) {
+		// 算法4.1：删除0点法（确定α）
+		if (verbose)System.out.println(" 算法4.1：删除0点法（确定α）");
+		Collection<RGraph> components = Component(getRgraph(verbose),verbose);
+		
+		// 算法4.2：删除1点法（确定δ）
+		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
+		Collection<Collection<RGraph>> components1 = Component(components);
+		
+		// 算法4.3：删除2点法（确定信标数目）
+	    if (verbose) System.out.println(" 算法4.3：删除2点法（确定信标数目）");
+		for (Collection<RGraph> coms : components1) {
+			Component(coms);
+		}
+		
+		if (verbose) {
+			System.out.println("=======================");
+			int i = 1;
+			for (Collection<PTPlace> siphon: Siphons) {
+				printPNNodes("Siphons[" + i + "]    = ", siphon);
+				i++;
+			}
+			i = 1;
+			for (Collection<PTPlace> siphonCom: SiphonComs) {
+				printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
+				i++;
+			}
+			// 信标补集矩阵
+			InvariantMatrix Cmatrix = CMatrix();
+			int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
+			System.out.println("C-Matrix:");
+			Cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+				   rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+			
+		}
+	}
+	
+	/**
 	 * 计算资源有向图或他的强联通分量的信标及其补集
 	 * @param component 资源有向图或他的强联通分量
 	 * @param verbose 是否打印输出
-	 * @return 强联通分量
+	 * @return 强联通分量集合
 	 */
 	protected Collection<RGraph> Component(RGraph component, boolean verbose) {
 		Collection<RGraph> components = component.getStronglyConnectedComponentGraphs(verbose);
@@ -658,6 +699,31 @@ public class S3PR extends S2PR {
 			}
 		}
 		return components;
+	}
+	
+	/**
+	 * 删除1点，求强联通分量的信标及其补集
+	 * @param components 强联通分量集合
+	 * @param verbose 是否打印输出
+	 * @return 删除1点后的连通分量集合集
+	 */
+	protected Collection<Collection<RGraph>> Component(Collection<RGraph> components) {
+		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
+		for (RGraph com : components) {
+			if (com.getVertexCount() > 2) {
+				for (String v: com.getVertexNames()) {
+					RGraph cloneCom = com.clone();
+					try {
+						cloneCom.removeVertex(v); // 删除1点
+						childComponenets.add(Component(cloneCom,false));
+					} catch (VertexNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return childComponenets;
 	}
 
 	/**
