@@ -554,6 +554,7 @@ public class S3PR extends S2PR {
 		Collection<RGraph> components = Rgraph.getStronglyConnectedComponentGraphs(verbose);
 		
 		for (RGraph com: components) {
+			if (com.getVertexCount() < 2) continue; // |Ω|>=2.
 			Collection<PTPlace> S = new HashSet<>();  // 信标
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
 			if (Siphon_Com(com,S,SCom)) {
@@ -593,7 +594,7 @@ public class S3PR extends S2PR {
 		// 算法4.2：删除1点法（确定δ）
 		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
 		for (RGraph com : components) {
-			if (com.getVertexCount() > 2) {
+			if (com.getVertexCount() > 2) { // |Ω|>=2.
 				for (String v: com.getVertexNames()) {
 					RGraph cloneCom = com.clone();
 					try {
@@ -640,19 +641,51 @@ public class S3PR extends S2PR {
 	 * @see#algorithm4_1()
 	 * 
 	 */
-	public void algorithm4_3(boolean verbose) {
+	public InvariantMatrix algorithm4_3(boolean verbose) {
 		// 算法4.1：删除0点法（确定α）
 		if (verbose)System.out.println(" 算法4.1：删除0点法（确定α）");
 		Collection<RGraph> components = Component(getRgraph(verbose),verbose);
 		
+		// [C]矩阵
+		int m = 0;  // 开始是0行
+		int n = getPlaceCount(); // 列数是库所个数
+		InvariantMatrix cmatrix = new InvariantMatrix(m,n);
+		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+		int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+		if (verbose) {
+			System.out.println("C-Matrix:");
+			cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+		}
+		
 		// 算法4.2：删除1点法（确定δ）
 		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
 		Collection<Collection<RGraph>> components1 = Component(components);
+		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+		rank_alpha_delta = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+		if (verbose) {
+			System.out.println("C-Matrix:");
+			cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+		}
 		
 		// 算法4.3：删除2点法（确定信标数目）
 	    if (verbose) System.out.println(" 算法4.3：删除2点法（确定信标数目）");
 		for (Collection<RGraph> coms : components1) {
 			Component(coms);
+			cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+			rank_alpha_delta = rank_alpha_delta(cmatrix);  // rank([C])<=δ<=α
+			// [C]中已经不存在线性相关的非全0列，跳出删点循环
+			if (rank_alpha_delta[0] == rank_alpha_delta[2]) break;
+		}
+		
+		if (verbose) {
+			System.out.println("C-Matrix:");
+			cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
 		
 		if (verbose) {
@@ -667,15 +700,9 @@ public class S3PR extends S2PR {
 				printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
 				i++;
 			}
-			// 信标补集矩阵
-			InvariantMatrix Cmatrix = CMatrix();
-			int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
-			System.out.println("C-Matrix:");
-			Cmatrix.print(2, 0);
-			System.out.println("Cmatrix rank,alpha,delta = " + 
-				   rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
-			
 		}
+		
+		return cmatrix;
 	}
 	
 	/**
@@ -687,6 +714,7 @@ public class S3PR extends S2PR {
 	protected Collection<RGraph> Component(RGraph component, boolean verbose) {
 		Collection<RGraph> components = component.getStronglyConnectedComponentGraphs(verbose);
 		for (RGraph com : components) {
+			if (com.getVertexCount() < 2) continue; // |Ω|>=2.
 			Collection<PTPlace> S = new HashSet<>(); // 信标
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
 			if (Siphon_Com(com, S, SCom)) {
@@ -710,7 +738,7 @@ public class S3PR extends S2PR {
 	protected Collection<Collection<RGraph>> Component(Collection<RGraph> components) {
 		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
 		for (RGraph com : components) {
-			if (com.getVertexCount() > 2) {
+			if (com.getVertexCount() > 2) {  // |Ω|>=2.
 				for (String v: com.getVertexNames()) {
 					RGraph cloneCom = com.clone();
 					try {
@@ -784,7 +812,7 @@ public class S3PR extends S2PR {
 	 * [C]<sub>|Π|×|P|</sub>= [λs1|λs2|...]<sup>T</sup>
 	 * 是网N的严格极小信标的补集的特征P−向量矩阵，简称为补集矩阵，或[C]−矩阵，其中P = P0∪PA∪PR。
 	 * 
-	 * 根据algorithm4_1()或algorithm4_2计算所得的SiphonComs，生成[C]矩阵
+	 * 根据algorithm4_1()或algorithm4_2或algorithm4_3计算所得的SiphonComs，生成[C]矩阵
 	 * </pre>
 	 */
 	public InvariantMatrix CMatrix() {
@@ -799,6 +827,42 @@ public class S3PR extends S2PR {
 				cmatrix.set(i, lambda, 1);
 			}
 			i++;
+		}
+		return cmatrix;
+	}
+	
+	/**
+	 * <pre>
+	 * 补集矩阵（C矩阵，[C]矩阵
+	 * Li. p44, 定义3.1  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
+	 * P-向量λs称为S的特征P-向量，当且仅当任意p∈S, λs(p) = 1, 否则λs(p) = 0。
+	 * 定义3.2  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
+	 * [N]<sup>T</sup>是Petri网关联矩阵[N]的转置。
+	 * η<sub>s</sub>=[N]<sup>T</sup>λs称为S的特征T-向量。
+	 * wang. p83, 定义4.3: 设N = 是一个S3PR网，Π是网N的严格极小信标集合，则称
+	 * [C]<sub>|Π|×|P|</sub>= [λs1|λs2|...]<sup>T</sup>
+	 * 是网N的严格极小信标的补集的特征P−向量矩阵，简称为补集矩阵，或[C]−矩阵，其中P = P0∪PA∪PR。
+	 * 
+	 * 根据algorithm4_1()或algorithm4_2或algorithm4_3计算所得的SiphonComs，生成[C]矩阵
+	 * </pre>
+	 * @param cmatrix [C]矩阵初值
+	 * @return [C]矩阵
+	 */
+	public InvariantMatrix CMatrix(InvariantMatrix cmatrix) {
+		int m,n; // 行，列，|Π|，|P|
+		m = SiphonComs.size(); 
+		n = getPlaceCount();
+		
+		int i = cmatrix.getRowDimension();
+		for ( ;i < m; i++) {
+			int row[] = new int[n];
+			for (int j = 0; j < n; j++) row[j] = 0; 
+			Collection<PTPlace> sCom = SiphonComs.get(i);
+			for (PTPlace p: sCom) {
+				int lambda = toInt(p.getName().toString()) - 1; // toString()形成，如p20[p20]
+				row[lambda] = 1;
+			}
+			cmatrix = cmatrix.appendRow(row);
 		}
 		return cmatrix;
 	}
