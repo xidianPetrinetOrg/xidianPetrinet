@@ -469,6 +469,27 @@ public class InvariantMatrixTest {
 		assertEquals(b.getRowDimension(),7);
 	}
 	
+	//@Ignore
+	@Test
+	public void testAppendRow1() {
+		System.out.println("testAppendRow1()");
+		// 初始化0行，n列矩阵
+		InvariantMatrix m = new InvariantMatrix(0,4);
+		m.print(4, 0);
+		
+		m.print("append1:");
+		int row[] = {1,2,3,4};
+		m=m.appendRow(row);
+		m.print(4,0);
+		assertEquals(m.m,1); // proteted成员a.m为何能在此访问?  因为与原类在同一包package edu.xidian.math;
+		assertEquals(m.getRowDimension(),1);
+		
+		row[0]=5; row[1]=6; row[2]=7; row[3]=8;
+		m=m.appendRow(row);
+		m.print(4,0);
+		
+	}
+	
 	/**
 	 * Test method for {@link edu.xidian.math.InvariantMatrix#getPositiveList(int)}.
 	 */
