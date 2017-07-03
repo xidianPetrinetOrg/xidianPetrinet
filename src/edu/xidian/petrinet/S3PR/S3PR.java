@@ -745,6 +745,7 @@ public class S3PR extends S2PR {
 					RGraph cloneCom = com.clone();
 					try {
 						cloneCom.removeVertex(v); // 删除1点
+						System.out.println("remove v = " + v);
 						childComponenets.add(Component(cloneCom,true));
 					} catch (VertexNotFoundException e) {
 						// TODO Auto-generated catch block
@@ -773,7 +774,7 @@ public class S3PR extends S2PR {
 				try {
 					cloneCom.removeVertex(v2.get(0)); // 删除1点
 					cloneCom.removeVertex(v2.get(1)); // 删除2点
-					System.out.println("v2 = " + v2);
+					System.out.println("remove v2 = " + v2);
 					childComponenets.add(Component(cloneCom, true));
 				} catch (VertexNotFoundException e) {
 					// TODO Auto-generated catch block
