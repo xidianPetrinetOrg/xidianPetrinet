@@ -661,7 +661,7 @@ public class S3PR extends S2PR {
 		
 		// 算法4.2：删除1点法（确定δ）
 		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
-		Collection<Collection<RGraph>> components1 = Component(components);
+		Collection<Collection<RGraph>> components1 = Component1(components);
 		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
 		rank_alpha_delta = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
 		if (verbose) {
@@ -674,7 +674,7 @@ public class S3PR extends S2PR {
 		// 算法4.3：删除2点法（确定信标数目）
 	    if (verbose) System.out.println(" 算法4.3：删除2点法（确定信标数目）");
 		for (Collection<RGraph> coms : components1) {
-			Component(coms);
+			Component1(coms);
 			cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
 			rank_alpha_delta = rank_alpha_delta(cmatrix);  // rank([C])<=δ<=α
 			// [C]中已经不存在线性相关的非全0列，跳出删点循环
@@ -706,7 +706,7 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * 计算资源有向图或他的强联通分量的信标及其补集
+	 * 计算资源有向图或他的强连通分量的信标及其补集
 	 * @param component 资源有向图或他的强联通分量
 	 * @param verbose 是否打印输出
 	 * @return 强联通分量集合
@@ -730,12 +730,12 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * 删除1点，求强联通分量的信标及其补集
-	 * @param components 强联通分量集合
+	 * 计算D0[Ω]强分图删除1点后的的强联通分量集合的信标及其补集
+	 * @param components 强联通分量集合, 资源有向图对应的强联通分量，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
 	 * @param verbose 是否打印输出
 	 * @return 删除1点后的连通分量集合集
 	 */
-	protected Collection<Collection<RGraph>> Component(Collection<RGraph> components) {
+	protected Collection<Collection<RGraph>> Component1(Collection<RGraph> components) {
 		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
 		for (RGraph com : components) {
 			if (com.getVertexCount() > 2) {  // |Ω|>=2.
@@ -747,6 +747,34 @@ public class S3PR extends S2PR {
 					} catch (VertexNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return childComponenets;
+	}
+	
+	/**
+	 *  计算D0[Ω]强分图删除2点后的的强联通分量集合的信标及其补集
+	 * @param components 强联通分量集合, 资源有向图对应的强联通分量，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
+	 * @param verbose 是否打印输出
+	 * @return 删除2点后的连通分量集合集
+	 */
+	protected Collection<Collection<RGraph>> Component2(Collection<RGraph> components) {
+		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
+		for (RGraph com : components) {
+			if (com.getVertexCount() > 2) {  // |Ω|>=2.
+				for (String v1: com.getVertexNames()) {
+					for (String v2: com.getVertexNames()) {
+						RGraph cloneCom = com.clone();
+						try {
+							cloneCom.removeVertex(v1); // 删除1点
+							cloneCom.removeVertex(v2); // 删除2点
+							childComponenets.add(Component(cloneCom,false));
+						} catch (VertexNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			}
