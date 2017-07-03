@@ -531,7 +531,7 @@ public class S3PR extends S2PR {
 	 * C-矩阵中互不相同的非全0列的个数记作δ（delta），rank([C])<=δ<=α
 	 * 算法4.1：删除0点法（确定α）,求D0的所有强分图，每个强分图对应一个SMS及其信标补集，构造补集矩阵[C],得到alpha
 	 * 算法4.2：删除1点法（确定δ）,在算法4.1的强分图中，删除一个顶点，求其强分图，构造补集矩阵[C],得到delta
-	 * 算法4.3：删除2点法（确定信标数目）,在算法4.1和算法4.2的基础上, 通过一次从D0中删除2个顶点来计算出更多的SMS.
+	 * 算法4.3：删除2点法（确定基本信标数目）,在算法4.1和算法4.2的基础上, 通过一次从D0中删除2个顶点来计算出更多的SMS.
 	 *       从而确定在LS3PR网的补集矩阵[C]中是否确实存在线性相关的非全0列. 也就是说, 算法4.3可以确定出LS3PR网的|Π<sub>E</sub>|,即信标的数目
 	 * 
 	 *  计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
@@ -633,7 +633,7 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * <pre>
-	 * 算法4.3：删除2点法（确定信标数目），在算法4.1和算法4.2的基础上, 通过一次从D0中删除2个顶点来计算出更多的SMS.
+	 * 算法4.3：删除2点法（确定基本信标数目），在算法4.1和算法4.2的基础上, 通过一次从D0中删除2个顶点来计算出更多的SMS.
 	 *       从而确定在LS3PR网的补集矩阵[C]中是否确实存在线性相关的非全0列. 
 	 *       也就是说, 算法4.3可以确定出LS3PR网的|Π<sub>E</sub>|,即信标的数目.
 	 * </pre>
@@ -661,7 +661,7 @@ public class S3PR extends S2PR {
 		
 		// 算法4.2：删除1点法（确定δ）
 		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
-		Collection<Collection<RGraph>> components1 = Component1(components);
+		Component1(components);
 		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
 		rank_alpha_delta = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
 		if (verbose) {
@@ -671,14 +671,16 @@ public class S3PR extends S2PR {
 					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
 		
-		// 算法4.3：删除2点法（确定信标数目）
-	    if (verbose) System.out.println(" 算法4.3：删除2点法（确定信标数目）");
-		for (Collection<RGraph> coms : components1) {
-			Component1(coms);
-			cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
-			rank_alpha_delta = rank_alpha_delta(cmatrix);  // rank([C])<=δ<=α
-			// [C]中已经不存在线性相关的非全0列，跳出删点循环
-			if (rank_alpha_delta[0] == rank_alpha_delta[2]) break;
+		// 算法4.3：删除2点法（确定基本信标数目）
+	    if (verbose) System.out.println(" 算法4.3：删除2点法（确定基本信标数目）");
+	    Component2(components);
+		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+		rank_alpha_delta = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+		if (verbose) {
+			System.out.println("C-Matrix:");
+			cmatrix.print(2, 0);
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
 		
 		if (verbose) {
@@ -743,7 +745,7 @@ public class S3PR extends S2PR {
 					RGraph cloneCom = com.clone();
 					try {
 						cloneCom.removeVertex(v); // 删除1点
-						childComponenets.add(Component(cloneCom,false));
+						childComponenets.add(Component(cloneCom,true));
 					} catch (VertexNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -763,23 +765,42 @@ public class S3PR extends S2PR {
 	protected Collection<Collection<RGraph>> Component2(Collection<RGraph> components) {
 		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
 		for (RGraph com : components) {
-			if (com.getVertexCount() > 2) {  // |Ω|>=2.
-				for (String v1: com.getVertexNames()) {
-					for (String v2: com.getVertexNames()) {
-						RGraph cloneCom = com.clone();
-						try {
-							cloneCom.removeVertex(v1); // 删除1点
-							cloneCom.removeVertex(v2); // 删除2点
-							childComponenets.add(Component(cloneCom,false));
-						} catch (VertexNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+			if (com.getVertexCount() < 3)
+				continue; // |Ω|>=2.
+			List<List<String>> v2s = combine(com.getVertexNames()); // 删除点的组合
+			for (List<String> v2 : v2s) {
+				RGraph cloneCom = com.clone();
+				try {
+					cloneCom.removeVertex(v2.get(0)); // 删除1点
+					cloneCom.removeVertex(v2.get(1)); // 删除2点
+					System.out.println("v2 = " + v2);
+					childComponenets.add(Component(cloneCom, true));
+				} catch (VertexNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
+		//System.out.println("childComponenets = " + childComponenets);
 		return childComponenets;
+	}
+	
+	/**
+	 * 从strs中取出2个元素的所有不同组合
+	 */
+	public List<List<String>> combine(Collection<String> strs1) {
+		List<String> strs = new ArrayList<>(strs1);
+		List<List<String>> results = new ArrayList<>();
+		int n = strs.size();
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				List<String> comb = new ArrayList<>();
+				comb.add(strs.get(i));
+				comb.add(strs.get(j));
+				results.add(comb);
+			}
+		}
+		return results;
 	}
 
 	/**
