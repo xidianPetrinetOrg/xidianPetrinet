@@ -957,7 +957,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	@Test
+	//@Test
 	public void algorithm4_3() {
 		S3PR s3pr = getWangFigure4_1();
 		s3pr.algorithm4_3(true);
@@ -1217,4 +1217,59 @@ public class S3PRTest {
 		
 		return s3pr;
 	}
+	
+	/**
+	 * 组合测试，从n个元素中取出m个元素的所有组合
+	 */
+	int num = 0;
+	public void combine1(int n, int m) {
+		for (int i = 1; i < m; i++) {
+			if (m > 1)	{
+				combine1(n-1,m-1);
+				num++;
+			}
+        }
+	}
+	
+	@Test
+	public void combineTest1() {
+		//combine1(4,3);  // num = 4
+		//combine1(6,4);    // num = 15
+		combine1(4,2);    // num = 1
+		System.out.println("num="+num);
+	}
+	
+	
+	public void combine(int start, int m, int count, List<String> strs, List<List<String>> results) {
+		//1.先从数组中A取出一个元素，然后再从余下的元素B中取出一个元素，然后又在余下的元素C中取出一个元素
+		//2.按照数组索引从小到大依次取，避免重复
+		//依照上面的递归原则，我们可以设计如下的算法，按照索引从小到大遍历：
+		int n = strs.size();
+		// 固定start, 其余strs中，取出m-1个元素，构成m个元素
+		
+			List<String> com = new ArrayList<>();
+			for (int i = start; i < start + m; i++) {
+				com.add(strs.get(i));
+			}
+			results.add(com);
+			
+			com = new ArrayList<>();
+			for (int i = start + 1; i < start +1+ m; i++) {
+				com.add(strs.get(i));
+			}
+			results.add(com);
+		
+	}
+	
+	//@Test
+	public void combineTest() {
+		List<String> strs = new ArrayList<>();
+		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
+		List<List<String>> results = new ArrayList<>();
+		combine(0,3,3,strs,results);
+		
+		System.out.println(results.size());
+		System.out.println(results);
+	}
+	
 }
