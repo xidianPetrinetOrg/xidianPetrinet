@@ -111,6 +111,28 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
+	 * 由一个添加符合S2PR定义的Petri网对象构造S3PR对象
+	 * @param name 该S3PR网名称
+	 * @param ptnet 符合S3PR定义的Petri网对象
+	 * @param p0   闲置库所名称集合
+	 * @param PA 工序库所名称集合
+	 * @param PR 资源库所名称集合
+	 */
+	public S3PR(String name, PTNet ptnet, Collection<String> P0, Collection<String> PA, Collection<String> PR) {
+		this.setName(name);
+		// 初始化父类对象
+		for (String p0: P0) {
+        	this.P0.add(this.getPlace(p0));
+        }
+		for (String pa: PA) {
+        	this.PA.add(this.getPlace(pa));
+        }
+		for (String pr: PR) {
+        	this.PR.add(this.getPlace(pr));
+        }
+	}
+	
+	/**
 	 * 添加S2PR对象到本S3PR对象中
 	 * (1) 把s2pr的闲置库所p0加入到本对象，并且加入到本对象的P0中(P0 = {p01} ∪ {p02})
 	 * (2) 把s2pr的工序库所集PA加入到本对象中，并且添加到本对象的PA中(PA = PA1 ∪ PA2)
