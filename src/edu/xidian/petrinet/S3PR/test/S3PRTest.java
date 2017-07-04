@@ -957,7 +957,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	//@Test
+	@Test
 	public void algorithm4_3_verbose() {
 		S3PR s3pr = getWangFigure4_1();
 		// verbose模式，显示计算过程
@@ -968,7 +968,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	@Test
+	//@Test
 	public void algorithm4_3() {
 		S3PR s3pr = getWangFigure4_1();
 		// 非verbose模式，不显示计算过程

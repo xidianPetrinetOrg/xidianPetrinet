@@ -716,7 +716,10 @@ public class S3PR extends S2PR {
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
 			if (Siphon_Com(com, S, SCom)) {
 				// D0[Ω]删除1点和删除2点分别得到的某个强连通分量有可能是相同的，从而得到相同的信标及其补集
-				if (SiphonComs.contains(SCom)) continue;  
+				if (SiphonComs.contains(SCom)) {
+					if (verbose) printPNNodes("重复信标补集：", SCom);
+					continue;  
+				}
 				Siphons.add(S);
 				SiphonComs.add(SCom);
 				if (verbose) {
