@@ -957,10 +957,38 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
+	//@Test
+	public void algorithm4_3_verbose() {
+		S3PR s3pr = getWangFigure4_1();
+		// verbose模式，显示计算过程
+		s3pr.algorithm4_3(true);
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
+	 * Wang, p86,图4-1,对应的S3PR
+	 */
 	@Test
 	public void algorithm4_3() {
 		S3PR s3pr = getWangFigure4_1();
-		s3pr.algorithm4_3(true);
+		// 非verbose模式，不显示计算过程
+		InvariantMatrix cmatrix = s3pr.algorithm4_3(false);
+		System.out.println("=======================");
+		System.out.println("\nC-Matrix:");
+		cmatrix.print(2, 0);
+		int rank_alpha_delta[] = s3pr.rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+		System.out.println("Cmatrix rank,alpha,delta = " + 
+				rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+		int i = 1;
+		for (Collection<PTPlace> siphon: s3pr.getSiphons()) {
+			s3pr.printPNNodes("Siphons[" + i + "]    = ", siphon);
+			i++;
+		}
+		i = 1;
+		for (Collection<PTPlace> siphonCom: s3pr.getSiphonComs()) {
+			s3pr.printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
+			i++;
+		}
 	}
 	
 	/**

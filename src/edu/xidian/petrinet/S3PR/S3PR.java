@@ -537,6 +537,8 @@ public class S3PR extends S2PR {
 	 *  计算信标及其补集，记录至Siphons和SiphonComs成员，外部可以通过getSiphons()和getSiphonsComs()获取
 	 *  [C]-矩阵(信标补集矩阵)，alpha，delta可以通过rank_alpha_delta()获取
 	 * </pre>
+	 * 注：本函数功能可以通过调用@see#Component(RGraph component, boolean verbose)完成算法4.1的功能实现
+	 * 
 	 * @param verbose 是否打印输出
 	 * @see#CMatrix()
 	 * @see#rank_alpha_delta()
@@ -555,9 +557,11 @@ public class S3PR extends S2PR {
 		
 		for (RGraph com: components) {
 			if (com.getVertexCount() < 2) continue; // |Ω|>=2.
-			Collection<PTPlace> S = new HashSet<>();  // 信标
+			Collection<PTPlace> S = new HashSet<>();  // 信标(SMS)
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
 			if (Siphon_Com(com,S,SCom)) {
+				// D0[Ω]得到的强连通分量不会是相同的，因此不会得到相同的信标(SMS)及其补集，下句不应该执行
+				if (SiphonComs.contains(SCom)) continue;  
 				Siphons.add(S);
 				SiphonComs.add(SCom);
 				if (verbose) {
@@ -570,7 +574,7 @@ public class S3PR extends S2PR {
 		}
 		
 		if (verbose) {
-			// 信标补集矩阵
+			// 信标补集矩阵[C]
 			InvariantMatrix Cmatrix = CMatrix();
 			int rank_alpha_delta[] = rank_alpha_delta(Cmatrix);
 			System.out.println("C-Matrix:");
@@ -651,45 +655,30 @@ public class S3PR extends S2PR {
 		int n = getPlaceCount(); // 列数是库所个数
 		InvariantMatrix cmatrix = new InvariantMatrix(m,n);
 		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
-		int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
 		if (verbose) {
 			System.out.println("C-Matrix:");
 			cmatrix.print(2, 0);
+			int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
 			System.out.println("Cmatrix rank,alpha,delta = " + 
 					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
 		
 		// 算法4.2：删除1点法（确定δ）
 		if (verbose) System.out.println(" 算法4.2：删除1点法（确定δ）");
-		Component1(components);
+		Component1(components,verbose);
 		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
-		rank_alpha_delta = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
 		if (verbose) {
 			System.out.println("C-Matrix:");
 			cmatrix.print(2, 0);
+			int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
 			System.out.println("Cmatrix rank,alpha,delta = " + 
 					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
 		
 		// 算法4.3：删除2点法（确定基本信标数目）
 	    if (verbose) System.out.println(" 算法4.3：删除2点法（确定基本信标数目）");
-	    Component2(components);
+	    Component2(components,cmatrix,verbose);
 		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
-		rank_alpha_delta = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
-		if (verbose) {
-			System.out.println("C-Matrix:");
-			cmatrix.print(2, 0);
-			System.out.println("Cmatrix rank,alpha,delta = " + 
-					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
-		}
-		
-		if (verbose) {
-			System.out.println("C-Matrix:");
-			cmatrix.print(2, 0);
-			System.out.println("Cmatrix rank,alpha,delta = " + 
-					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
-		}
-		
 		if (verbose) {
 			System.out.println("=======================");
 			int i = 1;
@@ -702,14 +691,20 @@ public class S3PR extends S2PR {
 				printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
 				i++;
 			}
+			System.out.println("\nC-Matrix:");
+			cmatrix.print(2, 0);
+			int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 		}
 		
 		return cmatrix;
 	}
 	
 	/**
-	 * 计算资源有向图或他的强连通分量的信标及其补集
-	 * @param component 资源有向图或他的强联通分量
+	 * 计算资源有向图或他的强连通分量的信标(SMS)及其补集
+	 * @param component 资源有向图或他的强联通分量。算法4.1(删除0点法)，该参数是资源有向图;
+	 *                  算法4.2(删除1点法)和算法4.3(删除2点法)，该参数是删除0点法由D0[Ω]计算所得的强分图D0<sup>1</sup>, D1<sup>2</sup>, ..., D0<sup>k</sup>
 	 * @param verbose 是否打印输出
 	 * @return 强联通分量集合
 	 */
@@ -717,9 +712,11 @@ public class S3PR extends S2PR {
 		Collection<RGraph> components = component.getStronglyConnectedComponentGraphs(verbose);
 		for (RGraph com : components) {
 			if (com.getVertexCount() < 2) continue; // |Ω|>=2.
-			Collection<PTPlace> S = new HashSet<>(); // 信标
+			Collection<PTPlace> S = new HashSet<>(); // 信标(SMS)
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
 			if (Siphon_Com(com, S, SCom)) {
+				// D0[Ω]删除1点和删除2点分别得到的某个强连通分量有可能是相同的，从而得到相同的信标及其补集
+				if (SiphonComs.contains(SCom)) continue;  
 				Siphons.add(S);
 				SiphonComs.add(SCom);
 				if (verbose) {
@@ -732,12 +729,12 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * 计算D0[Ω]强分图删除1点后的的强联通分量集合的信标及其补集
-	 * @param components 强联通分量集合, 资源有向图对应的强联通分量，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
+	 * 算法4.2，计算D0[Ω]强分图删除1点后的的强联通分量集合的信标及其补集
+	 * @param components 强联通分量集合, 即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
 	 * @param verbose 是否打印输出
 	 * @return 删除1点后的连通分量集合集
 	 */
-	protected Collection<Collection<RGraph>> Component1(Collection<RGraph> components) {
+	protected Collection<Collection<RGraph>> Component1(Collection<RGraph> components, boolean verbose) {
 		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
 		for (RGraph com : components) {
 			if (com.getVertexCount() > 2) {  // |Ω|>=2.
@@ -745,8 +742,8 @@ public class S3PR extends S2PR {
 					RGraph cloneCom = com.clone();
 					try {
 						cloneCom.removeVertex(v); // 删除1点
-						System.out.println("remove v = " + v);
-						childComponenets.add(Component(cloneCom,true));
+						if (verbose) System.out.println("remove v = " + v);
+						childComponenets.add(Component(cloneCom,verbose));
 					} catch (VertexNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -758,12 +755,13 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 *  计算D0[Ω]强分图删除2点后的的强联通分量集合的信标及其补集
-	 * @param components 强联通分量集合, 资源有向图对应的强联通分量，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
+	 * 算法4.3, 计算D0[Ω]强分图删除2点后的的强联通分量集合的信标及其补集
+	 * @param components 强联通分量集合，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
+	 * @param cmatrix [C]矩阵初值
 	 * @param verbose 是否打印输出
 	 * @return 删除2点后的连通分量集合集
 	 */
-	protected Collection<Collection<RGraph>> Component2(Collection<RGraph> components) {
+	protected Collection<Collection<RGraph>> Component2(Collection<RGraph> components, InvariantMatrix cmatrix, boolean verbose) {
 		Collection<Collection<RGraph>> childComponenets = new HashSet<>();
 		for (RGraph com : components) {
 			if (com.getVertexCount() < 3)
@@ -774,23 +772,29 @@ public class S3PR extends S2PR {
 				try {
 					cloneCom.removeVertex(v2.get(0)); // 删除1点
 					cloneCom.removeVertex(v2.get(1)); // 删除2点
-					System.out.println("remove v2 = " + v2);
-					childComponenets.add(Component(cloneCom, true));
+					if (verbose) System.out.println("remove v2 = " + v2);
+					childComponenets.add(Component(cloneCom, verbose));
 				} catch (VertexNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+			cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+			int rank_alpha_delta[] = rank_alpha_delta(cmatrix);  // rank([C])<=δ<=α
+			// rank([C]) == δ, [C]中已经不存在线性相关的非全0列，跳出删点循环
+			if (rank_alpha_delta[0] == rank_alpha_delta[2]) {
+				if (verbose) System.out.println("跳出删点循环，(rank([C]) == δ) = " + rank_alpha_delta[0]);
+				break;
+			}
 		}
-		//System.out.println("childComponenets = " + childComponenets);
 		return childComponenets;
 	}
 	
 	/**
-	 * 从strs中取出2个元素的所有不同组合
+	 * 从strs1中取出2个元素的所有不同组合
 	 */
 	public List<List<String>> combine(Collection<String> strs1) {
-		List<String> strs = new ArrayList<>(strs1);
+		List<String> strs = new ArrayList<>(strs1);  // 使Collection集合有序
 		List<List<String>> results = new ArrayList<>();
 		int n = strs.size();
 		for (int i = 0; i < n; i++) {
@@ -805,9 +809,9 @@ public class S3PR extends S2PR {
 	}
 
 	/**
-	 * 计算资源有向图的强连通分量对应的信标及其补集，每个强连通分量对应一个信标补集和信标, 顶点集是SR(信标S中的资源库所集合)
+	 * 计算资源有向图的强连通分量对应的信标及其补集，每个强连通分量对应一个信标补集和信标(SMS), 顶点集是SR(信标S中的资源库所集合)
 	 * @param component 强连通分量
-	 * @param S 返回信标
+	 * @param S 返回信标(SMS)
 	 * @param SCom 返回信标的补集
 	 * @return true: 有信标及其补集; false：无，强连通分量的的顶点个数<2
 	 */
@@ -830,7 +834,7 @@ public class S3PR extends S2PR {
 		// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
 		Collection<PTPlace> Is = getIs(component.getElementSet());
 		S.addAll(Is);
-		S.removeAll(SCom); // wang (4-2)，信标
+		S.removeAll(SCom); // wang (4-2)，信标(SMS)
 		return true;
 	}
 		
@@ -852,7 +856,7 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * <pre>
-	 * 补集矩阵（C矩阵，[C]矩阵
+	 * 补集矩阵(称为C矩阵或[C]矩阵)
 	 * Li. p44, 定义3.1  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
 	 * P-向量λs称为S的特征P-向量，当且仅当任意p∈S, λs(p) = 1, 否则λs(p) = 0。
 	 * 定义3.2  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
@@ -883,7 +887,7 @@ public class S3PR extends S2PR {
 	
 	/**
 	 * <pre>
-	 * 补集矩阵（C矩阵，[C]矩阵
+	 * 补集矩阵(称为C矩阵或[C]矩阵)
 	 * Li. p44, 定义3.1  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
 	 * P-向量λs称为S的特征P-向量，当且仅当任意p∈S, λs(p) = 1, 否则λs(p) = 0。
 	 * 定义3.2  令S（是P的子集）是Petri网N = (P,T,F,W)的库所子集。
