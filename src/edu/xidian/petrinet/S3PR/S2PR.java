@@ -114,6 +114,7 @@ public class S2PR extends S2P {
 		// this S2PR对象对应的S2P对象
 		s2p = new S2P(name,ptnet,p0,PA); 
 		
+		// this 对象
 		for (PTTransition t : ptnet.getTransitions()) {
             this.addTransition(t.getName(), false);
         }
@@ -121,7 +122,8 @@ public class S2PR extends S2P {
             this.addPlace(p.getName(), false);
         }
         for (PTFlowRelation f : ptnet.getFlowRelations()) {
-        	//this.addFlowRelation(f, false);  // 错误的，至少应把f克隆了，
+        	// 错误的，这样添加的f是由原来ptnent的各个node组成的，本对象的node是以上addTransition()和addPlace()产生的“新”node
+        	//this.addFlowRelation(f, false);  
         	if (f.getDirectionPT()) {
         		this.addFlowRelationPT(f.getPlace().getName(), f.getTransition().getName(), false);
         	}
