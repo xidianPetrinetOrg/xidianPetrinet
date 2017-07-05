@@ -1247,7 +1247,7 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * 组合测试，从strs中取出2个元素的所有不同组合
+	 * 组合测试，从strs中取出2个元素的所有不同组合，参数返回结果
 	 */
 	public void combine1(List<String> strs, List<List<String>> results) {
 		int n = strs.size();
@@ -1271,21 +1271,10 @@ public class S3PRTest {
 		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 	}
 	
-	//@Test
-	public void combineTest2() {
-		Collection<String> strs = new HashSet<>();
-		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
-		List<String> strs1 = new ArrayList<>(strs);
-		List<List<String>> results = new ArrayList<>();
-		combine1(strs1,results);
-		System.out.println(results.size()); // 6
-		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
-	}
-	
 	/**
-	 * 组合测试，从strs中取出2个元素的所有不同组合
+	 * 组合测试，从strs中取出2个元素的所有不同组合，返回结果
 	 */
-	public List<List<String>> combine3(List<String> strs) {
+	public List<List<String>> combine2(List<String> strs) {
 		List<List<String>> results = new ArrayList<>();
 		int n = strs.size();
 		for (int i = 0; i < n; i++) {
@@ -1300,10 +1289,10 @@ public class S3PRTest {
 	}
 	
 	//@Test
-	public void combineTest3() {
+	public void combineTest2() {
 		List<String> strs = new ArrayList<>();
 		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
-		List<List<String>> results = combine3(strs);
+		List<List<String>> results = combine2(strs);
 		System.out.println(results.size()); // 6
 		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 	}
