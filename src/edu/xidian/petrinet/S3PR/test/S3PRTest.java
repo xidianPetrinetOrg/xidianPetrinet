@@ -1330,10 +1330,10 @@ public class S3PRTest {
 	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
 	 * C(n,m) = 1                        (n=0或m=0或n=m时)
 	 * C(n,m) = n!/m!*(n-m)!
-	 * @param n 集合总数，初值为strs的长度
+	 * @param n 集合总数，初值为strs的长度，strs.size()
 	 * @param m 取出元素数，即从n个元素中取出m个元素
 	 * @param strs 元素集合
-	 * @param results 从strs中取出m个元素的所有组合的集合，组合结果降序排列
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，组合结果降序排列
 	 * @param tmp 临时变量，存取每次取得的组合结果
 	 */
 	public void combine4(int n,int m,List<String> strs, List<List<String>> results,List<String> tmp) {
@@ -1352,7 +1352,7 @@ public class S3PRTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void combineTest4() {
 		List<String> strs = new ArrayList<>();
 		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
@@ -1376,10 +1376,10 @@ public class S3PRTest {
 	 * C(n,m) = 1                        (n=0或m=0或n=m时)
 	 * C(n,m) = n!/m!*(n-m)!
 	 * @param selected 模拟选取的元素索引，初值设为0，组合结果升序排列
-	 * @param n 集合总数，初值为strs的长度
+	 * @param n 集合总数，，初值为strs的长度，strs.size()
 	 * @param m 取出元素数，即从n个元素中取出m个元素
 	 * @param strs 元素集合
-	 * @param results 从strs中取出m个元素的所有组合的集合，selected初值设为0，组合结果升序排列。
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，selected初值设为0，组合结果升序排列。
 	 * @param tmp 临时变量，存取每次取得的组合结果
 	 */
 	public void combine5(int selected, int n,int m,List<String> strs, List<List<String>> results,List<String> tmp) {
@@ -1398,7 +1398,7 @@ public class S3PRTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void combineTest5() {
 		List<String> strs = new ArrayList<>();
 		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
@@ -1413,6 +1413,59 @@ public class S3PRTest {
 		//System.out.println(results);  // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]] 
 		
 		// combine5()结果
+		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	}
+	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 * @param selected 模拟选取的元素索引，初值设为0，组合结果升序排列
+	 * @param n 集合总数，初值为strs的长度，strs.size()
+	 * @param m 取出元素数，即从n个元素中取出m个元素
+	 * @param strs 元素集合
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，组合结果降序排列
+	 * @param tmp 临时变量，存取每次取得的组合结果
+	 */
+	List<String> tmp = new ArrayList<>();
+	public void combine6(int selected,int n,int m,List<String> strs, List<List<String>> results) {
+		if (m == 0 ) { // 取得一次组合结果
+			//System.out.println("tmp = " + tmp);
+			List<String> tmp1 = new ArrayList<>(tmp);
+			results.add(tmp1);
+			return;
+		}
+		if (n > 0) {
+			for (int i = selected; i < strs.size(); i++) {
+				String s = strs.get(i);  // 最后一个元素（索引为n-1）
+				tmp.add(s);                // s添加到组合结果中
+				combine6(i+1,n-1,m-1,strs,results);   // 因为s在组合结果中，因此执行：在n-1中选每个m-1个元素
+				tmp.remove(s);
+				//combine6(i+1,n-1,m,strs,results);     // 因为s不在组合结果中，因此执行：在n-1中选m个元素
+			}
+		}
+	}
+	
+	@Test
+	public void combineTest6() {
+		List<String> strs = new ArrayList<>();
+		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
+		List<List<String>> results = new ArrayList<>();
+		
+		// selected 模拟选取的元素索引，初值设为0，组合结果升序排列
+		combine6(0,strs.size(),2,strs,results);
+		
+		System.out.println(results.size()); // 6
+		// combine4()结果
+		// System.out.println(results);  // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]] 
+				
+		// combine5()结果
+		//System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+		
+		// combine6()结果与combine5()相同,但是combine4()、combine5()更简洁
 		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 	}
 }
