@@ -957,7 +957,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	//@Test
+	@Test
 	public void algorithm4_3_verbose() {
 		S3PR s3pr = getWangFigure4_1();
 		// verbose模式，显示计算过程
@@ -1352,7 +1352,7 @@ public class S3PRTest {
 		}
 	}
 	
-	//@Test
+	@Test
 	public void combineTest4() {
 		List<String> strs = new ArrayList<>();
 		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
@@ -1449,7 +1449,7 @@ public class S3PRTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void combineTest6() {
 		List<String> strs = new ArrayList<>();
 		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");

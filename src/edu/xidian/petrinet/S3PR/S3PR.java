@@ -812,7 +812,8 @@ public class S3PR extends S2PR {
 		for (RGraph com : components) {
 			if (com.getVertexCount() < 3)
 				continue; // |Ω|>=2.
-			List<List<String>> v2s = combine(com.getVertexNames()); // 删除点的组合
+			//List<List<String>> v2s = combine(com.getVertexNames()); // 删除点的组合
+			List<List<String>> v2s = combine(com.getVertexNames(),2); // 删除点的组合
 			for (List<String> v2 : v2s) {
 				RGraph cloneCom = com.clone();
 				try {
@@ -852,6 +853,47 @@ public class S3PR extends S2PR {
 			}
 		}
 		return results;
+	}
+	
+	/**
+	 * 从strs1中取出m个元素的所有不同组合.
+	 * 如：str1 = {"1","2","3","4"};
+	 * combine(str1,2); // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]]
+	 */
+	public List<List<String>> combine(Collection<String> strs1, int m) {
+		List<String> strs = new ArrayList<>(strs1);  // 使Collection集合有序
+		List<List<String>> results = new ArrayList<>();
+		List<String> tmp = new ArrayList<>();
+		combine(strs.size(),m,strs,results,tmp);
+		return results;
+	}
+	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 * @param n 集合总数，初值为strs的长度，strs.size()
+	 * @param m 取出元素数，即从n个元素中取出m个元素
+	 * @param strs 元素集合
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，组合结果降序排列
+	 * @param tmp 临时变量，存取每次取得的组合结果
+	 */
+	public void combine(int n,int m,List<String> strs,List<List<String>> results,List<String> tmp) {
+		if (m == 0 ) { // 取得一次组合结果
+			List<String> tmp1 = new ArrayList<>(tmp);
+			results.add(tmp1);
+			return;
+		}
+		if (n > 0) {
+			String s = strs.get(n-1);  // 最后一个元素（索引为n-1）
+			tmp.add(s);                // s添加到组合结果中
+			combine(n-1,m-1,strs,results,tmp);   // 因为s在组合结果中，因此执行：在n-1中选每个m-1个元素
+			tmp.remove(s);
+			combine(n-1,m,strs,results,tmp);     // 因为s不在组合结果中，因此执行：在n-1中选m个元素
+		}
 	}
 
 	/**
