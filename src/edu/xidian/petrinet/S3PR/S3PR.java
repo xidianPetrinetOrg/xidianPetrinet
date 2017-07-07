@@ -111,6 +111,49 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
+	 * 由PTNet对象构造S3PR对象
+	 * @param name  该S3PR网名称
+	 * @param ptnet Petri网对象
+	 * @param P0   闲置库所名称集合
+	 * @param PA 工序库所名称集合
+	 * @param PR 资源库所名称集合
+	 */
+	public S3PR(String name, PTNet ptnet, Collection<String> P0, Collection<String> PA, Collection<String> PR) {
+		this.setName(name);
+		
+		// 初始化父类对象
+		for (PTTransition t : ptnet.getTransitions()) {
+            this.addTransition(t.getName(), false);
+        }
+        for (PTPlace p : ptnet.getPlaces()) {
+            this.addPlace(p.getName(), false);
+        }
+        for (PTFlowRelation f : ptnet.getFlowRelations()) {
+        	// 错误的，这样添加的f是由原来ptnent的各个node组成的，本对象的node是以上addTransition()和addPlace()产生的“新”node
+        	//this.addFlowRelation(f, false);  
+        	if (f.getDirectionPT()) {
+        		this.addFlowRelationPT(f.getPlace().getName(), f.getTransition().getName(), false);
+        	}
+        	else {
+            	this.addFlowRelationTP(f.getTransition().getName(), f.getPlace().getName(), false);
+        	}
+        }
+               
+        this.setInitialMarking(ptnet.getInitialMarking().clone());
+        
+		for (String p0: P0) {
+        	this.P0.add(this.getPlace(p0));
+        }
+		for (String pa: PA) {
+        	this.PA.add(this.getPlace(pa));
+        }
+		for (String pr: PR) {
+        	this.PR.add(this.getPlace(pr));
+        }
+	}
+
+	
+	/**
 	 * 添加S2PR对象到本S3PR对象中
 	 * (1) 把s2pr的闲置库所p0加入到本对象，并且加入到本对象的P0中(P0 = {p01} ∪ {p02})
 	 * (2) 把s2pr的工序库所集PA加入到本对象中，并且添加到本对象的PA中(PA = PA1 ∪ PA2)
