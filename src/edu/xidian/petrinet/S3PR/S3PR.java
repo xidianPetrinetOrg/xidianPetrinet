@@ -863,14 +863,14 @@ public class S3PR extends S2PR {
 			if (verbose) { 
 				System.out.println("删点分量：" + com);
 			}
-			if (com.getVertexCount() < 2) {
+			int total = com.getVertexCount();
+			if (total < 2) {
 				if (verbose) System.out.println("|Ω| < 2, 不删点！");
 				continue; // |Ω|>=2.
 			}
-			for (int N = 1; N <= com.getVertexCount() - 2; N++) {
+			for (int N = 1; N <= total - 2; N++) {
 				if (verbose) {
-					int total = com.getVertexCount()-2;
-					System.out.println("删除点数: " + N + "/" + total);
+					System.out.println("删除点数: " + N + "/" + (total-2));
 				}
 				List<List<String>> v2s = combine(com.getVertexNames(),N); // 删除N点的组合，等效
 				for (List<String> v2 : v2s) {
