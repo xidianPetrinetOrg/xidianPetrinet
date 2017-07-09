@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
@@ -757,7 +758,8 @@ public class S3PR extends S2PR {
 			if (com.getVertexCount() < 2) continue; // |Ω|>=2.
 			Collection<PTPlace> S = new HashSet<>(); // 信标(SMS)
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
-			if (Siphon_Com(com, S, SCom)) {
+			if (Siphon_Com_S3PR(com, S, SCom)) {  // 适于S3PR
+			//if (Siphon_Com(com, S, SCom)) {  // 仅适用于LS3PR
 				// D0[Ω]删除1点和删除2点分别得到的某个强连通分量有可能是相同的，从而得到相同的信标及其补集
 				if (SiphonComs.contains(SCom)) {
 					if (verbose) printPNNodes("重复信标补集：", SCom);
@@ -969,10 +971,11 @@ public class S3PR extends S2PR {
 	}
 
 	/**
+	 * 仅适用于LS3PR
 	 * 计算资源有向图的强连通分量对应的信标及其补集，每个强连通分量对应一个信标补集和信标(SMS), 顶点集是SR(信标S中的资源库所集合)
 	 * @param component 强连通分量
-	 * @param S 返回信标(SMS)
-	 * @param SCom 返回信标的补集
+	 * @param S 返回信标(SMS)【wang (4-2)】
+	 * @param SCom 返回信标的补集【 wang (4-7)，信标补集】，仅适于LS3PR
 	 * @return true: 有信标及其补集; false：无，强连通分量的的顶点个数<2
 	 */
 	@SuppressWarnings("rawtypes")
@@ -993,6 +996,45 @@ public class S3PR extends S2PR {
 		}
 		// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
 		Collection<PTPlace> Is = getIs(component.getElementSet());
+		S.addAll(Is);
+		S.removeAll(SCom); // wang (4-2)，信标(SMS)
+		return true;
+	}
+	
+	/**
+	 * 适用于S3PR网
+	 * 计算资源有向图的强连通分量对应的信标及其补集，每个强连通分量对应一个信标补集和信标(SMS), 顶点集是SR(信标S中的资源库所集合)
+	 * wang (4-5)，因为[S]一定不属于P0，因此原式中的P0可以省略
+	 * [S] = {p|p∈∪<sub>r∈Ω</sub>H(r)∧(p的后置集的后置集∩PA)非空，是∪<sub>r∈Ω</sub>H(r)的子集}
+	 * @param component 强连通分量
+	 * @param S 返回信标(SMS)【wang (4-2), S = ‖Is‖ \ [S]】
+	 * @param SCom 返回信标的补集【 wang (4-5)，信标补集】,适于S3PR, 因为SCom一定是非P0，因此去掉原式的P0部分
+	 * @return true: 有信标及其补集; false：无，强连通分量的的顶点个数<2
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected boolean Siphon_Com_S3PR(RGraph component, Collection<PTPlace> S, Collection<PTPlace> SCom) {		 
+		int num = component.getVertexCount();
+		if (num < 2) return false; // 非SMS,至少资源库所个数>=2 
+		
+		Collection<PTPlace> omiga = component.getElementSet(); // 强分图的顶点，也是信标SMS中的资源SR，
+	
+		Collection<PTPlace> hrs = getHr(omiga);  // omiga资源持有者
+		Collection<PTPlace> postpost = new HashSet<>(); // p的后置集的后置集
+		for(PTPlace p :hrs) {
+			postpost.clear();
+			Set<AbstractPNNode<PTFlowRelation>> post = p.getChildren();
+			for (AbstractPNNode pp: post) {
+				postpost.addAll(pp.getChildren()); // p的后置集的后置集
+			}
+			postpost.retainAll(PA);
+			// 一定要检查postpost.isEmpty(),因为如果是空集，导致containsAll()的判断为真,引起错误的判断
+		    if (!postpost.isEmpty() && hrs.containsAll(postpost)) { 
+		    	SCom.add(p);  // wang (4-5)，信标补集
+		    }
+		}
+		
+		// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
+		Collection<PTPlace> Is = getIs(omiga);
 		S.addAll(Is);
 		S.removeAll(SCom); // wang (4-2)，信标(SMS)
 		return true;
