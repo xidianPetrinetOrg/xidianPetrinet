@@ -812,8 +812,8 @@ public class S3PR extends S2PR {
 		for (RGraph com : components) {
 			if (com.getVertexCount() < 3)
 				continue; // |Ω|>=2.
-			//List<List<String>> v2s = combine(com.getVertexNames()); // 删除点的组合
-			List<List<String>> v2s = combine(com.getVertexNames(),2); // 删除点的组合
+			List<List<String>> v2s = combine(com.getVertexNames()); // 删除2点的组合，等效
+			//List<List<String>> v2s = combine(com.getVertexNames(),2); // 删除2点的组合，等效
 			for (List<String> v2 : v2s) {
 				RGraph cloneCom = com.clone();
 				try {
@@ -835,6 +835,78 @@ public class S3PR extends S2PR {
 			}
 		}
 		return childComponenets;
+	}
+	
+	/**
+	 * 计算D0[Ω]强分图删除1 - (N-2)点后的的强联通分量集合的信标(SMS)及其补集, N是D0[]强分图对应的顶点数。
+	 * @param verbose 是否打印输出
+	 */
+	public void deleteN(boolean verbose) {
+		// 强联通分量集合，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
+		if (verbose)System.out.println("资源有向图D0的强连通分量，及每个分量对应的SMS及其补集。");
+		Collection<RGraph> components = Component(getRgraph(verbose),verbose);
+		
+		// [C]矩阵
+		int m = 0;  // 开始是0行
+		int n = getPlaceCount(); // 列数是库所个数
+		InvariantMatrix cmatrix = new InvariantMatrix(m,n);
+		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵，由Component()计算所得的SiphonComs，生成[C]矩阵
+		if (verbose) {
+			System.out.println("C-Matrix:");
+			cmatrix.print(2, 0);
+			int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+		}
+		
+		for (RGraph com : components) {
+			if (verbose) { 
+				System.out.println("删点分量：" + com);
+			}
+			if (com.getVertexCount() < 2) {
+				if (verbose) System.out.println("|Ω| < 2, 不删点！");
+				continue; // |Ω|>=2.
+			}
+			for (int N = 1; N <= com.getVertexCount() - 2; N++) {
+				if (verbose) {
+					int total = com.getVertexCount()-2;
+					System.out.println("删除点数: " + N + "/" + total);
+				}
+				List<List<String>> v2s = combine(com.getVertexNames(),N); // 删除N点的组合，等效
+				for (List<String> v2 : v2s) {
+					RGraph cloneCom = com.clone();
+					try {
+						for (String vv: v2) { // 删除N点
+							cloneCom.removeVertex(vv); // 删除1点
+						}
+						if (verbose) System.out.println("remove v2 = " + v2);
+						Component(cloneCom, verbose);
+					} catch (VertexNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+				if (verbose) {
+					System.out.println("=======================");
+					int i = 1;
+					for (Collection<PTPlace> siphon: Siphons) {
+						printPNNodes("Siphons[" + i + "]    = ", siphon);
+						i++;
+					}
+					i = 1;
+					for (Collection<PTPlace> siphonCom: SiphonComs) {
+						printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
+						i++;
+					}
+					System.out.println("\nC-Matrix:");
+					cmatrix.print(2, 0);
+					int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+					System.out.println("Cmatrix rank,alpha,delta = " + 
+							rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+				}
+			}
+		}
 	}
 	
 	/**
