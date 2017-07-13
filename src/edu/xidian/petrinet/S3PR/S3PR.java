@@ -1173,6 +1173,42 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
+	 * 随机生成资源有向图D0 = (V0,E0)。
+	 * （1）确定资源个数|PR|, 即D0 的顶点集合|V0|的数目;
+	 * （2）确定delta = |E0|/(|V0|(|V0| − 1)), 且满足0<=delta<=1; 
+	 * （3）然后随机生成简单有向图D0.
+	 * @param name
+	 * @param vertexNum
+	 * @return
+	 */
+	public RGraph createRgraph(String name, int vertexNum) {
+		float delta = 0.01F;
+		int E0;
+		RGraph rGraph = new RGraph(name);
+		E0 = (int) (vertexNum*(vertexNum-1)*delta + 0.5);
+		for (int i = 1; i <= vertexNum; i++) {
+			String vertexName = "r" + i;
+			rGraph.addVertex(vertexName);
+		}
+		for (int e = 1, vertex = 1; e <= E0; e++) {
+			String edgeName = "t" + e; // t1,t2,...
+			String v1,v2;
+			v1 = "r" + vertex;         // r1,r2,...
+			v2 = "r" + (vertex + 1);   // r2,r3,...
+			try {
+				rGraph.addREdge(edgeName,v1,v2);
+			} catch (VertexNotFoundException except) {
+				// TODO Auto-generated catch block
+				except.printStackTrace();
+			}
+			vertex++;
+			if (vertex > vertexNum) vertex = 1;
+		}
+		
+		return rGraph;
+	}
+	
+	/**
 	 * '['以前的字符串转int，例如："p20[p20]" ==> 20 
 	 * @param s
 	 * @return
