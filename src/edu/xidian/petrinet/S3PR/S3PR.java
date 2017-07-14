@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
@@ -111,16 +112,36 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
-	 * 由一个添加符合S2PR定义的Petri网对象构造S3PR对象
-	 * @param name 该S3PR网名称
-	 * @param ptnet 符合S3PR定义的Petri网对象
-	 * @param p0   闲置库所名称集合
+	 * 由PTNet对象构造S3PR对象
+	 * @param name  该S3PR网名称
+	 * @param ptnet Petri网对象
+	 * @param P0   闲置库所名称集合
 	 * @param PA 工序库所名称集合
 	 * @param PR 资源库所名称集合
 	 */
 	public S3PR(String name, PTNet ptnet, Collection<String> P0, Collection<String> PA, Collection<String> PR) {
 		this.setName(name);
+
 		// 初始化父类对象
+		for (PTTransition t : ptnet.getTransitions()) {
+            this.addTransition(t.getName(), false);
+        }
+        for (PTPlace p : ptnet.getPlaces()) {
+            this.addPlace(p.getName(), false);
+        }
+        for (PTFlowRelation f : ptnet.getFlowRelations()) {
+        	// 错误的，这样添加的f是由原来ptnent的各个node组成的，本对象的node是以上addTransition()和addPlace()产生的“新”node
+        	//this.addFlowRelation(f, false);  
+        	if (f.getDirectionPT()) {
+        		this.addFlowRelationPT(f.getPlace().getName(), f.getTransition().getName(), false);
+        	}
+        	else {
+            	this.addFlowRelationTP(f.getTransition().getName(), f.getPlace().getName(), false);
+        	}
+        }
+               
+        this.setInitialMarking(ptnet.getInitialMarking().clone());
+        
 		for (String p0: P0) {
         	this.P0.add(this.getPlace(p0));
         }
@@ -736,7 +757,8 @@ public class S3PR extends S2PR {
 			if (com.getVertexCount() < 2) continue; // |Ω|>=2.
 			Collection<PTPlace> S = new HashSet<>(); // 信标(SMS)
 			Collection<PTPlace> SCom = new HashSet<>(); // 信标补集
-			if (Siphon_Com(com, S, SCom)) {
+			if (Siphon_Com_S3PR(com, S, SCom)) {  // 适于S3PR
+			//if (Siphon_Com(com, S, SCom)) {  // 仅适用于LS3PR
 				// D0[Ω]删除1点和删除2点分别得到的某个强连通分量有可能是相同的，从而得到相同的信标及其补集
 				if (SiphonComs.contains(SCom)) {
 					if (verbose) printPNNodes("重复信标补集：", SCom);
@@ -791,7 +813,8 @@ public class S3PR extends S2PR {
 		for (RGraph com : components) {
 			if (com.getVertexCount() < 3)
 				continue; // |Ω|>=2.
-			List<List<String>> v2s = combine(com.getVertexNames()); // 删除点的组合
+			List<List<String>> v2s = combine(com.getVertexNames()); // 删除2点的组合，等效
+			//List<List<String>> v2s = combine(com.getVertexNames(),2); // 删除2点的组合，等效
 			for (List<String> v2 : v2s) {
 				RGraph cloneCom = com.clone();
 				try {
@@ -816,6 +839,78 @@ public class S3PR extends S2PR {
 	}
 	
 	/**
+	 * 计算D0[Ω]强分图删除1 - (N-2)点后的的强联通分量集合的信标(SMS)及其补集, N是D0[Ω]强分图对应的顶点数。
+	 * @param verbose 是否打印输出
+	 */
+	public void deleteN(boolean verbose) {
+		// 强联通分量集合，即算法4.1求出的D0[Ω]强分图D0<sup>1</sup>,D0<sup>2</sup>,....
+		if (verbose)System.out.println("资源有向图D0的强连通分量，及每个分量对应的SMS及其补集。");
+		Collection<RGraph> components = Component(getRgraph(verbose),verbose);
+		
+		// [C]矩阵
+		int m = 0;  // 开始是0行
+		int n = getPlaceCount(); // 列数是库所个数
+		InvariantMatrix cmatrix = new InvariantMatrix(m,n);
+		cmatrix = CMatrix(cmatrix); // 构造[C]矩阵，由Component()计算所得的SiphonComs，生成[C]矩阵
+		if (verbose) {
+			System.out.println("C-Matrix:");
+			cmatrix.print(2, 0);
+			int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+			System.out.println("Cmatrix rank,alpha,delta = " + 
+					rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+		}
+		
+		for (RGraph com : components) {
+			if (verbose) { 
+				System.out.println("删点分量：" + com);
+			}
+			int total = com.getVertexCount();
+			if (total < 2) {
+				if (verbose) System.out.println("|Ω| < 2, 不删点！");
+				continue; // |Ω|>=2.
+			}
+			for (int N = 1; N <= total - 2; N++) {
+				if (verbose) {
+					System.out.println("删除点数: " + N + "/" + (total-2));
+				}
+				List<List<String>> v2s = combine(com.getVertexNames(),N); // 删除N点的组合，等效
+				for (List<String> v2 : v2s) {
+					RGraph cloneCom = com.clone();
+					try {
+						for (String vv: v2) { // 删除N点
+							cloneCom.removeVertex(vv); // 删除1点
+						}
+						if (verbose) System.out.println("remove v2 = " + v2);
+						Component(cloneCom, verbose);
+					} catch (VertexNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				cmatrix = CMatrix(cmatrix); // 构造[C]矩阵
+				if (verbose) {
+					System.out.println("=======================");
+					int i = 1;
+					for (Collection<PTPlace> siphon: Siphons) {
+						printPNNodes("Siphons[" + i + "]    = ", siphon);
+						i++;
+					}
+					i = 1;
+					for (Collection<PTPlace> siphonCom: SiphonComs) {
+						printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
+						i++;
+					}
+					System.out.println("\nC-Matrix:");
+					cmatrix.print(2, 0);
+					int rank_alpha_delta[] = rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+					System.out.println("Cmatrix rank,alpha,delta = " + 
+							rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * 从strs1中取出2个元素的所有不同组合
 	 */
 	public List<List<String>> combine(Collection<String> strs1) {
@@ -832,12 +927,54 @@ public class S3PR extends S2PR {
 		}
 		return results;
 	}
+	
+	/**
+	 * 从strs1中取出m个元素的所有不同组合.
+	 * 如：str1 = {"1","2","3","4"};
+	 * combine(str1,2); // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]]
+	 */
+	public List<List<String>> combine(Collection<String> strs1, int m) {
+		List<String> strs = new ArrayList<>(strs1);  // 使Collection集合有序
+		List<List<String>> results = new ArrayList<>();
+		List<String> tmp = new ArrayList<>();
+		combine(strs.size(),m,strs,results,tmp);
+		return results;
+	}
+	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 * @param n 集合总数，初值为strs的长度，strs.size()
+	 * @param m 取出元素数，即从n个元素中取出m个元素
+	 * @param strs 元素集合
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，组合结果降序排列
+	 * @param tmp 临时变量，存取每次取得的组合结果
+	 */
+	public void combine(int n,int m,List<String> strs,List<List<String>> results,List<String> tmp) {
+		if (m == 0 ) { // 取得一次组合结果
+			List<String> tmp1 = new ArrayList<>(tmp);
+			results.add(tmp1);
+			return;
+		}
+		if (n > 0) {
+			String s = strs.get(n-1);  // 最后一个元素（索引为n-1）
+			tmp.add(s);                // s添加到组合结果中
+			combine(n-1,m-1,strs,results,tmp);   // 因为s在组合结果中，因此执行：在n-1中选每个m-1个元素
+			tmp.remove(s);
+			combine(n-1,m,strs,results,tmp);     // 因为s不在组合结果中，因此执行：在n-1中选m个元素
+		}
+	}
 
 	/**
+	 * 仅适用于LS3PR
 	 * 计算资源有向图的强连通分量对应的信标及其补集，每个强连通分量对应一个信标补集和信标(SMS), 顶点集是SR(信标S中的资源库所集合)
 	 * @param component 强连通分量
-	 * @param S 返回信标(SMS)
-	 * @param SCom 返回信标的补集
+	 * @param S 返回信标(SMS)【wang (4-2)】
+	 * @param SCom 返回信标的补集【 wang (4-7)，信标补集】，仅适于LS3PR
 	 * @return true: 有信标及其补集; false：无，强连通分量的的顶点个数<2
 	 */
 	@SuppressWarnings("rawtypes")
@@ -858,6 +995,45 @@ public class S3PR extends S2PR {
 		}
 		// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
 		Collection<PTPlace> Is = getIs(component.getElementSet());
+		S.addAll(Is);
+		S.removeAll(SCom); // wang (4-2)，信标(SMS)
+		return true;
+	}
+	
+	/**
+	 * 适用于S3PR网
+	 * 计算资源有向图的强连通分量对应的信标及其补集，每个强连通分量对应一个信标补集和信标(SMS), 顶点集是SR(信标S中的资源库所集合)
+	 * wang (4-5)，因为[S]一定不属于P0，因此原式中的P0可以省略
+	 * [S] = {p|p∈∪<sub>r∈Ω</sub>H(r)∧(p的后置集的后置集∩PA)非空，是∪<sub>r∈Ω</sub>H(r)的子集}
+	 * @param component 强连通分量
+	 * @param S 返回信标(SMS)【wang (4-2), S = ‖Is‖ \ [S]】
+	 * @param SCom 返回信标的补集【 wang (4-5)，信标补集】,适于S3PR, 因为SCom一定是非P0，因此去掉原式的P0部分
+	 * @return true: 有信标及其补集; false：无，强连通分量的的顶点个数<2
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected boolean Siphon_Com_S3PR(RGraph component, Collection<PTPlace> S, Collection<PTPlace> SCom) {		 
+		int num = component.getVertexCount();
+		if (num < 2) return false; // 非SMS,至少资源库所个数>=2 
+		
+		Collection<PTPlace> omiga = component.getElementSet(); // 强分图的顶点，也是信标SMS中的资源SR，
+	
+		Collection<PTPlace> hrs = getHr(omiga);  // omiga资源持有者
+		Collection<PTPlace> postpost = new HashSet<>(); // p的后置集的后置集
+		for(PTPlace p :hrs) {
+			postpost.clear();
+			Set<AbstractPNNode<PTFlowRelation>> post = p.getChildren();
+			for (AbstractPNNode pp: post) {
+				postpost.addAll(pp.getChildren()); // p的后置集的后置集
+			}
+			postpost.retainAll(PA);
+			// 一定要检查postpost.isEmpty(),因为如果是空集，导致containsAll()的判断为真,引起错误的判断
+		    if (!postpost.isEmpty() && hrs.containsAll(postpost)) { 
+		    	SCom.add(p);  // wang (4-5)，信标补集
+		    }
+		}
+		
+		// 参数是强连通分量的顶点集，构成信标S中资源库所集合SR
+		Collection<PTPlace> Is = getIs(omiga);
 		S.addAll(Is);
 		S.removeAll(SCom); // wang (4-2)，信标(SMS)
 		return true;
@@ -993,6 +1169,42 @@ public class S3PR extends S2PR {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * 随机生成资源有向图D0 = (V0,E0)。
+	 * （1）确定资源个数|PR|, 即D0 的顶点集合|V0|的数目;
+	 * （2）确定delta = |E0|/(|V0|(|V0| − 1)), 且满足0<=delta<=1; 
+	 * （3）然后随机生成简单有向图D0.
+	 * @param name
+	 * @param vertexNum
+	 * @return
+	 */
+	public RGraph createRgraph(String name, int vertexNum) {
+		float delta = 0.01F;
+		int E0;
+		RGraph rGraph = new RGraph(name);
+		E0 = (int) (vertexNum*(vertexNum-1)*delta + 0.5);
+		for (int i = 1; i <= vertexNum; i++) {
+			String vertexName = "r" + i;
+			rGraph.addVertex(vertexName);
+		}
+		for (int e = 1, vertex = 1; e <= E0; e++) {
+			String edgeName = "t" + e; // t1,t2,...
+			String v1,v2;
+			v1 = "r" + vertex;         // r1,r2,...
+			v2 = "r" + (vertex + 1);   // r2,r3,...
+			try {
+				rGraph.addREdge(edgeName,v1,v2);
+			} catch (VertexNotFoundException except) {
+				// TODO Auto-generated catch block
+				except.printStackTrace();
+			}
+			vertex++;
+			if (vertex > vertexNum) vertex = 1;
+		}
+		
+		return rGraph;
 	}
 	
 	/**

@@ -957,7 +957,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_3(boolean)}.
 	 * Wang, p86,图4-1,对应的S3PR
 	 */
-	@Test
+	//@Test
 	public void algorithm4_3_verbose() {
 		S3PR s3pr = getWangFigure4_1();
 		// verbose模式，显示计算过程
@@ -989,6 +989,17 @@ public class S3PRTest {
 			s3pr.printPNNodes("SiphonComs[" + i + "] = ", siphonCom);
 			i++;
 		}
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#deleteN(boolean)}.
+	 * Wang, p86,图4-1,对应的S3PR
+	 */
+	@Test
+	public void deleteN_verbose() {
+		S3PR s3pr = getWangFigure4_1();
+		// verbose模式，显示计算过程
+		s3pr.deleteN(true);
 	}
 	
 	/**
@@ -1247,7 +1258,7 @@ public class S3PRTest {
 	}
 	
 	/**
-	 * 组合测试，从strs中取出2个元素的所有不同组合
+	 * 组合测试，从strs中取出2个元素的所有不同组合，参数返回结果
 	 */
 	public void combine1(List<String> strs, List<List<String>> results) {
 		int n = strs.size();
@@ -1271,21 +1282,10 @@ public class S3PRTest {
 		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 	}
 	
-	//@Test
-	public void combineTest2() {
-		Collection<String> strs = new HashSet<>();
-		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
-		List<String> strs1 = new ArrayList<>(strs);
-		List<List<String>> results = new ArrayList<>();
-		combine1(strs1,results);
-		System.out.println(results.size()); // 6
-		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
-	}
-	
 	/**
-	 * 组合测试，从strs中取出2个元素的所有不同组合
+	 * 组合测试，从strs中取出2个元素的所有不同组合，返回结果
 	 */
-	public List<List<String>> combine3(List<String> strs) {
+	public List<List<String>> combine2(List<String> strs) {
 		List<List<String>> results = new ArrayList<>();
 		int n = strs.size();
 		for (int i = 0; i < n; i++) {
@@ -1300,12 +1300,189 @@ public class S3PRTest {
 	}
 	
 	//@Test
-	public void combineTest3() {
+	public void combineTest2() {
 		List<String> strs = new ArrayList<>();
 		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
-		List<List<String>> results = combine3(strs);
+		List<List<String>> results = combine2(strs);
 		System.out.println(results.size()); // 6
 		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
 	}
 	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 */
+	public int combine3(int n,int m) {
+		if (n == 0 || m == 0 || n == m ){
+			return 1;
+		}
+		else // 0 < m < n 
+		{
+			return combine3(n-1,m-1) + combine3(n-1,m);   
+		}
+	}
+	
+	//@Test
+	public void combineTest3() {
+		// 组合数
+		System.out.println("combine3(4,3)= " + combine3(4,3));  // 4
+		// 组合数
+		System.out.println("combine3(4,2)= " + combine3(4,2));  // 6
+	}
+	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 * @param n 集合总数，初值为strs的长度，strs.size()
+	 * @param m 取出元素数，即从n个元素中取出m个元素
+	 * @param strs 元素集合
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，组合结果降序排列
+	 * @param tmp 临时变量，存取每次取得的组合结果
+	 */
+	public void combine4(int n,int m,List<String> strs, List<List<String>> results,List<String> tmp) {
+		if (m == 0 ) { // 取得一次组合结果
+			//System.out.println("tmp = " + tmp);
+			List<String> tmp1 = new ArrayList<>(tmp);
+			results.add(tmp1);
+			return;
+		}
+		if (n > 0) {
+			String s = strs.get(n-1);  // 最后一个元素（索引为n-1）
+			tmp.add(s);                // s添加到组合结果中
+			combine4(n-1,m-1,strs,results,tmp);   // 因为s在组合结果中，因此执行：在n-1中选每个m-1个元素
+			tmp.remove(s);
+			combine4(n-1,m,strs,results,tmp);     // 因为s不在组合结果中，因此执行：在n-1中选m个元素
+		}
+	}
+	
+	//@Test
+	public void combineTest4() {
+		List<String> strs = new ArrayList<>();
+		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
+		List<List<String>> results = new ArrayList<>();
+		List<String> tmp = new ArrayList<>();
+		combine4(strs.size(),2,strs,results,tmp);
+		
+		System.out.println(results.size()); // 6
+		// combine4()结果
+		System.out.println(results);  // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]] 
+				
+		// combine5()结果
+		//System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	}
+	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 * @param selected 模拟选取的元素索引，初值设为0，组合结果升序排列
+	 * @param n 集合总数，，初值为strs的长度，strs.size()
+	 * @param m 取出元素数，即从n个元素中取出m个元素
+	 * @param strs 元素集合
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，selected初值设为0，组合结果升序排列。
+	 * @param tmp 临时变量，存取每次取得的组合结果
+	 */
+	public void combine5(int selected, int n,int m,List<String> strs, List<List<String>> results,List<String> tmp) {
+		if (m == 0 ) { // 取得一次组合结果
+			//System.out.println("tmp = " + tmp);
+			List<String> tmp1 = new ArrayList<>(tmp);
+			results.add(tmp1);
+			return;
+		}
+		if (n > 0) {
+			String s = strs.get(selected);  // 模拟选取的元素（索引为selected）
+			tmp.add(s);                     // s添加到组合结果中
+			combine5(selected+1,n-1,m-1,strs,results,tmp);   // 因为s在组合结果中，因此执行：在n-1中选每个m-1个元素
+			tmp.remove(s);
+			combine5(selected+1,n-1,m,strs,results,tmp);     // 因为s不在组合结果中，因此执行：在n-1中选m个元素
+		}
+	}
+	
+	//@Test
+	public void combineTest5() {
+		List<String> strs = new ArrayList<>();
+		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
+		List<List<String>> results = new ArrayList<>();
+		List<String> tmp = new ArrayList<>();
+		
+		// selected 模拟选取的元素索引，初值设为0，组合结果升序排列
+		combine5(0,strs.size(),2,strs,results,tmp);
+		System.out.println(results.size()); // 6
+		
+		// combine4()结果
+		//System.out.println(results);  // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]] 
+		
+		// combine5()结果
+		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	}
+	
+	/**
+	 * 从n个元素的集合中，取出m个元素的所有不同组合（与顺序无关，即顺序不同，包含元素相同即可）。
+	 * 我们扫描每一个元素，针对该元素，我们可以将其放到组合集中，然后在剩下的n-1个元素中再选择m-1个元素；
+	 * 我们也可以不放该元素进集合，而直接从剩下的n-1个元素中选择m个元素。
+	 * C(n,m) = C(n-1,m-1) + C(n-1,m)    (0<m<n时)
+	 * C(n,m) = 1                        (n=0或m=0或n=m时)
+	 * C(n,m) = n!/m!*(n-m)!
+	 * @param selected 模拟选取的元素索引，初值设为0，组合结果升序排列
+	 * @param n 集合总数，初值为strs的长度，strs.size()
+	 * @param m 取出元素数，即从n个元素中取出m个元素
+	 * @param strs 元素集合
+	 * @param results 返回组合结果，从strs中取出m个元素的所有组合的集合，组合结果降序排列
+	 * @param tmp 临时变量，存取每次取得的组合结果
+	 */
+	List<String> tmp = new ArrayList<>();
+	public void combine6(int selected,int n,int m,List<String> strs, List<List<String>> results) {
+		if (m == 0 ) { // 取得一次组合结果
+			//System.out.println("tmp = " + tmp);
+			List<String> tmp1 = new ArrayList<>(tmp);
+			results.add(tmp1);
+			return;
+		}
+		if (n > 0) {
+			for (int i = selected; i < strs.size(); i++) {
+				String s = strs.get(i);  // 最后一个元素（索引为n-1）
+				tmp.add(s);                // s添加到组合结果中
+				combine6(i+1,n-1,m-1,strs,results);   // 因为s在组合结果中，因此执行：在n-1中选每个m-1个元素
+				tmp.remove(s);
+				//combine6(i+1,n-1,m,strs,results);     // 因为s不在组合结果中，因此执行：在n-1中选m个元素
+			}
+		}
+	}
+	
+	//@Test
+	public void combineTest6() {
+		List<String> strs = new ArrayList<>();
+		strs.add("1"); strs.add("2"); strs.add("3"); strs.add("4");
+		List<List<String>> results = new ArrayList<>();
+		
+		// selected 模拟选取的元素索引，初值设为0，组合结果升序排列
+		combine6(0,strs.size(),2,strs,results);
+		
+		System.out.println(results.size()); // 6
+		// combine4()结果
+		// System.out.println(results);  // [[4, 3], [4, 2], [4, 1], [3, 2], [3, 1], [2, 1]] 
+				
+		// combine5()结果
+		//System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+		
+		// combine6()结果与combine5()相同,但是combine4()、combine5()更简洁
+		System.out.println(results);  // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+	}
+	
+	/*************************************************************
+	 * 从n个元素的集合中，取出m个元素的所有不同组合
+	 * 结论：combine6()结果与combine5()相同,但是combine4()、combine5()更简洁
+	 * 优先采用combine4(),参数tmp可以作为成员变量。
+	**************************************************************/
 }
