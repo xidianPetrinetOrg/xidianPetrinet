@@ -569,7 +569,7 @@ public class S3PRTest {
 	
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#S3PR(S2PR)}.
-	 * 自动生成网， Wang algorithm4_1(),algorithm4_2(),algorithm4_1()
+	 * 2个资源， 自动生成网， Wang algorithm4_1(),algorithm4_2(),algorithm4_1()
 	 */
 	//@Test
 	public void testS3PR() {
@@ -580,6 +580,27 @@ public class S3PRTest {
 		S3PR s3pr = new S3PR("test_s3pr","s2pr_1",s2pr);
 		System.out.println("s3pr: " + s3pr);
 		
+		// 2个强分图，每个是1个节点（资源），
+		// 本s3pr实际上是一个s2pr，因此，Cmatrix rank,alpha,delta = 0,0,0
+		//s3pr.algorithm4_1(true);  // Cmatrix rank,alpha,delta = 0,0,0
+		//s3pr.algorithm4_2(true);  // Cmatrix rank,alpha,delta = 0,0,0
+		s3pr.algorithm4_3(true);  // Cmatrix rank,alpha,delta = 0,0,0
+	}
+	
+	/**
+	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#S3PR(S2PR)}.
+	 * 3个资源，自动生成网， Wang algorithm4_1(),algorithm4_2(),algorithm4_1()
+	 */
+	@Test
+	public void testS3PR1() {
+		//fail("Not yet implemented");
+		S2PR s2pr = new S2PR("test_s2pr",3,1,4);
+		System.out.println("s2pr:" + s2pr);
+		
+		S3PR s3pr = new S3PR("test_s3pr","s2pr_1",s2pr);
+		System.out.println("s3pr: " + s3pr);
+		
+		// 3个强分图，每个是1个节点（资源），
 		// 本s3pr实际上是一个s2pr，因此，Cmatrix rank,alpha,delta = 0,0,0
 		//s3pr.algorithm4_1(true);  // Cmatrix rank,alpha,delta = 0,0,0
 		//s3pr.algorithm4_2(true);  // Cmatrix rank,alpha,delta = 0,0,0
@@ -590,7 +611,7 @@ public class S3PRTest {
 	 * Li. 图3-1或图4-2, Wang algorithm4_1(),algorithm4_2(),algorithm4_1()
 	 */
 	//@Test
-	public void testS3PR1() {
+	public void testS3PR2() {
 	
 		S3PR s3pr = Li_Figure3_1();
 		
