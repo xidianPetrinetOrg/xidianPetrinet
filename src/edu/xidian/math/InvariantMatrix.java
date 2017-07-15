@@ -543,6 +543,7 @@ public class InvariantMatrix extends Matrix {
      * 此函数速度优于rankE()
      */
     public int rank() {
+    	if (m == 0 || n == 0) return 0;  // 0行或0列的矩阵，秩是0
     	int c[][] = getArray();
     	return rank(c);
     }
@@ -552,6 +553,7 @@ public class InvariantMatrix extends Matrix {
      * 此函数速度慢于rank()
      */
     public int rankE() {
+    	if (m == 0 || n == 0) return 0; // 0行或0列的矩阵，秩是0
     	int c[][] = getArray();
     	return rankE(c);
     }
