@@ -1184,11 +1184,10 @@ public class S3PR extends S2PR {
 	 * @param vertexNum
 	 * @return
 	 */
-	public RGraph createRgraph(String name, int vertexNum) {
-		float delta = 0.01F;
+	public RGraph createRGraph(String name, int vertexNum, float delta) {
 		int E0;
 		RGraph rGraph = new RGraph(name);
-		E0 = (int) (vertexNum*(vertexNum-1)*delta + 0.5);
+		E0 = (int) (vertexNum*(vertexNum-1)*delta);
 		for (int i = 1; i <= vertexNum; i++) {
 			String vertexName = "r" + i;
 			rGraph.addVertex(vertexName);
@@ -1209,6 +1208,77 @@ public class S3PR extends S2PR {
 		}
 		
 		return rGraph;
+	}
+	
+	public S3PR RGraphToS3PR(RGraph rGraph) {
+		S3PR s3pr = new S3PR();
+		
+		// 资源库所集，s3pr的PR在EdgeAddToS3PR
+		for (String prName: rGraph.getVertexNames()) {
+			s3pr.addPlace(prName);
+		}
+		// D0中一条边对应一个S2PR网，包含一个idle库所，两个工序库所，两个资源库所(边的关联顶点)。
+		for (REdge edge: rGraph.getEdges()) {
+			edgeAddToS3PR(s3pr, edge);
+		}
+		return s3pr;
+	}
+	
+	
+	/**
+	 * <pre>
+	 * 本函数把edge代表的S2PR网，添加到s3pr网中。
+	 * edge对应一个S2PR网，包含一个idle库所，两个工序库所，两个资源库所(边的关联顶点)。
+	 * <------- pr2 <-----..<----- pr1 <-----. 
+	 * |                  ||                 |
+	 * t1 ----> pa1 ----> t2 -----> pa2 ---> t3
+	 * |                                     |
+	 * <----------------- p0 <---------------.
+	 * </pre>
+	 * @param s3pr 被添加的S3PR网，返回添加后的网
+	 * @param edge 代表的S2PR将被添加到s3pr中
+	 */
+	public void edgeAddToS3PR(S3PR s3pr, REdge edge) {
+		String p0,pa1,pa2,pr1,pr2,t1,t2,t3;
+		// idle
+		p0 = s3pr.lastPlaceName(); s3pr.addPlace(p0);  
+		// pa1
+		pa1 = s3pr.lastPlaceName(); s3pr.addPlace(pa1);
+		// pa2
+		pa2 = s3pr.lastPlaceName(); s3pr.addPlace(pa2);
+		// t1,t2,t3
+		t1 = s3pr.lastTransitionName(); s3pr.addTransition(t1);
+		t2 = s3pr.lastTransitionName(); s3pr.addTransition(t2);
+		t3 = s3pr.lastTransitionName(); s3pr.addTransition(t3);
+        // pr1,pr2
+		pr1 = edge.getSource().getName();
+		pr2 = edge.getTarget().getName();
+		// FlowRelation
+		s3pr.addFlowRelationPT(p0,t1,1);
+		s3pr.addFlowRelationTP(t1,pa1,1);
+		s3pr.addFlowRelationPT(pa1,t2,1);
+		s3pr.addFlowRelationTP(t2,pa2,1);
+		s3pr.addFlowRelationPT(pa2,t3,1);
+		s3pr.addFlowRelationTP(t3,p0,1);
+		
+		s3pr.addFlowRelationTP(t3,pr1,1);
+		s3pr.addFlowRelationPT(pr1,t2,1);
+		s3pr.addFlowRelationTP(t2,pr2,1);
+		s3pr.addFlowRelationPT(pr2,t1,1);
+		
+		// P0
+		s3pr.getP0().add(s3pr.getPlace(p0)); // 由于使用Collection，因此不会有重复元素被添加。
+		// PR
+		s3pr.getPR().add(s3pr.getPlace(pr1)); // 由于使用Collection，因此不会有重复元素被添加。
+		s3pr.getPR().add(s3pr.getPlace(pr2)); // 由于使用Collection，因此不会有重复元素被添加。
+	}
+	
+	/**
+	 * 获取闲置库所集
+	 * @return
+	 */
+	public Collection<PTPlace> getP0() {
+		return P0;
 	}
 	
 	/**

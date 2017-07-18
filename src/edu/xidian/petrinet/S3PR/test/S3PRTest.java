@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.junit.After;
@@ -19,6 +20,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.invation.code.toval.misc.ListUtils;
+import de.invation.code.toval.misc.SetUtils;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
@@ -591,7 +594,7 @@ public class S3PRTest {
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#S3PR(S2PR)}.
 	 * 3个资源，自动生成网， Wang algorithm4_1(),algorithm4_2(),algorithm4_1()
 	 */
-	@Test
+	//@Test
 	public void testS3PR1() {
 		//fail("Not yet implemented");
 		S2PR s2pr = new S2PR("test_s2pr",3,1,4);
@@ -831,7 +834,7 @@ public class S3PRTest {
 		
 		System.out.println("---getIp(p0)");
 		for (S2PR s2pr: s3pr.getS2pr().values()) {
-			s3pr.printPNNodes(s2pr.getP0().getName() + "对应的Ip = ", s3pr.getIp(s2pr.getP0()));
+			s3pr.printPNNodes(s2pr.get_p0().getName() + "对应的Ip = ", s3pr.getIp(s2pr.get_p0()));
 		}
 		
 		System.out.println("---getIp()");
@@ -1308,4 +1311,40 @@ public class S3PRTest {
 	 * 结论：combine6()结果与combine5()相同,但是combine4()、combine5()更简洁
 	 * 优先采用combine4(),参数tmp可以作为成员变量。
 	**************************************************************/
+	
+	//@Test
+	public void testRandom() {
+		int max=20;
+	    int min=10;
+	    Random random = new Random();
+	    for (int i = 0; i < 20; i++) {
+	    	int s = random.nextInt(max)%(max-min+1) + min;
+	    	System.out.print(s + ",");
+	    }
+	    System.out.println();
+	    for (int i = 0; i < 20; i++) {
+	    	int s = random.nextInt(max)%(max-min+1) + min;
+	    	System.out.print(s + ",");
+	    }
+	}
+	
+	//@Test
+	public void testRandomSet() {
+		Set<Integer> c = new HashSet<>();
+		c.add(1); c.add(2); c.add(3); c.add(4);
+		for (int i = 0; i < 10; i++) {
+			Set<Integer> result = SetUtils.getRandomSubset(c,2);
+			System.out.println(result);
+		}
+	}
+	
+	@Test
+	public void testRandomSet1() {
+		List<Integer> c = new ArrayList<>();
+		c.add(1); c.add(2); c.add(3); c.add(4);
+		for (int i = 0; i < 10; i++) {
+			List<List<Integer>> result = ListUtils.randomPartition(c, 2);
+			System.out.println(result);
+		}
+	}
 }
