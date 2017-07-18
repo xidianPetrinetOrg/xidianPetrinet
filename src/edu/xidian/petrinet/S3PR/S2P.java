@@ -166,7 +166,7 @@ public class S2P extends PTNet {
         	}
         }
         
-        this.setP0(this.getPlace(p0));
+        this.set_p0(this.getPlace(p0));
         for (String pa: PA) {
         	this.PA.add(this.getPlace(pa));
         }
@@ -315,7 +315,7 @@ public class S2P extends PTNet {
 	 * 获取闲置库所p0
 	 * @return
 	 */
-	public PTPlace getP0() {
+	public PTPlace get_p0() {
 		return p0;
 	}
 
@@ -323,7 +323,7 @@ public class S2P extends PTNet {
 	 * 设置闲置库所p0
 	 * @param p0
 	 */
-	public void setP0(PTPlace p0) {
+	public void set_p0(PTPlace p0) {
 		this.p0 = p0;
 	}
 	
