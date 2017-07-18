@@ -45,6 +45,17 @@ public class S2PR extends S2P {
      * this S2PR对象对应的S2P对象, 即不含资源库所(PR)的S2P对象
      */
     protected S2P s2p = null;
+    
+	/**
+	 * Resource Place name's prefix, default "p"
+	 */
+	private String r_prefix = "1";
+	
+	/**
+	 * last Resource Place name's suffix, start 1
+	 */
+	private int r_suffix = 1;
+	
 	/**
 	 * 
 	 */
@@ -302,6 +313,20 @@ public class S2PR extends S2P {
 	 */
 	public Collection<PTPlace> getPR() {
 		return PR;
+	}
+	
+	/**
+	 * last Resource Place Name: r_prefix + r_suffix++
+	 */
+	protected String lastResourceName() {
+		return r_prefix + r_suffix++;
+	}
+	
+	/**
+	 * current Resource Place Name: r_prefix + r_suffix
+	 */
+	public String currentResourceName() {
+		return r_prefix + r_suffix;
 	}
 	
 	@Override
