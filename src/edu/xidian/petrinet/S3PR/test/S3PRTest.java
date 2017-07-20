@@ -20,8 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.invation.code.toval.misc.ListUtils;
-import de.invation.code.toval.misc.SetUtils;
+import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
@@ -1307,11 +1306,16 @@ public class S3PRTest {
 	}
 	
 	/*************************************************************
+	 * ***********************************************************
 	 * 从n个元素的集合中，取出m个元素的所有不同组合
 	 * 结论：combine6()结果与combine5()相同,但是combine4()、combine5()更简洁
 	 * 优先采用combine4(),参数tmp可以作为成员变量。
+	 * ***********************************************************
 	**************************************************************/
 	
+	/*******************************************************
+	 * 获取min到max之间的随机整数，包含min和max
+	 */
 	//@Test
 	public void testRandom() {
 		int max=20;
@@ -1319,7 +1323,7 @@ public class S3PRTest {
 	    Random random = new Random();
 	    for (int i = 0; i < 20; i++) {
 	    	int s = random.nextInt(max)%(max-min+1) + min;
-	    	System.out.print(s + ",");
+	    	System.out.print(s + ",");  // 包含max和min,及其之间的值， 即10 ~ 20之间的整数，包含10和20
 	    }
 	    System.out.println();
 	    for (int i = 0; i < 20; i++) {
@@ -1328,23 +1332,41 @@ public class S3PRTest {
 	    }
 	}
 	
+	/*******************************************************
+	 * random.nextInt(10)： 获取0到9之间的随机整数，包含0和9，不包含10
+	 */
 	//@Test
-	public void testRandomSet() {
-		Set<Integer> c = new HashSet<>();
-		c.add(1); c.add(2); c.add(3); c.add(4);
-		for (int i = 0; i < 10; i++) {
-			Set<Integer> result = SetUtils.getRandomSubset(c,2);
-			System.out.println(result);
-		}
+	public void testRandom1() {
+		Random random = new Random();
+	    for (int i = 0; i < 10; i++) {
+	    	System.out.print(random.nextInt(10) + ",");  // 0 ~ 9，包含0，不包含10
+	    }
+	    System.out.println();
+	    
+	    for (int i = 0; i < 10; i++) {
+	    	System.out.print(random.nextInt(10) + 1 + ",");  // 1 ~ 10，包含1和10
+	    }
+	    System.out.println();
 	}
 	
 	@Test
-	public void testRandomSet1() {
-		List<Integer> c = new ArrayList<>();
-		c.add(1); c.add(2); c.add(3); c.add(4);
-		for (int i = 0; i < 10; i++) {
-			List<List<Integer>> result = ListUtils.randomPartition(c, 2);
-			System.out.println(result);
+	public void testRGraphToS3PR() {
+		RGraph rGraph = new RGraph();
+		PTPlace p1 = new PTPlace("r1");
+		PTPlace p2 = new PTPlace("r2");
+		//rGraph.addVertex("r1",p1); rGraph.addVertex("r2",p2);
+		rGraph.addVertex("r1"); rGraph.addVertex("r2");
+		try {
+			rGraph.addREdge("t2", "r1", "r2");
+		} catch (VertexNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		//System.out.println("rGraph:" + rGraph);
+		
+		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
+		System.out.println("s3pr:" + s3pr);
 	}
+	
 }

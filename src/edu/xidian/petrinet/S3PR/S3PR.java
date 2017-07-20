@@ -1210,10 +1210,10 @@ public class S3PR extends S2PR {
 		return rGraph;
 	}
 	
-	public S3PR RGraphToS3PR(RGraph rGraph) {
+	static public S3PR RGraphToS3PR(RGraph rGraph) {
 		S3PR s3pr = new S3PR();
 		
-		// 资源库所集，s3pr的PR在EdgeAddToS3PR
+		// 资源库所集，s3pr的PR
 		for (String prName: rGraph.getVertexNames()) {
 			s3pr.addPlace(prName);
 		}
@@ -1238,7 +1238,7 @@ public class S3PR extends S2PR {
 	 * @param s3pr 被添加的S3PR网，返回添加后的网
 	 * @param edge 代表的S2PR将被添加到s3pr中
 	 */
-	public void edgeAddToS3PR(S3PR s3pr, REdge edge) {
+	static public void edgeAddToS3PR(S3PR s3pr, REdge edge) {
 		String p0,pa1,pa2,pr1,pr2,t1,t2,t3;
 		// idle
 		p0 = s3pr.lastPlaceName(); s3pr.addPlace(p0);  
@@ -1268,9 +1268,12 @@ public class S3PR extends S2PR {
 		
 		// P0
 		s3pr.getP0().add(s3pr.getPlace(p0)); // 由于使用Collection，因此不会有重复元素被添加。
+		// PA
+		s3pr.getPA().add(s3pr.getPlace(pa1)); 
+		s3pr.getPA().add(s3pr.getPlace(pa2)); 
 		// PR
-		s3pr.getPR().add(s3pr.getPlace(pr1)); // 由于使用Collection，因此不会有重复元素被添加。
-		s3pr.getPR().add(s3pr.getPlace(pr2)); // 由于使用Collection，因此不会有重复元素被添加。
+		s3pr.getPR().add(s3pr.getPlace(pr1)); 
+		s3pr.getPR().add(s3pr.getPlace(pr2)); 
 	}
 	
 	/**
