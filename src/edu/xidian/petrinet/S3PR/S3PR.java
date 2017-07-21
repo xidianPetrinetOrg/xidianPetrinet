@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uni.freiburg.iig.telematik.jagal.graph.Edge;
+import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
@@ -1210,7 +1212,13 @@ public class S3PR extends S2PR {
 		return rGraph;
 	}
 	
-	static public S3PR RGraphToS3PR(RGraph rGraph) {
+	/**
+	 * 有资源有向图生成S3PR对象，每个edge对应一个S2PR网，包含一个idle库所，两个工序库所，两个资源库所(边的关联顶点)。
+	 * @param rGraph 资源有向图，这里不用RGraph类型，原因是这里的图顶点元素不必用PTPlace表示
+	 * @return 此资源有向图对应的S3PR对象
+	 */
+	@SuppressWarnings("rawtypes")
+	static public S3PR RGraphToS3PR(Graph<String> rGraph) {
 		S3PR s3pr = new S3PR();
 		
 		// 资源库所集，s3pr的PR
@@ -1218,7 +1226,7 @@ public class S3PR extends S2PR {
 			s3pr.addPlace(prName);
 		}
 		// D0中一条边对应一个S2PR网，包含一个idle库所，两个工序库所，两个资源库所(边的关联顶点)。
-		for (REdge edge: rGraph.getEdges()) {
+		for (Edge edge: rGraph.getEdges()) {
 			edgeAddToS3PR(s3pr, edge);
 		}
 		return s3pr;
@@ -1238,7 +1246,8 @@ public class S3PR extends S2PR {
 	 * @param s3pr 被添加的S3PR网，返回添加后的网
 	 * @param edge 代表的S2PR将被添加到s3pr中
 	 */
-	static public void edgeAddToS3PR(S3PR s3pr, REdge edge) {
+	@SuppressWarnings("rawtypes")
+	static public void edgeAddToS3PR(S3PR s3pr, Edge edge) {
 		String p0,pa1,pa2,pr1,pr2,t1,t2,t3;
 		// idle
 		p0 = s3pr.lastPlaceName(); s3pr.addPlace(p0);  
@@ -1271,9 +1280,10 @@ public class S3PR extends S2PR {
 		// PA
 		s3pr.getPA().add(s3pr.getPlace(pa1)); 
 		s3pr.getPA().add(s3pr.getPlace(pa2)); 
-		// PR
-		s3pr.getPR().add(s3pr.getPlace(pr1)); 
-		s3pr.getPR().add(s3pr.getPlace(pr2)); 
+		
+		// PR, 在RGraphToS3PR()已经添加
+		//s3pr.getPR().add(s3pr.getPlace(pr1)); 
+		//s3pr.getPR().add(s3pr.getPlace(pr2)); 
 	}
 	
 	/**

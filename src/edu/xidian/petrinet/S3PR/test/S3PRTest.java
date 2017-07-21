@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
@@ -1349,21 +1350,30 @@ public class S3PRTest {
 	    System.out.println();
 	}
 	
+	/***
+	 * 
+	 * t6 <---- p6 <----- t5 <---- p5 <-----t4
+	 * |                  ||                 |
+	 * -------> r2 ------>..-----> r1 ------>.
+	 * <------- r2 <------..<----- r1 <------. 
+	 * |                  ||                 |
+	 * t1 -----> p2 ----> t2 -----> p3 ---> t3
+	 * |                                     |
+	 * <----------------- p1 <---------------.
+	 */
 	@Test
 	public void testRGraphToS3PR() {
-		RGraph rGraph = new RGraph();
-		PTPlace p1 = new PTPlace("r1");
-		PTPlace p2 = new PTPlace("r2");
-		//rGraph.addVertex("r1",p1); rGraph.addVertex("r2",p2);
+		Graph<String> rGraph = new Graph<>();
 		rGraph.addVertex("r1"); rGraph.addVertex("r2");
 		try {
-			rGraph.addREdge("t2", "r1", "r2");
+			rGraph.addEdge("r1", "r2");
+			rGraph.addEdge("r2", "r1");
 		} catch (VertexNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//System.out.println("rGraph:" + rGraph);
+		System.out.println("rGraph:" + rGraph);
 		
 		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
 		System.out.println("s3pr:" + s3pr);
