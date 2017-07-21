@@ -1351,6 +1351,49 @@ public class S3PRTest {
 	}
 	
 	/***
+	 * <------- r2 <------..<----- r1 <------. 
+	 * |                  ||                 |
+	 * t1 -----> p2 ----> t2 -----> p3 ---> t3
+	 * |                                     |
+	 * <----------------- p1 <---------------.
+	 */
+	//@Test
+	public void testRGraphToS3PR1() {
+		Graph<String> rGraph = new Graph<>();
+		rGraph.addVertex("r1"); rGraph.addVertex("r2");
+		try {
+			rGraph.addEdge("r1", "r2");
+		} catch (VertexNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("rGraph:" + rGraph);
+		
+		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
+		System.out.println("s3pr:" + s3pr);
+		
+		s3pr.algorithm4_3(true);  // Cmatrix rank,alpha,delta = 0,0,0
+	}
+	
+	/***
+	 * <------- r2 <------..<----- r1 <------. 
+	 * |                  ||                 |
+	 * t1 -----> p2 ----> t2 -----> p3 ---> t3
+	 * |                                     |
+	 * <----------------- p1 <---------------.
+	 */
+	//@Test
+	public void testRGraphToS3PR1_auto() {
+		Graph<String> rGraph = S3PR.createRGraph(2, 0.5f);
+		System.out.println("rGraph:" + rGraph);
+		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
+		System.out.println("s3pr:" + s3pr);
+		
+		s3pr.algorithm4_3(true);  // Cmatrix rank,alpha,delta = 0,0,0
+	}
+	
+	/***
 	 * 
 	 * t6 <---- p6 <----- t5 <---- p5 <-----t4
 	 * |                  ||                 |
@@ -1361,8 +1404,8 @@ public class S3PRTest {
 	 * |                                     |
 	 * <----------------- p1 <---------------.
 	 */
-	@Test
-	public void testRGraphToS3PR() {
+	//@Test
+	public void testRGraphToS3PR2() {
 		Graph<String> rGraph = new Graph<>();
 		rGraph.addVertex("r1"); rGraph.addVertex("r2");
 		try {
@@ -1377,6 +1420,45 @@ public class S3PRTest {
 		
 		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
 		System.out.println("s3pr:" + s3pr);
+		
+		s3pr.algorithm4_3(true);
+		/***
+		 * Siphon:      [r1[r1], r2[r2], p3[p3], p6[p6]]
+           SiphonCom:   [p2[p2], p5[p5]]
+           C-Matrix:
+           [0]    0   1   0   0   1   0   0   0
+           Cmatrix rank,alpha,delta = 1,2,1
+		 */
+	}
+	
+	/***
+	 * 
+	 * t6 <---- p6 <----- t5 <---- p5 <-----t4
+	 * |                  ||                 |
+	 * -------> r2 ------>..-----> r1 ------>.
+	 * <------- r2 <------..<----- r1 <------. 
+	 * |                  ||                 |
+	 * t1 -----> p2 ----> t2 -----> p3 ---> t3
+	 * |                                     |
+	 * <----------------- p1 <---------------.
+	 */
+	@Test
+	public void testRGraphToS3PR2_auto() {
+		Graph<String> rGraph = S3PR.createRGraph(2, 1.0f);
+		//Graph<String> rGraph = S3PR.createRGraph(30, 1.0f);
+		System.out.println("rGraph:" + rGraph);
+		
+		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
+		System.out.println("s3pr:" + s3pr);
+		
+		s3pr.algorithm4_3(true);
+		/***
+		 * Siphon:      [r1[r1], r2[r2], p3[p3], p6[p6]]
+           SiphonCom:   [p2[p2], p5[p5]]
+           C-Matrix:
+           [0]    0   1   0   0   1   0   0   0
+           Cmatrix rank,alpha,delta = 1,2,1
+		 */
 	}
 	
 }

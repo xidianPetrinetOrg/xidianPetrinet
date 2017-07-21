@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import de.uni.freiburg.iig.telematik.jagal.graph.Edge;
@@ -1182,31 +1183,40 @@ public class S3PR extends S2PR {
 	 * delta表示D0趋于完全有向图的程度，或者可以说成是D0为完全有向图的概率，或者说成D0s为完全有向图的概率。
 	 * 当delta=0时，意味着E0为空; 当delta=1时，则D0是一个完全有向图。
 	 * delta的物理意义是资源竞争的激烈程度。处于一个回路中的资源在使用时存在竞争关系。当delta=1时，回路数目最大化，竞争最为激烈，因此产生的SMS最多，潜在的死锁可能性也最大。
-	 * @param name
 	 * @param vertexNum
 	 * @return
 	 */
-	public RGraph createRGraph(String name, int vertexNum, float delta) {
-		int E0;
-		RGraph rGraph = new RGraph(name);
+	public static Graph<String> createRGraph(int vertexNum, float delta) {
+		int E0; // 边数
+		Graph<String> rGraph = new Graph<>();
 		E0 = (int) (vertexNum*(vertexNum-1)*delta);
 		for (int i = 1; i <= vertexNum; i++) {
 			String vertexName = "r" + i;
 			rGraph.addVertex(vertexName);
 		}
-		for (int e = 1, vertex = 1; e <= E0; e++) {
-			String edgeName = "t" + e; // t1,t2,...
-			String v1,v2;
-			v1 = "r" + vertex;         // r1,r2,...
-			v2 = "r" + (vertex + 1);   // r2,r3,...
+		
+		Random random = new Random();
+		int v1,v2;
+		String v1_name,v2_name;
+		for (int e = 1; e <= E0; e++) {
+			for (;;) {
+			   v1 = random.nextInt(vertexNum) + 1;  // 1 ~ vertexNum
+			   v2 = random.nextInt(vertexNum) + 1;
+			   System.out.println("v1,v2="+v1+","+v2);
+			   if (v1 != v2) {
+				   v1_name = "r" + v1;
+				   v2_name = "r" + v2;
+				   if (!rGraph.containsEdge(v1_name, v2_name))
+					   break;
+			   }
+			}
+			System.out.println("====v1,v2="+v1+","+v2);
 			try {
-				rGraph.addREdge(edgeName,v1,v2);
+				rGraph.addEdge(v1_name,v2_name);
 			} catch (VertexNotFoundException except) {
 				// TODO Auto-generated catch block
 				except.printStackTrace();
 			}
-			vertex++;
-			if (vertex > vertexNum) vertex = 1;
 		}
 		
 		return rGraph;
@@ -1244,7 +1254,7 @@ public class S3PR extends S2PR {
 	 * <----------------- p0 <---------------.
 	 * </pre>
 	 * @param s3pr 被添加的S3PR网，返回添加后的网
-	 * @param edge 代表的S2PR将被添加到s3pr中
+	 * @param edge 代表的S2PR将被添加到s3pr中,这里不用REdge类型，原因是这里的图顶点元素不必用PTPlace表示，边也不需要name
 	 */
 	@SuppressWarnings("rawtypes")
 	static public void edgeAddToS3PR(S3PR s3pr, Edge edge) {
@@ -1276,14 +1286,14 @@ public class S3PR extends S2PR {
 		s3pr.addFlowRelationPT(pr2,t1,1);
 		
 		// P0
-		s3pr.getP0().add(s3pr.getPlace(p0)); // 由于使用Collection，因此不会有重复元素被添加。
+		s3pr.getP0().add(s3pr.getPlace(p0)); 
 		// PA
 		s3pr.getPA().add(s3pr.getPlace(pa1)); 
 		s3pr.getPA().add(s3pr.getPlace(pa2)); 
 		
-		// PR, 在RGraphToS3PR()已经添加
-		//s3pr.getPR().add(s3pr.getPlace(pr1)); 
-		//s3pr.getPR().add(s3pr.getPlace(pr2)); 
+		// PR, 由于使用Collection，因此不会有重复元素被添加。
+		s3pr.getPR().add(s3pr.getPlace(pr1)); 
+		s3pr.getPR().add(s3pr.getPlace(pr2)); 
 	}
 	
 	/**
