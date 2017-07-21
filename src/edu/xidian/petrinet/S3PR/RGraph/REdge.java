@@ -84,15 +84,22 @@ public class REdge extends Edge<Vertex<PTPlace>> {
 	public String toString() {
 		PTPlace s = source.getElement();
 		PTPlace t = target.getElement();
-		try {
-			if (s == null || t == null) {
-				throw new Exception("Add vertex, plase use function add(name,source,target)");
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// 如果顶点是PTPlace，按照PTPlace输出，否则，按照顶点的名字在父类中输出
+		if (s == null || t == null) {
+			return super.toString();
 		}
-		return name + "(" + s + " -> " + t + ")";
+		else 
+			return name + "(" + s + " -> " + t + ")";
+        // 顶点无元素，不抛出异常
+//		try {
+//			if (s == null || t == null) {
+//				throw new Exception("Add vertex, plase use function add(name,source,target)");
+//			}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 	}
 
 }

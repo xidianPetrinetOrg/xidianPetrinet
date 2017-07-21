@@ -196,8 +196,11 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 		str.append("Vertices(" + vertexMap.size() + "):\n");
 		List<PTPlace> places = new ArrayList<>();
 		for (Vertex<PTPlace> v: getVertices()) {
+			// 如果此Graph中无顶点元素，顶点和边按照父类中的描述，按照顶点名称输出
+			if (v.getElement() == null) return super.toString();
 			places.add(v.getElement());
 		}
+	
 		Collections.sort(places,new PNNodeComparator());
 		str.append(places);
 		
