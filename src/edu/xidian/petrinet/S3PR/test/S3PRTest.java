@@ -1444,21 +1444,23 @@ public class S3PRTest {
 	 */
 	@Test
 	public void testRGraphToS3PR2_auto() {
-		Graph<String> rGraph = S3PR.createRGraph(2, 1.0f);
-		//Graph<String> rGraph = S3PR.createRGraph(30, 1.0f);
-		System.out.println("rGraph:" + rGraph);
+		//Graph<String> rGraph = S3PR.createRGraph(2, 1.0f);
+		Graph<String> rGraph = S3PR.createRGraph(30, 1.0f);
+		//System.out.println("rGraph:" + rGraph);
 		
 		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
-		System.out.println("s3pr:" + s3pr);
+		//System.out.println("s3pr:" + s3pr);
 		
-		s3pr.algorithm4_3(true);
-		/***
-		 * Siphon:      [r1[r1], r2[r2], p3[p3], p6[p6]]
-           SiphonCom:   [p2[p2], p5[p5]]
-           C-Matrix:
-           [0]    0   1   0   0   1   0   0   0
-           Cmatrix rank,alpha,delta = 1,2,1
-		 */
+		//s3pr.algorithm4_3(true);
+		s3pr.algorithm4_3(false);
+		// 非verbose模式，不显示计算过程
+		InvariantMatrix cmatrix = s3pr.algorithm4_3(false);
+		System.out.println("=======================");
+		//System.out.println("\nC-Matrix:");
+		//cmatrix.print(2, 0);
+		int rank_alpha_delta[] = s3pr.rank_alpha_delta(cmatrix); // rank([C])<=δ<=α
+		System.out.println("Cmatrix rank,alpha,delta = " + 
+						rank_alpha_delta[0] + "," + rank_alpha_delta[1] + "," + rank_alpha_delta[2]);
 	}
 	
 }

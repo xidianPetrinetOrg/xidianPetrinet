@@ -1188,21 +1188,20 @@ public class S3PR extends S2PR {
 	 */
 	public static Graph<String> createRGraph(int vertexNum, float delta) {
 		int E0; // 边数
+		int v1,v2;
+		String v1_name,v2_name;
 		Graph<String> rGraph = new Graph<>();
 		E0 = (int) (vertexNum*(vertexNum-1)*delta);
 		for (int i = 1; i <= vertexNum; i++) {
-			String vertexName = "r" + i;
-			rGraph.addVertex(vertexName);
+			v1_name = "r" + i;
+			rGraph.addVertex(v1_name);
 		}
 		
 		Random random = new Random();
-		int v1,v2;
-		String v1_name,v2_name;
 		for (int e = 1; e <= E0; e++) {
 			for (;;) {
 			   v1 = random.nextInt(vertexNum) + 1;  // 1 ~ vertexNum
 			   v2 = random.nextInt(vertexNum) + 1;
-			   System.out.println("v1,v2="+v1+","+v2);
 			   if (v1 != v2) {
 				   v1_name = "r" + v1;
 				   v2_name = "r" + v2;
@@ -1210,7 +1209,6 @@ public class S3PR extends S2PR {
 					   break;
 			   }
 			}
-			System.out.println("====v1,v2="+v1+","+v2);
 			try {
 				rGraph.addEdge(v1_name,v2_name);
 			} catch (VertexNotFoundException except) {
