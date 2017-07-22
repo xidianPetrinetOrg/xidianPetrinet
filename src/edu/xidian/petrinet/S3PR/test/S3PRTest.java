@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.invation.code.toval.time.TimeScale;
+import de.invation.code.toval.time.TimeValue;
 import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
@@ -35,6 +37,7 @@ import edu.xidian.petrinet.S3PR.RGraph.RGraph;
  *
  */
 public class S3PRTest {
+	 long start; // 开始时间
 
 	/**
 	 * @throws java.lang.Exception
@@ -55,6 +58,9 @@ public class S3PRTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		System.out.println("setUp()....");
+		// 记录开始时间
+		start = System.currentTimeMillis();
 	}
 
 	/**
@@ -62,6 +68,11 @@ public class S3PRTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		System.out.println("tearDown()....");
+		TimeValue runtime = new TimeValue(System.currentTimeMillis() - start, TimeScale.MILLISECONDS);
+		runtime.adjustScale();
+		
+		System.out.println(runtime + " done.");
 	}
 	
 	/*******************************************
@@ -1461,15 +1472,15 @@ public class S3PRTest {
 	@Test
 	public void testRGraphToS3PR2_auto() {
 		//Graph<String> rGraph = S3PR.createRGraph(3, 1.0f);
-		Graph<String> rGraph = S3PR.createRGraph(3, 1.0f);
+		Graph<String> rGraph = S3PR.createRGraph(30, 1.0f);
 		System.out.println("rGraph:" + rGraph);
 		
 		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
-		//System.out.println("s3pr:" + s3pr);
+		System.out.println("s3pr:" + s3pr);
 		
 		System.out.println("=======================");
-		//s3pr.algorithm4_3(true);
-		s3pr.algorithm4_3(false);
+		s3pr.algorithm4_3(true);
+		//s3pr.algorithm4_3(false);
 		// 非verbose模式，不显示计算过程
 		InvariantMatrix cmatrix = s3pr.algorithm4_3(false);
 		//System.out.println("\nC-Matrix:");
