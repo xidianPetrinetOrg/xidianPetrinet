@@ -1350,7 +1350,22 @@ public class S3PRTest {
 	    System.out.println();
 	}
 	
+	// 生成完全有向图，从而生成S3PR，并计算s3pr.algorithm4_3(true)
+	//@Test
+	public void complteGraph() {
+		int vertexNum = 3; // 顶点数
+		Graph<String> rGraph = S3PR.completeGraph(vertexNum);
+		// edgeNum = vertexNumvertexNum*(vertexNum-1)
+		assertEquals(vertexNum*(vertexNum-1), rGraph.getEdgeCount());
+		System.out.println(rGraph);
+		
+		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
+		System.out.println("s3pr:" + s3pr);
+		s3pr.algorithm4_3(true);  // Cmatrix rank,alpha,delta = 3,6,3
+	}
+	
 	/***
+	 * 生成资源有向图，从而生成S3PR，并计算s3pr.algorithm4_3(true)
 	 * <------- r2 <------..<----- r1 <------. 
 	 * |                  ||                 |
 	 * t1 -----> p2 ----> t2 -----> p3 ---> t3
@@ -1377,6 +1392,7 @@ public class S3PRTest {
 	}
 	
 	/***
+	 * 随机生成资源有向图，从而生成S3PR，并计算s3pr.algorithm4_3(true)
 	 * <------- r2 <------..<----- r1 <------. 
 	 * |                  ||                 |
 	 * t1 -----> p2 ----> t2 -----> p3 ---> t3
@@ -1394,7 +1410,7 @@ public class S3PRTest {
 	}
 	
 	/***
-	 * 
+	 * 生成资源有向图，从而生成S3PR，并计算s3pr.algorithm4_3(true)
 	 * t6 <---- p6 <----- t5 <---- p5 <-----t4
 	 * |                  ||                 |
 	 * -------> r2 ------>..-----> r1 ------>.
@@ -1432,7 +1448,7 @@ public class S3PRTest {
 	}
 	
 	/***
-	 * 
+	 * 随机生成资源有向图，从而生成S3PR，并计算s3pr.algorithm4_3(true)
 	 * t6 <---- p6 <----- t5 <---- p5 <-----t4
 	 * |                  ||                 |
 	 * -------> r2 ------>..-----> r1 ------>.
@@ -1444,18 +1460,18 @@ public class S3PRTest {
 	 */
 	@Test
 	public void testRGraphToS3PR2_auto() {
-		//Graph<String> rGraph = S3PR.createRGraph(2, 1.0f);
-		Graph<String> rGraph = S3PR.createRGraph(30, 1.0f);
-		//System.out.println("rGraph:" + rGraph);
+		//Graph<String> rGraph = S3PR.createRGraph(3, 1.0f);
+		Graph<String> rGraph = S3PR.createRGraph(3, 1.0f);
+		System.out.println("rGraph:" + rGraph);
 		
 		S3PR s3pr = S3PR.RGraphToS3PR(rGraph);
 		//System.out.println("s3pr:" + s3pr);
 		
+		System.out.println("=======================");
 		//s3pr.algorithm4_3(true);
 		s3pr.algorithm4_3(false);
 		// 非verbose模式，不显示计算过程
 		InvariantMatrix cmatrix = s3pr.algorithm4_3(false);
-		System.out.println("=======================");
 		//System.out.println("\nC-Matrix:");
 		//cmatrix.print(2, 0);
 		int rank_alpha_delta[] = s3pr.rank_alpha_delta(cmatrix); // rank([C])<=δ<=α

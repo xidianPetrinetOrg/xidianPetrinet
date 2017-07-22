@@ -1183,10 +1183,13 @@ public class S3PR extends S2PR {
 	 * delta表示D0趋于完全有向图的程度，或者可以说成是D0为完全有向图的概率，或者说成D0s为完全有向图的概率。
 	 * 当delta=0时，意味着E0为空; 当delta=1时，则D0是一个完全有向图。
 	 * delta的物理意义是资源竞争的激烈程度。处于一个回路中的资源在使用时存在竞争关系。当delta=1时，回路数目最大化，竞争最为激烈，因此产生的SMS最多，潜在的死锁可能性也最大。
-	 * @param vertexNum
-	 * @return
+	 * @param vertexNum 顶点数，资源个数|PR|，即D0 的顶点集合|V0|的数目
+	 * @return Graph对象，这里不用RGraph类型，原因是这里的图顶点元素不必用PTPlace表示
 	 */
 	public static Graph<String> createRGraph(int vertexNum, float delta) {
+		// 如果生成完全有向图，边数=vertexNum*(vertexNum),不用随机生成个边，直接调用下列函数即可。
+		if (Math.abs(delta-1.0f) <= 0.001) return completeGraph(vertexNum);
+		
 		int E0; // 边数
 		int v1,v2;
 		String v1_name,v2_name;
@@ -1218,6 +1221,39 @@ public class S3PR extends S2PR {
 		}
 		
 		return rGraph;
+	}
+	
+	/**
+	 * 
+	 * 完全有向图，即任意两个顶点之间均有路径可达，边的个数 = (|V0|(|V0| − 1))
+	 * @param vertexNum 顶点数，资源个数|PR|，即D0 的顶点集合|V0|的数目
+	 * @return 这里不用RGraph类型，原因是这里的图顶点元素不必用PTPlace表示
+	 */
+	public static Graph<String> completeGraph(int vertexNum) {
+		int v1,v2;
+		String v1_name,v2_name;
+		Graph<String> rGraph = new Graph<>();
+		for (int i = 1; i <= vertexNum; i++) {
+			v1_name = "r" + i;
+			rGraph.addVertex(v1_name);
+		}
+		// 任意两个节点间均有路径
+		for (v1 = 1; v1 <= vertexNum; v1++) {
+			for (v2 = 1; v2 <= vertexNum; v2++) {
+			   if (v1 == v2) continue;
+			   v1_name = "r" + v1;
+			   v2_name = "r" + v2;
+			   try {
+					rGraph.addEdge(v1_name,v2_name);
+				} catch (VertexNotFoundException except) {
+					// TODO Auto-generated catch block
+					except.printStackTrace();
+				}
+			}
+		}
+		
+		return rGraph;
+		
 	}
 	
 	/**
