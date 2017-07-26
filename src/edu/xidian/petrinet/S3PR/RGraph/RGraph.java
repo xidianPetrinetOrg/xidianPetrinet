@@ -10,6 +10,7 @@ import java.util.Set;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jagal.graph.Vertex;
 import de.uni.freiburg.iig.telematik.jagal.graph.abstr.AbstractGraph;
+import de.uni.freiburg.iig.telematik.jagal.graph.exception.EdgeNotFoundException;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.jagal.traverse.algorithms.SCCTarjan;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
@@ -186,6 +187,88 @@ public class RGraph extends AbstractGraph<Vertex<PTPlace>, REdge, PTPlace> {
 			}
 		}
 		return ComGraphs;
+	}
+	
+	/**
+	 * 删除符合条件的内部边和平行边。
+	 * 父类的removeEdge(String sourceVertexName, String targetVertexName)，不会删除平行边
+	 * @throws VertexNotFoundException 
+	 */
+	public void removeEdges(String sourceVertexName, String targetVertexName) throws VertexNotFoundException, EdgeNotFoundException {
+		if (!containsVertex(sourceVertexName)) {
+			throw new VertexNotFoundException(sourceVertexName, this);
+		}
+		if (!containsVertex(targetVertexName)) {
+			throw new VertexNotFoundException(targetVertexName, this);
+		}
+		// 平行边中找
+		for (REdge edge: getParallelEdges()) {
+			if (edge.getSource().getName().equals(sourceVertexName) &&
+			    edge.getTarget().getName().equals(targetVertexName)) {
+				parallelEdges.remove(edge);
+			}
+		}
+		// 内部边
+		super.removeEdge(sourceVertexName, targetVertexName);
+	}
+	
+	/**
+	 * 按名字删除边名字在整个边集合中（包括内部边和平行边）是唯一的。
+	 * 父类的removeEdge(String sourceVertexName, String targetVertexName)，不会删除平行边
+	 * @throws VertexNotFoundException, EdgeNotFoundException 
+	 */
+	public void removeEdge(String edgeName) throws VertexNotFoundException, EdgeNotFoundException {
+		REdge edge = getEdge(edgeName);
+		if (getParallelEdges().contains(edge)) {
+			parallelEdges.remove(edge);
+			return; // 是平行边，就不会是内部边
+		}
+		if (edge != null ) {
+			removeEdge(edge); // 删除内部边，有可能抛出异常VertexNotFoundException
+			return;
+		}
+		// 没有这样的边
+		throw new EdgeNotFoundException(edge,this);
+	}
+	
+	/**
+	 * 按名字找边，名字在整个边集合中（包括内部边和平行边）是唯一的。
+	 * @return 边对象，如果没有符合条件的边，返回null
+	 */
+	public REdge getEdge(String edgeName) {
+		REdge result = null;
+		for (REdge edge: getEdges()) {
+			if (edge.getName().equals(edgeName)) {
+				return edge; // 在内部边，就不可能在平行边
+			}
+		}
+		// 平行边中找
+		for (REdge edge: getParallelEdges()) {
+			if (edge.getName().equals(edgeName)) {
+				result = edge;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * @return 边集合，包含符合条件的内部边和平行边。
+	 * @throws EdgeNotFoundException 
+	 * @throws VertexNotFoundException 
+	 */
+	public Collection<REdge> getEdges(String sourceVertexName, String targetVertexName) throws VertexNotFoundException, EdgeNotFoundException {
+		Collection<REdge> edges = new HashSet<>();
+		edges.add(getEdge(sourceVertexName, targetVertexName));
+		// 平行边中找
+		for (REdge edge: getParallelEdges()) {
+			if (edge.getSource().getName().equals(sourceVertexName) &&
+			    edge.getTarget().getName().equals(targetVertexName)) {
+				edges.add(edge);
+		        // break; // 可能有多个
+			}
+		}
+		return edges;
 	}
 
 	@Override

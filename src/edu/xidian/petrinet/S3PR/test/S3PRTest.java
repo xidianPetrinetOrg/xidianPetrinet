@@ -23,6 +23,7 @@ import org.junit.Test;
 import de.invation.code.toval.time.TimeScale;
 import de.invation.code.toval.time.TimeValue;
 import de.uni.freiburg.iig.telematik.jagal.graph.Graph;
+import de.uni.freiburg.iig.telematik.jagal.graph.exception.EdgeNotFoundException;
 import de.uni.freiburg.iig.telematik.jagal.graph.exception.VertexNotFoundException;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.abstr.AbstractPNNode;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
@@ -1004,6 +1005,36 @@ public class S3PRTest {
 		//Collection<RGraph> Components1 = rGraph.getStronglyConnectedComponentGraphs(false);
 		System.out.println(Components1);
 	}
+
+	@Test
+	public void RGraphWangFigure4_1_RemoveEdge() {
+		S3PR s3pr = WangFigure4_1();
+		// 资源有向图
+		RGraph rGraph = s3pr.getRgraph(true);
+		
+		System.out.println("==========================");
+		try {
+			// 删除了内部边：t14(p32[r7] -> p30[r5])
+			// 没有删除平行边：t18(p32[r7] -> p30[r5])
+			// rGraph.removeEdge("p32", "p30"); 
+			
+			// 以上两种符合条件的边均可删除
+			//rGraph.removeEdges("p32", "p30");
+			
+			//rGraph.removeEdge("t14"); // ok
+			rGraph.removeEdge("t18"); // ok
+			
+		} catch (VertexNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (EdgeNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		System.out.println(rGraph);
+		
+		System.out.println("t14: " + rGraph.getEdge("t14"));
+	}
 	
 	/**
 	 * Test method for {@link edu.xidian.petrinet.S3PR.S3PR#algorithm4_1(boolean)}.
@@ -1469,7 +1500,7 @@ public class S3PRTest {
 	 * |                                     |
 	 * <----------------- p1 <---------------.
 	 */
-	@Test
+	//@Test
 	public void testRGraphToS3PR2_auto() {
 		//Graph<String> rGraph = S3PR.createRGraph(3, 1.0f);
 		Graph<String> rGraph = S3PR.createRGraph(30, 1.0f);
