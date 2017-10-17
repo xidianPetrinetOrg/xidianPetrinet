@@ -50,25 +50,6 @@ public class CreatePetriNetByFile extends S3PR {
 		resourceFile = new HandleResourceFile();
 		ptNet = resourceFile.ReadResRelFile(path);
 		resourceFile.equipmenet(P0, PA, PR);
-		
-	/*	//////////////////////////////////////////////
-		System.out.println("++++++++p0++++++++");
-		for (String string : P0) {
-			System.out.print(string + " ");
-		}
-		System.out.println();
-		System.out.println("++++++++pA++++++++");
-		for (String string : PA) {
-			System.out.print(string + " ");
-		}
-		System.out.println();
-		System.out.println("++++++++pR++++++++");
-		for (String string : PR) {
-			System.out.print(string + " ");
-		}
-		System.out.println();
-		/////////////////////////////////////////////
-*/		
 		this.ptNet = ptNet;
 		s3pr = CreateS3PR();
 		return ptNet;
@@ -76,10 +57,8 @@ public class CreatePetriNetByFile extends S3PR {
 	
 	//接口，创建生成S3PR网
 	public S3PR CreateS3PR() {
-		System.out.println("wuuwuuwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 		s3pr = new S3PR("S3PR_Resource", ptNet, P0, PA, PR);
 		System.out.println("s3PR=="+s3pr);
-		System.out.println("wuuwuuwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 		return s3pr;
 	}
 	
@@ -102,61 +81,4 @@ public class CreatePetriNetByFile extends S3PR {
 		createPetriNetByFile.CreateResourceGraphByResourceRelation(createS3PR);
 		
 	}
-		/*Collection<PTPlace> pr2 = createS3PR.getPR();
-		 * for (PTPlace ptPlace : pr2) {
-			System.out.println("==============================================");
-			System.out.println("curentPlace: "+ ptPlace.getName());
-			PTPlace place = ptPlace;
-			Set<AbstractPNNode<PTFlowRelation>> parents = ptPlace.getParents();
-			
-			for (PTPlace ptPlace1 : pr2) {
-				if(!ptPlace.equals(ptPlace1)){
-					System.out.println("OtherPlace: "+ ptPlace1);
-					Set<AbstractPNNode<PTFlowRelation>> children = ptPlace1.getChildren();
-					Set<AbstractPNNode<PTFlowRelation>> temp = new HashSet<>();
-					temp.addAll(parents);
-					temp.retainAll(children); //求取交集
-					if(!temp.isEmpty()){
-						System.out.println(ptPlace+"《-----"+ptPlace1 + "的中间变迁");
-						for (AbstractPNNode<PTFlowRelation> abstractPNNode : temp) {
-							System.out.println(abstractPNNode);
-						}
-					}
-					
-				}
-			}
-				
-				
-			}
-			
-			Set<AbstractPNNode<PTFlowRelation>> children = ptPlace.getChildren();
-			
-		
-			
-		    for (AbstractPNNode<PTFlowRelation> abstractPNNode : parents) {
-				
-		    	System.out.println("---"+abstractPNNode);
-				for (AbstractPNNode<PTFlowRelation> abstractPNNode1 : children) {
-					System.out.println("++"+abstractPNNode1);
-				}
-				
-			}
-			System.out.println("==============================================");
-			
-			
-		}*/
-		
-		/*System.out.println("================hr==================");
-		for (PTPlace ptPlace : pr2) {
-			System.out.println("==============================================");
-			System.out.println("curentPlace: "+ ptPlace);
-			
-			Collection<PTPlace> hr = createS3PR.getHr(ptPlace);
-			for (PTPlace ptPlace2 : hr) {
-				System.out.println(ptPlace2);
-			}
-		}
-		System.out.println("================hr==================");*/
-	
-	
 }

@@ -22,8 +22,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S3PR.S3PR;
 
 /**
- * 测试shape: 椭圆中心显示token的数量（大于6）或显示相应数量的小黑点。<br>
- *
+ * 图形化显示资源关系流
  */
 public class CreateRRG extends JFrame
 {
@@ -41,8 +40,6 @@ public class CreateRRG extends JFrame
 	{
 		super("ResourceRelationGraph");
 	}
-	
-	
 	public Object insertVertex(String Ri){
 		Object v1 = graph.insertVertex(parent, null, 
 				new mxTokenToShape(Ri,0), 50, 50, 40, 40,
@@ -76,20 +73,16 @@ public class CreateRRG extends JFrame
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
 		layout.execute(graph.getDefaultParent());
 	}
-
 	public static void Create()
 	{
 		frame = new CreateRRG();
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		frame.setSize(300,300);
 		frame.setVisible(true);
 		frame.test2();
-		frame.validate();  // 重画请求，或者： frame.revalidate(); 不知为何，frame.invalidate(); 无反应
-		
-		
+		frame.validate();  
+
 		frame.addWindowListener(new WindowAdapter() {
 		   public void windowClosing(WindowEvent e) {
 		   int value=JOptionPane.showConfirmDialog(null, "确定要关闭吗？");
@@ -99,9 +92,7 @@ public class CreateRRG extends JFrame
 		      }
 		   }
 	   });
-	}
-	
-	
+	}	
 	public static void main(String[] args) {
 		Create();
 	}
@@ -150,16 +141,12 @@ public class CreateRRG extends JFrame
 				Set<AbstractPNNode<PTFlowRelation>> parents = ptPlace.getParents();
 				for (PTPlace ptPlace1 : pr2) {
 					if(!ptPlace.equals(ptPlace1)){
-						//System.out.println("OtherPlace: "+ ptPlace1);
 						Set<AbstractPNNode<PTFlowRelation>> children = ptPlace1.getChildren();
 						Set<AbstractPNNode<PTFlowRelation>> temp = new HashSet<>();
 						temp.addAll(parents);
 						temp.retainAll(children); //求取交集
 						if(!temp.isEmpty()){
-							//System.out.println(ptPlace+"《-----"+ptPlace1 + "的中间变迁");
-							
 							for (AbstractPNNode<PTFlowRelation> abstractPNNode : temp) {
-								//System.out.println(abstractPNNode);
 								String key1 = ptPlace1.getName();
 								Object value1 = map.get(key1);
 								String key = ptPlace.getName();
@@ -176,10 +163,8 @@ public class CreateRRG extends JFrame
 		{
 			graph.getModel().endUpdate();
 		}
-		
 		mxGraphComponent graphComponent = new mxGraphComponent(graph);
 		getContentPane().add(graphComponent);
-		
 		// layout
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
 		layout.execute(graph.getDefaultParent());
