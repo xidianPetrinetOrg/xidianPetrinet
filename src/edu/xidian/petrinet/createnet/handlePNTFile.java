@@ -19,8 +19,6 @@ import java.util.Map;
  * */
 import java.util.Set;
 
-import javax.swing.plaf.metal.MetalIconFactory.PaletteCloseIcon;
-
 import de.invation.code.toval.graphic.component.DisplayFrame;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;

@@ -1,7 +1,5 @@
 package edu.xidian.petrinet.createnet;
 /*
-* Time    :2017年7月14日 上午8:22:29
-* Email   :2215225782@qq.com
 * 作用：处理资源流文件
 */
 
@@ -19,9 +17,6 @@ import java.util.List;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.S3PR.S3PR;
-import edu.xidian.petrinet.Utils.PNNodeComparator;
-import edu.xidian.petrinet.Utils.myUtils;
-import sun.util.resources.cldr.es.TimeZoneNames_es_419;
 
 public class HandleResourceFile extends S3PR{
 	
