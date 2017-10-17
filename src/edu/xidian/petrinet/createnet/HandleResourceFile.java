@@ -97,8 +97,18 @@ public class HandleResourceFile extends S3PR{
 			 //marking.set(Place[idles[i]-1], 2);
 		 }
 		 ptnet.setInitialMarking(marking);
+		 
+		 System.out.println("--------ptNet-----------");
+		 System.out.println(ptnet);
+		 System.out.println("--------ptNet-----------");
+		 
+		 
+		 
 		 return ptnet; 
 	}
+	
+	
+	
 	public static int[][] ReadResourceRelationFile(String path) {
 		File file = new File(path);
 		BufferedReader buf = null;
@@ -273,6 +283,11 @@ public class HandleResourceFile extends S3PR{
 		}
 		
 	}
-	public static void main(String[] args) {	
+
+	public static void main(String[] args) {
+		
 	}
+
+	
+	
 }

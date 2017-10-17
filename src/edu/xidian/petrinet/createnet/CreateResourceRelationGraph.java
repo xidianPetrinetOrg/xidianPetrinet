@@ -19,7 +19,9 @@ public class CreateResourceRelationGraph extends JFrame {
 	private static CreateResourceRelationGraph frame;
 	static{
 		graph.getModel().beginUpdate();
+		
 	}
+	
 	public static Object insertVertex(String Ri){
 		Object v1 = graph.insertVertex(parent, null, 
 				new mxTokenToShape(Ri,0), 20, 20, 30, 30,
@@ -29,9 +31,15 @@ public class CreateResourceRelationGraph extends JFrame {
 	public static void insertEdge(Object vi,Object vj,String ti){
 		graph.insertEdge(parent, null,ti,vi,vj);
 	}
-	public  void create(S3PR s3pr) {	
+	
+	
+	public  void create(S3PR s3pr) {
+		
+		
+		
 		HashMap<String, Object> map = new HashMap<>();
 		int k = 1;
+		
 		Init();
 		
 		try {
@@ -52,7 +60,51 @@ public class CreateResourceRelationGraph extends JFrame {
 		// layout
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
 		layout.execute(graph.getDefaultParent());
+		
+		/*
+		Collection<PTPlace> pr2 = s3pr.getPR(); 
+			for (PTPlace ptPlace : pr2) {
+				Object insertVertex = insertVertex(ptPlace.getName());
+				map.put("V"+k, insertVertex);
+				k++;
+			}
+		
+		for(int i = 0; i < map.size();i++){
+			
+			
+		}
+		
+		for (PTPlace ptPlace : pr2) {
+			System.out.println("==============================================");
+			System.out.println("curentPlace: "+ ptPlace.getName());
+			//Object insertVertex = insertVertex(ptPlace.getName());
+			PTPlace place = ptPlace;
+			Set<AbstractPNNode<PTFlowRelation>> parents = ptPlace.getParents();
+			for (PTPlace ptPlace1 : pr2) {
+				if(!ptPlace.equals(ptPlace1)){
+					System.out.println("OtherPlace: "+ ptPlace1);
+					Set<AbstractPNNode<PTFlowRelation>> children = ptPlace1.getChildren();
+					Set<AbstractPNNode<PTFlowRelation>> temp = new HashSet<>();
+					temp.addAll(parents);
+					temp.retainAll(children); //姹傚彇浜ら泦
+					if(!temp.isEmpty()){
+						System.out.println(ptPlace+"锟�?-----"+ptPlace1 + "鐨勪腑闂村彉锟�?");
+						
+						for (AbstractPNNode<PTFlowRelation> abstractPNNode : temp) {
+							System.out.println(abstractPNNode);
+							String key1 = ptPlace1.getName();
+							object value1 = map.get(key1);
+							String key = ptPlace.getName();
+							object value = map.get(key);
+							insertEdge(key1, key, abstractPNNode.getName().toString());
+						}
+						
+					}
+				}
+			}
+		}*/
 		frame.validate();
+		
 	}
 	private static void Init() {
 		frame = new CreateResourceRelationGraph();
@@ -61,6 +113,7 @@ public class CreateResourceRelationGraph extends JFrame {
 		frame.setVisible(true);
 		
 	}
+
 	public static void main(String[] args) {
 		//create(s3pr);
 	}

@@ -172,6 +172,7 @@ public class ActionHandle {
 					i = i+1;
 				}
 				
+				System.out.println("++++++"+ aList.size());
 				if(i > 0 && i < aList.size())
 				{
 					//0 如果刚开始是非初始状态，则首先关闭上一次打开的框图，然后在创建框图

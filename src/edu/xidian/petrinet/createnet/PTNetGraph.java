@@ -78,7 +78,9 @@ import edu.xidian.petrinet.graph.PTMarkingGraphComponent.IMarkingGraphReady;
 import edu.xidian.petrinet.graph.PTNetGraphComponent;
 
 /**
- * 图形化显示petri网
+ * PTNet Graph and It's marking graph, 提供可视化编辑功能 ：<br>
+ * 图形显示朝向：东、西、南、北<br>
+ * 顶点Label的显示位置; undo,redo<br>
  */
 public class PTNetGraph implements ActionListener, ItemListener {
 	/** 输出状态信息 */
