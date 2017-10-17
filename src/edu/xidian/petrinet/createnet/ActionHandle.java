@@ -21,6 +21,8 @@ import edu.xidian.petrinet.graph.PTNetGraphComponent;
 
 public class ActionHandle {
 	
+	//
+	
 	//用于存放从界面中筛选后的Place：
 	private ArrayList<String> p_List  = new ArrayList<String>();
 	//用于存放从界面中删选后的Transition
@@ -31,9 +33,6 @@ public class ActionHandle {
 	private ArrayList<String> tp_temp = new ArrayList<String>();
 	//存放初始marking
 	private ArrayList<String> Marking = new ArrayList<String>(); 
-	
-	
-	
 	static PTNet ptNet = null;
 	
 
@@ -44,10 +43,9 @@ public class ActionHandle {
 	
 	private JButton StepBefore = new JButton("上一步");
 	private JButton StepAfter = new JButton("下一步");
+
 	
-	
-	
-	//pnt 文件按钮
+	//pnt 文件的处理按钮
 	private JButton pnt_Submit = new JButton("start");
 	private JButton pnt_Clear = new JButton("clear");
 	
@@ -182,6 +180,8 @@ public class ActionHandle {
 						DP1.dispose();
 					}
 					
+					
+					
 					//1 创建Petri网
 					PTNet ptNet = new PTNet();
 					
@@ -190,6 +190,8 @@ public class ActionHandle {
 					ArrayList<String>  T = aList.get(i).getBianQian();
 					ArrayList<String>  M = aList.get(i).getChuShiKuSuo();
 					String []       str4 = aList.get(i).getLiuGuanXi();
+					
+					
 					
 					//3 给网中装配获取的信息
 					  //3.1 装配Place

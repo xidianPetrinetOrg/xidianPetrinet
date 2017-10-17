@@ -61,7 +61,6 @@ public class CreateResourceRelationGraph extends JFrame {
 		frame.setVisible(true);
 		
 	}
-
 	public static void main(String[] args) {
 		//create(s3pr);
 	}

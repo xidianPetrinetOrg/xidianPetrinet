@@ -136,7 +136,6 @@ public class CreateRRG extends JFrame
 				k++;
 			}
 			for (PTPlace ptPlace : pr2) {
-				System.out.println("==============================================");
 				PTPlace place = ptPlace;
 				Set<AbstractPNNode<PTFlowRelation>> parents = ptPlace.getParents();
 				for (PTPlace ptPlace1 : pr2) {

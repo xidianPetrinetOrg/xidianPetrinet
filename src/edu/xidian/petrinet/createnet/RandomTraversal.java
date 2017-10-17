@@ -135,15 +135,12 @@ public class RandomTraversal {
 	public static void main(String[] args) {
 		PTNet ptnet = CreatePetriNet.createPTnet1();
 		System.out.println("ptnet\n" + ptnet);
-		
-		//RandomPTTraverserTest((PTNet) ptnet.clone());
 		RandomPTTraverserTest(ptnet);
 		
 		System.out.println(ptnet.getEnabledTransitions().size()); 
 	
 		for(int i = 0;i < ptNetTraversalStepInfos.size();i++)
 		{
-			
 			//1 创建Petri网
 			PTNet ptNet = new PTNet();
 			

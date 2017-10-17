@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.S3PR.S3PR;
 
+//根据文件创建petri网：可以采用pnt文件，也可以采用资源关系流文件
 public class CreatePetriNetByFile extends S3PR {
 
 	private handlePNTFile handleFile;
