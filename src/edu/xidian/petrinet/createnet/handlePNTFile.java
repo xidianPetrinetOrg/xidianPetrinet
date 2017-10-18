@@ -100,18 +100,13 @@ public class handlePNTFile extends S2PR{
 							if (i == 0) {
 								
 								place.add(getP_prefix()+Integer.valueOf(sq[i]));
-								//place.add(Place[Integer.valueOf(sq[i]) - 1]);
 							} else if (i == 1) {
 								Marking.add(Integer.valueOf(sq[i]));
 							} else {
 								TP.add(getT_prefix()+sq[i]);
-								//TP.add(Transition[Integer.valueOf(sq[i]) - 1]);
-								// tpArray是为了获取数字比如 ：t4 获取 4
 								tpArray.add(Integer.valueOf(sq[i]));
 								transition.add(getT_prefix()+sq[i]);
-								//transition.add(Transition[Integer.valueOf(sq[i]) - 1]);
 								TP.add(place.get(j));
-								// tpArray是为了获取数字比如 ：p1 获取 1
 								tpArray.add(j + 1);
 								TP.add(String.valueOf(1));
 							}
@@ -119,14 +114,10 @@ public class handlePNTFile extends S2PR{
 						// 2 逗号的后半部分的分析
 						for (int i = 0; i < sq1.length; i++) {
 							PT.add(place.get(j));
-							// tpArray是为了获取数字比如 ：p1 获取 1
 							ptArray.add(j + 1);
 							TP.add(getT_prefix()+sq[i]);
-							//PT.add(Transition[Integer.valueOf(sq1[i]) - 1]);
-							// ptArray是为了获取数字比如 ：t4 获取 4
 							ptArray.add(Integer.valueOf(sq[i]));
 							transition.add(getT_prefix()+sq1[i]);
-							//transition.add(Transition[Integer.valueOf(sq1[i]) - 1]);
 							PT.add(String.valueOf(1));
 						}
 						j++;
@@ -135,184 +126,34 @@ public class handlePNTFile extends S2PR{
 				}
 				// 关闭读入流
 				read.close();
-
-				// 测试抓取的数据准确性：
-				// System.out.println("遍历库所：");
-				// bianli(place);
 				equipmentPlaceTool(place);
-
-				// System.out.println("遍历变迁：");
-				// bianliTransition(transition);
 				equipmentTransitionTool(transition);
-
-				// System.out.println("遍历TP：");
-				// bianli(TP);
 				equipmenTransitionToPlace(TP);
-
-				// System.out.println("遍历PT：");
-				// bianli(PT);
 				equipmentPlaceToTransition(PT);
-
-				System.out.println("遍历初始marking");
 				bianliMarking(Marking);
 				PTMarking marking = new PTMarking();
 				equipmentInitMarkingTools(marking, place, Marking);
 
 				ptNet.setInitialMarking(marking);
 
-				// 随机遍历一个Petri网
 				RandomTraversal.RandomPTTraverserTest(ptNet);
 				// 获取遍历后的信息
 				aList = RandomTraversal.getPtNetTraversalStepInfos();
 
 				System.out.println(aList.size());
-
-				// 此处为了传递DPF到主线程方便，不采用多线程进行值的传递，具体的线程间的对象或者值的传递机制
-				// 知识还有欠缺，刚开始用常规的方法进行多线程间的值DPF传递，一直报空指针异常，调试了好久，发现是
-				// 多线程之间的值或者对象的传递不是那么简单。所有去掉了多线程的机制。
 				PTNetGraphComponent component = new PTNetGraphComponent(ptNet);
 				try {
-					component.initialize(); // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
+					component.initialize(); 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				DPF = new DisplayFrame(component, true); // 显示图形元素
-				// DP.dispose();
-
-				/*
-				 * javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				 * public void run() { PTNetGraphComponent component = new
-				 * PTNetGraphComponent(ptNet); try { component.initialize(); //
-				 * 初始化，由petriNet信息，装配visualGraph,图形元素中心布局 } catch (Exception e)
-				 * { e.printStackTrace(); } DPF = new
-				 * DisplayFrame(component,true); // 显示图形元素 //DP.dispose(); } });
-				 */
 			} else {
-				// ActionHandle3 actionHandle3 = new ActionHandle3();
-				ActionHandle.info_Lable1.setText("<html>您输入的路径有误或者不存在！<br/>请点击Clear后重新输入！</html>");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	/*public void readTxtFile1(String filePath) {
-		try {
-			String encoding = "GBK";
-			File file = new File(filePath);
-			if (file.isFile() && file.exists()) { // 判断文件是否存在
-				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
-				BufferedReader bufferedReader = new BufferedReader(read);
-				String lineText = null;
-				while ((lineText = bufferedReader.readLine()) != null) {
-					if (m == 0 || lineText.equals(str_2)) {
-						// Do nothing! 对第一行和最后一行不进行处理！
-					} else {
-						// 抓取中间行的数据！
-						// System.out.println("file exist");
-						String str1 = lineText;
-						System.out.println(str1);
-						String[] string2 = str1.split(",");
-						String string3 = string2[0].replaceAll(" +", ",");
-						String string4 = string2[1].replaceAll(" +", ",");
-
-						String[] sq = string3.split(",");
-						String[] sq1 = string4.split(",");
-
-						// 1 逗号的前半部分的数据分析
-						for (int i = 0; i < sq.length; i++) {
-							if (i == 0) {
-								place.add(getP_prefix()+sq[i]);
-								//place.add(Place[Integer.valueOf(sq[i]) - 1]);
-							} else if (i == 1) {
-								Marking.add(Integer.valueOf(sq[i]));
-							} else {
-								TP.add(getT_prefix()+sq[i]);
-								//TP.add(Transition[Integer.valueOf(sq[i]) - 1]);
-								// tpArray是为了获取数字比如 ：t4 获取 4
-								tpArray.add(Integer.valueOf(sq[i]));
-								transition.add(getT_prefix()+sq[i]);
-								//transition.add(Transition[Integer.valueOf(sq[i]) - 1]);
-								TP.add(place.get(j));
-								// tpArray是为了获取数字比如 ：p1 获取 1
-								tpArray.add(j + 1);
-								TP.add(String.valueOf(1));
-							}
-						}
-						// 2 逗号的后半部分的分析
-						for (int i = 0; i < sq1.length; i++) {
-							PT.add(place.get(j));
-							// tpArray是为了获取数字比如 ：p1 获取 1
-							ptArray.add(j + 1);
-							PT.add(getT_prefix()+sq1[i]);
-							//PT.add(Transition[Integer.valueOf(sq1[i]) - 1]);
-							// ptArray是为了获取数字比如 ：t4 获取 4
-							ptArray.add(Integer.valueOf(sq1[i]));
-							transition.add(getT_prefix()+sq1[i]);
-							//transition.add(Transition[Integer.valueOf(sq1[i]) - 1]);
-							PT.add(String.valueOf(1));
-						}
-						j++;
-					} // if语句结束
-					m++;
-				}
-				// 关闭读入流
-				read.close();
-
-				// 装配完成以后，进行计算关联矩阵：
-				System.out.println("库所个数：" + place.size());
-				System.out.println("变迁个数：" + transition.size());
-				IncidenceMatrix = new int[place.size()][transition.size()];
-				calculateIncidenceMatrix();
-				print();
-
-				// 测试抓取的数据准确性：
-				// System.out.println("遍历库所：");
-				// bianli(place);
-				equipmentPlaceTool(place);
-
-				// System.out.println("遍历变迁：");
-				// bianliTransition(transition);
-				equipmentTransitionTool(transition);
-
-				System.out.println("遍历TP：");
-				bianli(TP);
-				System.out.println("遍历tpArray：");
-				bianli2(tpArray);
-				equipmenTransitionToPlace(TP);
-
-				System.out.println("遍历PT：");
-				bianli(PT);
-				System.out.println("遍历ptArray：");
-				bianli2(ptArray);
-				equipmentPlaceToTransition(PT);
-
-				System.out.println("遍历初始marking");
-				bianliMarking(Marking);
-				PTMarking marking = new PTMarking();
-				equipmentInitMarkingTools(marking, place, Marking);
-
-				ptNet.setInitialMarking(marking);
-
-				
-				//此时应该是替换原先的框图中的图形。。。
-				
-				javax.swing.SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// createAndShowGUI(ptnetGraphComponent); //
-						// 显示PTNet对应的图形
-						PTNetGraph.createAndShowGUI(ptNet); // 显示PTNet
-					}
-				});
-			} else {
-				// ActionHandle3 actionHandle3 = new ActionHandle3();
-				ActionHandle.info_Lable1.setText("<html>您输入的路径有误或者不存在！<br/>请点击Clear后重新输入！</html>");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
-
 	public static void bianli(ArrayList<String> str) {
 		System.out.println(str.size());
 		for (int i = 0; i < str.size(); i++) {
@@ -320,14 +161,6 @@ public class handlePNTFile extends S2PR{
 		}
 		System.out.println("");
 	}
-/*
-	public static void bianli2(ArrayList<Integer> str) {
-		System.out.println(str.size());
-		for (int i = 0; i < str.size(); i++) {
-			System.out.print(str.get(i) + " ");
-		}
-		System.out.println("");
-	}*/
 
 	public static void bianliTransition(Set<String> transition) {
 		List<String> t = new ArrayList<String>(transition);
@@ -549,12 +382,11 @@ public class handlePNTFile extends S2PR{
 							PT.add(String.valueOf(1));
 						}
 						j++;
-					} // if语句结束
+					} 
 					m++;
 				}
 				// 关闭读入流
 				read.close();
-
 				// 装配完成以后，进行计算关联矩阵：
 				System.out.println("库所个数：" + place.size());
 				System.out.println("变迁个数：" + transition.size());
@@ -562,13 +394,8 @@ public class handlePNTFile extends S2PR{
 				calculateIncidenceMatrix();
 				print();
 
-				// 测试抓取的数据准确性：
-				// System.out.println("遍历库所：");
-				// bianli(place);
 				equipmentPlaceTool(place);
 
-				// System.out.println("遍历变迁：");
-				// bianliTransition(transition);
 				equipmentTransitionTool(transition);
 
 				System.out.println("遍历TP：");
@@ -589,28 +416,11 @@ public class handlePNTFile extends S2PR{
 				equipmentInitMarkingTools(marking, place, Marking);
 
 				ptNet.setInitialMarking(marking);
-
-				
-				//此时应该是替换原先的框图中的图形。。。
-				
-				/*javax.swing.SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// createAndShowGUI(ptnetGraphComponent); //
-						// 显示PTNet对应的图形
-						PTNetGraph.createAndShowGUI(ptNet); // 显示PTNet
-					}
-				});*/
 			} else {
-				// ActionHandle3 actionHandle3 = new ActionHandle3();
-				ActionHandle.info_Lable1.setText("<html>您输入的路径有误或者不存在！<br/>请点击Clear后重新输入！</html>");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			}
 		return ptNet;
-	}
-
-	public static void main(String[] args) {
-		
 	}
 }

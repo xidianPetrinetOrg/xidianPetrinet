@@ -21,9 +21,11 @@ import edu.xidian.petrinet.S3PR.S3PR;
 public class HandleResourceFile extends S3PR{
 	
 	private PTNet ptnet;
-	private int[][] resourceRelationMatrix = null;
+	private int[][] resourceRelationMatrix;
 	private int[][] IncidenceMatrix ;
 	private int[] idles;
+	private int resourceStart;
+	
 	
 	public int[][] getResourceRelationMatrix() {
 		return resourceRelationMatrix;
@@ -37,9 +39,6 @@ public class HandleResourceFile extends S3PR{
 	public void setIncidenceMatrix(int[][] incidenceMatrix) {
 		IncidenceMatrix = incidenceMatrix;
 	}
-
-	private int resourceStart;
-
 	public PTNet ReadResRelFile(String path) {
 		resourceRelationMatrix = ReadResourceRelationFile(path);
 		List createS3PR = createS3PR(resourceRelationMatrix);
@@ -55,28 +54,22 @@ public class HandleResourceFile extends S3PR{
 		 for(int i = 0; i < IncidenceMatrix.length; i++)
 		 {
 			 String pi = getP_prefix()+(i+1);
-			 //String pi = Place[i];
 			 ptnet.addPlace(pi);
 			 for(int j = 0;j < IncidenceMatrix[0].length;j++)
 			 {
 				 String tj = getT_prefix()+(j+1);
-				 //String tj = Transition[j];
 				 ptnet.addTransition(tj);
 				 
 				 if(IncidenceMatrix[i][j] == 1)
 				 {
 					 String pI = getP_prefix()+(i+1);
-					 //String pI = Place[i];
 					 String tJ = getT_prefix()+(j+1);
-					 //String tJ = Transition[j];
 					 ptnet.addFlowRelationTP(tJ, pI,1);
 				 }
 				 if(IncidenceMatrix[i][j] == -1)
 				 {
 					 String pI = getP_prefix()+(i+1);
-					 //String pI = Place[i];
 					 String tJ = getT_prefix()+(j+1);
-					 //String tJ = Transition[j];
 					 ptnet.addFlowRelationPT(pI, tJ,1);
 				 }
 			 }
@@ -85,30 +78,20 @@ public class HandleResourceFile extends S3PR{
 		 PTMarking marking = new PTMarking();
 		 for(int i = resourceStart-1;i<IncidenceMatrix.length;i++)
 		 {
-			 //资源库所的marking是1
 			 String pi = getP_prefix()+(i+1);
 			 marking.set(pi, 1); 
 		 }
 		 for(int i = 0; i <idles.length;i++)
 		 {
-			 //闲置库所的初始marking是2
 			 String Pi = getP_prefix()+idles[i];
 			 marking.set(Pi, 2);
-			 //marking.set(Place[idles[i]-1], 2);
 		 }
 		 ptnet.setInitialMarking(marking);
-		 
 		 System.out.println("--------ptNet-----------");
 		 System.out.println(ptnet);
 		 System.out.println("--------ptNet-----------");
-		 
-		 
-		 
 		 return ptnet; 
 	}
-	
-	
-	
 	public static int[][] ReadResourceRelationFile(String path) {
 		File file = new File(path);
 		BufferedReader buf = null;
@@ -257,37 +240,23 @@ public class HandleResourceFile extends S3PR{
 		list.add(resourceStart);
 		return list;
 	}
-
-
-
 	public void equipmenet(Collection<String> p0, Collection<String> pA, Collection<String> pR) {
 		for(int i = resourceStart-1;i<IncidenceMatrix.length;i++)
 		 {
 			pR.add(getP_prefix()+(i+1));
-			//pR.add(Place[i]);
 		 }
 		 for(int i = 0; i <idles.length;i++)
 		 {
 			 p0.add(getP_prefix()+idles[i]);
-			 //p0.add(Place[idles[i]-1]);
 		 }
 		
 		for(int i = 0; i < resourceStart-1;i++){
 			int flag = -1;
 			String t = getP_prefix()+(i+1);
-			//String t = Place[i];
 			boolean contains = p0.contains(t);
 			if(contains == false){
 				pA.add(t);
 			}
 		}
-		
 	}
-
-	public static void main(String[] args) {
-		
-	}
-
-	
-	
 }
