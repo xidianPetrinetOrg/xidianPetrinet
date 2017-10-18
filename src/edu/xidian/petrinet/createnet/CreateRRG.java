@@ -22,7 +22,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S3PR.S3PR;
 
 /**
- * 测试shape: 椭圆中心显示token的数量（大于6）或显示相应数量的小黑点。<br>
+ * 图形化显示资源关系流<br>
  *
  */
 public class CreateRRG extends JFrame
@@ -36,7 +36,6 @@ public class CreateRRG extends JFrame
 		graph.getModel().beginUpdate();
 	}
 	
-
 	public CreateRRG()
 	{
 		super("ResourceRelationGraph");
@@ -80,14 +79,12 @@ public class CreateRRG extends JFrame
 	public static void Create()
 	{
 		frame = new CreateRRG();
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		frame.setSize(300,300);
 		frame.setVisible(true);
 		frame.test2();
-		frame.validate();  // 重画请求，或者： frame.revalidate(); 不知为何，frame.invalidate(); 无反应
+		frame.validate(); 
 		
 		
 		frame.addWindowListener(new WindowAdapter() {
