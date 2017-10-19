@@ -221,7 +221,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
     		IMarkingGraphReady ready = new IMarkingGraphReady() {
     			@Override
     			public void graph(boolean isReady) {
-    				//if (isReady) status("marking graph is ready.");
     				isMarkingGraphReady = isReady;
     			}
     		};
@@ -231,8 +230,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
-    	
-    	// Clears the command history.
     	if(undoManager != null) {
     	  undoManager.clear();
     	}
