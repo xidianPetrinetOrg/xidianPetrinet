@@ -40,8 +40,6 @@ public class CreateRRG extends JFrame
 	{
 		super("ResourceRelationGraph");
 	}
-	
-	
 	public Object insertVertex(String Ri){
 		Object v1 = graph.insertVertex(parent, null, 
 				new mxTokenToShape(Ri,0), 50, 50, 40, 40,
@@ -152,10 +150,7 @@ public class CreateRRG extends JFrame
 						temp.addAll(parents);
 						temp.retainAll(children); //求取交集
 						if(!temp.isEmpty()){
-							//System.out.println(ptPlace+"《-----"+ptPlace1 + "的中间变迁");
-							
 							for (AbstractPNNode<PTFlowRelation> abstractPNNode : temp) {
-								//System.out.println(abstractPNNode);
 								String key1 = ptPlace1.getName();
 								Object value1 = map.get(key1);
 								String key = ptPlace.getName();
@@ -172,10 +167,8 @@ public class CreateRRG extends JFrame
 		{
 			graph.getModel().endUpdate();
 		}
-		
 		mxGraphComponent graphComponent = new mxGraphComponent(graph);
 		getContentPane().add(graphComponent);
-		
 		// layout
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
 		layout.execute(graph.getDefaultParent());

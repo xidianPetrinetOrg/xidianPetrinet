@@ -20,18 +20,9 @@ public class PetriNet {
 	//private static String string = "p1  3    2  4,1  3";
 	@SuppressWarnings("unchecked")
 	private static Map<String,Integer> Marking = new HashMap<String,Integer>();
-
-	/**
-	 * Place name's prefix, default "p"
-	 */
 	private String p_prefix = "p";
 	
-	/**
-	 * Transition name's prefix, default "t"
-	 */
 	private String t_prefix = "t";
-	
-	
 	
 	//j 用来记录行数的辅助数字
 	private static int j = 1;

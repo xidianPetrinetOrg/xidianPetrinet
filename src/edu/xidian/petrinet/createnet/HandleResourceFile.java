@@ -87,9 +87,6 @@ public class HandleResourceFile extends S3PR{
 			 marking.set(Pi, 2);
 		 }
 		 ptnet.setInitialMarking(marking);
-		 System.out.println("--------ptNet-----------");
-		 System.out.println(ptnet);
-		 System.out.println("--------ptNet-----------");
 		 return ptnet; 
 	}
 	public static int[][] ReadResourceRelationFile(String path) {

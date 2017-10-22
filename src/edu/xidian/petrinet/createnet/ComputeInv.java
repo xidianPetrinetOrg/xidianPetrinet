@@ -20,7 +20,6 @@ public class ComputeInv extends ComputeInvariant{
 		System.out.println(matrixToFormatString);
 		return matrixToFormatString;
 	}
-	
 	//根据关联矩阵计算P-InvariantMatrix
 	public static String Cal_T_Inv(int[][] IM){
 		InvariantMatrix incidenceM = new InvariantMatrix(IM);   

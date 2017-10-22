@@ -41,9 +41,7 @@ public class handlePNTFile extends S2PR{
 
 	static PTNet ptNet = null;
 
-	private static final String toStringFormat = "Current Net IncidenceMatrix: %s %n ";
-	
-	// j 用来记录行数的辅助数字
+	// j用来记录行数的辅助数字
 	private static int j = 0;
 	private static int m = 0;
 	// 用str_2和最后一行读取的字符串进行比较,此处默认的处理机制是：最后一行的只有一个字符@ 且位于第一个位置。
@@ -55,14 +53,12 @@ public class handlePNTFile extends S2PR{
 	public ArrayList<Integer> tpArray = new ArrayList<>();
 	// 2的辅助数组ptArray：
 	public ArrayList<Integer> ptArray = new ArrayList<>();
-
 	protected static int[][] IncidenceMatrix = null;
-
-	// private static RandomTraversalTest3 randomTraversalTest3 = new
-	// RandomTraversalTest3();
 	private ArrayList<PTNetTraversalStepInfo> aList;
 	private static DisplayFrame DPF;
 
+	private static final String toStringFormat = "Current Net IncidenceMatrix: %s %n ";
+	
 	public DisplayFrame getDP() {
 
 		return DPF;
@@ -258,9 +254,7 @@ public class handlePNTFile extends S2PR{
 				IncidenceMatrix[row][col] = -1;
 			}
 		}
-
 	}
-
 	public static Map<String, StringBuffer> R = new HashMap<String, StringBuffer>();
 
 	// 打印关联矩阵：
@@ -278,7 +272,6 @@ public class handlePNTFile extends S2PR{
 					IncidenceMatrix[i][j] = CreatePetriNet.IncMatObjectNet[i][j];
 				}
 			}
-
 		}
 
 		for (int i = 0; i < IncidenceMatrix.length; i++) {
@@ -332,7 +325,7 @@ public class handlePNTFile extends S2PR{
 	public PTNet readPntFile(String path) {
 		
 		try {
-			String encoding = "GBK";
+			String encoding = "UTF-8";
 			File file = new File(path);
 			if (file.isFile() && file.exists()) { // 判断文件是否存在
 				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
@@ -342,8 +335,6 @@ public class handlePNTFile extends S2PR{
 					if (m == 0 || lineText.equals(str_2)) {
 						// Do nothing! 对第一行和最后一行不进行处理！
 					} else {
-						// 抓取中间行的数据！
-						// System.out.println("file exist");
 						String str1 = lineText;
 						System.out.println(str1);
 						String[] string2 = str1.split(",");
@@ -361,11 +352,9 @@ public class handlePNTFile extends S2PR{
 								Marking.add(Integer.valueOf(sq[i]));
 							} else {
 								TP.add(getT_prefix()+sq[i]);
-								// tpArray是为了获取数字比如 ：t4 获取 4
 								tpArray.add(Integer.valueOf(sq[i]));
 								transition.add(getT_prefix()+sq[i]);
 								TP.add(place.get(j));
-								// tpArray是为了获取数字比如 ：p1 获取 1
 								tpArray.add(j + 1);
 								TP.add(String.valueOf(1));
 							}
@@ -373,10 +362,8 @@ public class handlePNTFile extends S2PR{
 						// 2 逗号的后半部分的分析
 						for (int i = 0; i < sq1.length; i++) {
 							PT.add(place.get(j));
-							// tpArray是为了获取数字比如 ：p1 获取 1
 							ptArray.add(j + 1);
 							PT.add(getT_prefix()+sq1[i]);
-							// ptArray是为了获取数字比如 ：t4 获取 4
 							ptArray.add(Integer.valueOf(sq1[i]));
 							transition.add(getT_prefix()+sq1[i]);
 							PT.add(String.valueOf(1));
@@ -395,22 +382,9 @@ public class handlePNTFile extends S2PR{
 				print();
 
 				equipmentPlaceTool(place);
-
 				equipmentTransitionTool(transition);
-
-				System.out.println("遍历TP：");
-				bianli(TP);
-				System.out.println("遍历tpArray：");
-				//bianli2(tpArray);
 				equipmenTransitionToPlace(TP);
-
-				System.out.println("遍历PT：");
-				bianli(PT);
-				System.out.println("遍历ptArray：");
-				//bianli2(ptArray);
 				equipmentPlaceToTransition(PT);
-
-				System.out.println("遍历初始marking");
 				bianliMarking(Marking);
 				PTMarking marking = new PTMarking();
 				equipmentInitMarkingTools(marking, place, Marking);

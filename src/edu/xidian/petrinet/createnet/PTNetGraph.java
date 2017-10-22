@@ -553,7 +553,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	}
 	/**
 	 * 创建资源有向图 
-	 *
 	 */
 	public class GeneratorResourceRelationAction extends AbstractAction{
 
