@@ -2,12 +2,15 @@ package edu.xidian.petrinet.createnet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import de.invation.code.toval.graphic.component.DisplayFrame;
 import de.invation.code.toval.validate.InconsistencyException;
 import de.uni.freiburg.iig.telematik.sepia.exception.PNException;
+import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTMarking;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
@@ -16,7 +19,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.traverse.RandomPTTraverse
 import edu.xidian.petrinet.CreatePetriNet;
 import edu.xidian.petrinet.graph.PTNetGraphComponent;
 
-public class RandomTraversal {
+public class RandomTraversal extends PTNet{
 	/**
 	 * 随机遍历，在使能变迁中，随机选择一个变迁发射，可能刚开始的使能变迁好几个，这里只能随机选择一个使能变迁
 	 * 进行变迁演示，此处所谓的随机只是随机一部分变迁进行遍历，比如此处的刚开始的使能变迁可以是t1 或t2 而此处的
@@ -25,13 +28,17 @@ public class RandomTraversal {
 	
 	private static ArrayList<PTNetTraversalStepInfo>  ptNetTraversalStepInfos =
 			new ArrayList<PTNetTraversalStepInfo>();
-	
+	//static  PTNet ptNet = new PTNet();
+	private static PTNet  ptNet = null;
 	//便于外部类的获取
 	public static ArrayList<PTNetTraversalStepInfo> getPtNetTraversalStepInfos() {
+		
 		return ptNetTraversalStepInfos;
 	}
 
 	public static void RandomPTTraverserTest(PTNet ptnet) {		
+		
+		ptNet = ptnet;
 		System.out.println("===Random Petri Net Traversal====");
 		RandomPTTraverser t = new RandomPTTraverser(ptnet);
 		for (int i = 1; ptnet.hasEnabledTransitions(); i++) {
@@ -42,31 +49,45 @@ public class RandomTraversal {
 			PTNetTraversalStepInfo ptNetTraversalStepInfo = new PTNetTraversalStepInfo();
 			//<1>
 			ArrayList<String>  P = new ArrayList<String>();
-			Collection<PTPlace> place = ptnet.initPlace();
+			//Collection<PTPlace> place = ptnet.initPlace();
+			
+			Collection<PTPlace> place = ptnet.getPlaces();
+			
 			Iterator<PTPlace> it = place.iterator();
 			while(it.hasNext())
 			{	
 				P.add(it.next().getName());
 			}
 
-			Map<String, PTTransition> transition = ptnet.initTransition();
+			//Map<String, PTTransition> transition = ptnet.initTransition();
+			//Map<String, PTTransition> transition = (Map<String, PTTransition>) ptnet.getTransitions();
 			//<2>
+			Collection<PTTransition> transitions2 = ptnet.getTransitions();
 			ArrayList<String>  T = new ArrayList<String>();
-			Iterator<String> it1 = transition.keySet().iterator();
-			while(it1.hasNext())
-			{
-				T.add(it1.next());
+			Iterator<PTTransition> iterator = transitions2.iterator();
+			for (PTTransition ptTransition : transitions2) {
+				
+				String s1 = ptTransition.toString();
+				//System.out.println(s1);
+				
+				String[] split = s1.split("\\[");
+				//System.out.println(split[0]);
+				T.add(split[0]);
+			
 			}
 		    //<3>
 		    ArrayList<String> M = new ArrayList<String>();		    
-			PTMarking string = ptnet.initMarking();
-			String[] str5 = string.toString1().split(",");
+			//PTMarking string = ptnet.initMarking();
+			PTMarking string = ptnet.getInitialMarking();
+			//会调用哪个String
+			String[] str5 = string.toString().split(",");
+		
             for(int k = 0; k < str5.length;k++)
             {
             	M.add(str5[k]);
             }
 			//<4>
-			String str1 = ptnet.toString3();
+			String str1 = toPrint(ptnet);
 			String str2 = str1.replaceAll("-> ", ",");
 			String str3 = str2.replaceAll(" -", ",");
 			String[] str4 = str3.split(",");			
@@ -95,10 +116,15 @@ public class RandomTraversal {
 				e.printStackTrace();
 			}
 			System.out.println(ptnet);
+			
+			//test
 		}
 		
 		System.out.println("no more enabled transitions");
-	}	
+	}
+	
+	
+	
 	public static void equipmentPlaceTool(PTNet ptNet ,ArrayList<String> P)
 	{
 		if(ptNet == null)
@@ -198,4 +224,29 @@ public class RandomTraversal {
 	        }); 
 		}
 	}
+	
+	@Override
+	public String toString(){
+		String placeFormat = "%s,%s,";
+		StringBuilder builder = new StringBuilder();
+		
+		List<String> placeNamesSorted = new ArrayList<String>(ptNet.getMarking().places());
+		Collections.sort(placeNamesSorted);
+		for(String pla: placeNamesSorted){
+			builder.append(String.format(placeFormat, pla, ptNet.getMarking().get(pla)));
+		}
+		
+		return builder.toString();
+	}
+	 public static String toPrint(PTNet ptnet){
+		 StringBuilder relationBuilder = new StringBuilder();
+		 Collection<PTFlowRelation> flowRelations = ptnet.getFlowRelations();
+		 for (PTFlowRelation relation : flowRelations) {
+			 relationBuilder.append("");
+			 relationBuilder.append(relation);
+			 relationBuilder.append(',');
+		}
+		
+		return String.format("%s %n", relationBuilder.toString());
+		}
 }

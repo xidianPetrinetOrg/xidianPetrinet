@@ -60,6 +60,8 @@ public class CreatePetriNetByFile extends S3PR {
 		return ptNet;
 	}
 	
+	
+	//
 	//接口，创建生成S3PR网
 	public S3PR CreateS3PR() {
 		s3pr = new S3PR("S3PR_Resource", ptNet, P0, PA, PR);
