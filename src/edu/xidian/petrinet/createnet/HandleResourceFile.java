@@ -1,6 +1,6 @@
 package edu.xidian.petrinet.createnet;
 /*
-* 作用：处理资源流文件
+* 作用：处理资源流文件<br>
 */
 
 import java.io.BufferedReader;

@@ -4,6 +4,11 @@ import edu.xidian.math.InvariantMatrix;
 import edu.xidian.petrinet.ComputeInvariant;
 import edu.xidian.petrinet.Utils.myUtils;
 
+/**
+ *
+ * 计算不变式矩阵<br>
+ *
+ */
 public class ComputeInv extends ComputeInvariant{
 
 	public ComputeInv(InvariantMatrix C) {

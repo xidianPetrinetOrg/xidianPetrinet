@@ -69,7 +69,6 @@ public class CreateRRG extends JFrame
 		mxGraphComponent graphComponent = new mxGraphComponent(graph);
 		getContentPane().add(graphComponent);
 		
-		// layout
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
 		layout.execute(graph.getDefaultParent());
 	}

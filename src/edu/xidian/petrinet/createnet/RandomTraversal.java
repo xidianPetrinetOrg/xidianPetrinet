@@ -122,9 +122,6 @@ public class RandomTraversal extends PTNet{
 		
 		System.out.println("no more enabled transitions");
 	}
-	
-	
-	
 	public static void equipmentPlaceTool(PTNet ptNet ,ArrayList<String> P)
 	{
 		if(ptNet == null)
@@ -135,7 +132,6 @@ public class RandomTraversal extends PTNet{
 		while(it.hasNext())
 		{
 			ptNet.addPlace(it.next());
-
 	    }
 	}
 
@@ -235,10 +231,9 @@ public class RandomTraversal extends PTNet{
 		for(String pla: placeNamesSorted){
 			builder.append(String.format(placeFormat, pla, ptNet.getMarking().get(pla)));
 		}
-		
 		return builder.toString();
 	}
-	 public static String toPrint(PTNet ptnet){
+	public static String toPrint(PTNet ptnet){
 		 StringBuilder relationBuilder = new StringBuilder();
 		 Collection<PTFlowRelation> flowRelations = ptnet.getFlowRelations();
 		 for (PTFlowRelation relation : flowRelations) {
@@ -248,5 +243,5 @@ public class RandomTraversal extends PTNet{
 		}
 		
 		return String.format("%s %n", relationBuilder.toString());
-		}
+	}
 }

@@ -7,7 +7,9 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import edu.xidian.petrinet.S3PR.S3PR;
 
 /**
- * 根据文件创建petri网：可以采用pnt文件，也可以采用资源关系流文件
+ * 根据文件创建petri网: <br>
+ * <1> 采用pnt文件，        <br>
+ * <2> 采用资源关系流文件 <br>
  *
  */
 public class CreatePetriNetByFile extends S3PR {
@@ -26,11 +28,9 @@ public class CreatePetriNetByFile extends S3PR {
 
 	public CreatePetriNetByFile(){
 	}
-	
 	public HandleResourceFile getResourceFile() {
 		return resourceFile;
 	}
-
 	public void setResourceFile(HandleResourceFile resourceFile) {
 		this.resourceFile = resourceFile;
 	}
@@ -59,9 +59,7 @@ public class CreatePetriNetByFile extends S3PR {
 		s3pr = CreateS3PR();
 		return ptNet;
 	}
-	
-	
-	//
+
 	//接口，创建生成S3PR网
 	public S3PR CreateS3PR() {
 		s3pr = new S3PR("S3PR_Resource", ptNet, P0, PA, PR);
