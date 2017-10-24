@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,6 +68,7 @@ import com.mxgraph.util.mxUndoManager;
 import com.mxgraph.util.mxUndoableEdit;
 import com.mxgraph.util.mxUndoableEdit.mxUndoableChange;
 import com.mxgraph.view.mxGraph;
+import com.sun.javafx.css.CalculatedValue;
 
 import de.uni.freiburg.iig.telematik.sepia.generator.PNGenerator;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
@@ -80,6 +82,7 @@ import edu.xidian.petrinet.graph.PTNetGraphComponent;
 /**
  * PTNet Graph and It's marking graph, 提供可视化编辑功能 ：<br>
  * 图形显示朝向：东、西、南、北<br>
+ * 顶点Label的显示位置; undo,redo<br>
  */
 public class PTNetGraph implements ActionListener, ItemListener {
 	/** 输出状态信息 */
@@ -95,7 +98,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     CreatePetriNetByFile createPetriNetByFile;
     
     
-    public static final String ComboStr[] = {"ResourceRelationMatrix","IncidenceMatrix","P-InvariantMatrix","T-InvariantMatrix","..."};
+    public static final String ComboStr[] = {"ResourceRelationMatrix","IncidenceMatrix","P-InvariantMatrix","T-InvariantMatrix","Calculate_SMS"};
     /** PTNet graph component */
     private PTNetGraphComponent ptnetGraphComponent = null;
     
@@ -193,10 +196,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
          */
         graphComponent();
         
+        // Create the actions shared by the toolBar and menu. toolBar和menu共用的动作在这里生成, 按键助记符是Alt的组合键
 	    createAction();
 	    	
+	    //Add a couple of emacs key bindings for undo,redo,undo,redo快捷按键（CTRL-Z/CTRL-Y）
 		addBindings();
 		    
+        //////////////undo
 		this.undoManager = ptnetGraphComponent.getUndoManager();
 		undoManager.addListener(mxEvent.UNDO, undoHandler);
 		undoManager.addListener(mxEvent.REDO, undoHandler);
@@ -204,6 +210,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     }
     
     public PTNetGraph() {
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -221,6 +228,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     		IMarkingGraphReady ready = new IMarkingGraphReady() {
     			@Override
     			public void graph(boolean isReady) {
+    				//if (isReady) status("marking graph is ready.");
     				isMarkingGraphReady = isReady;
     			}
     		};
@@ -230,6 +238,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
     	} catch (Exception e) {
     		e.printStackTrace();
     	}
+    	
+    	// Clears the command history.
     	if(undoManager != null) {
     	  undoManager.clear();
     	}
@@ -541,7 +551,27 @@ public class PTNetGraph implements ActionListener, ItemListener {
 			   	cal_T_Inv = ComputeInv.Cal_T_Inv(incidence);
         	}
 		   	status1(cal_T_Inv);
+        }else if(aString.equals("Calculate_SMS")){
+        	S3PR createS3PR = createPetriNetByFile.s3pr;
+        	System.out.println("s3pr"+createS3PR);
+        	ArrayList<String> calculateSMS = new SMS().calculateSMS(createS3PR);
+        	
+        	//存储为字符串的形式：
+        	String Siphons = calculateSMS.get(0);
+        	String SiphonComs = calculateSMS.get(1);
+        	String stringCmatrix = calculateSMS.get(2);
+        	/*System.out.println("dog");
+        	System.out.println("result:\n"+ Siphons);
+     	    System.out.println("result:\n"+ SiphonComs);
+     	    System.out.println(stringCmatrix);
+        	System.out.println("dog");*/
+        	
+        	status1(Siphons);
+        	status1(SiphonComs);
+        	status1(stringCmatrix);
+        	
         }else if(aString.equals("...")){
+        	
         	//可以继续增加功能块
         	//setDialogAndLable("待开发..", lable, dialog);
         }
@@ -553,6 +583,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	}
 	/**
 	 * 创建资源有向图 
+	 *
 	 */
 	public class GeneratorResourceRelationAction extends AbstractAction{
 
@@ -581,6 +612,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Label显示在顶点的左边 */
 	@SuppressWarnings("serial")
 	public class LabelLeftAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public LabelLeftAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -595,6 +633,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Label显示在顶点的右边 */
 	@SuppressWarnings("serial")
 	public class LabelRightAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public LabelRightAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -609,6 +654,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Label显示在顶点的上边 */
 	@SuppressWarnings("serial")
 	public class LabelTopAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public LabelTopAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -622,6 +674,13 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Label显示在顶点的下边 */
 	@SuppressWarnings("serial")
 	public class LabelBottomAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public LabelBottomAction(String name, ImageIcon icon, String desc, Integer mnemonic) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -635,6 +694,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** 生成PTNet对象 */
 	@SuppressWarnings("serial")
 	public class GeneratorPTNetAction extends AbstractAction {
+		/**
+		 * 生成PTNet对象
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public GeneratorPTNetAction(String name, String desc, Integer mnemonic) {
 			super(name);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -673,7 +738,9 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	
 	/** open file
 	 *  根据文件生成Petri网
-	 */
+	 *  
+	 *  
+	 *  */
 	public class OpenAction extends AbstractAction{
 
 		protected String fileName = null;
@@ -715,7 +782,9 @@ public class PTNetGraph implements ActionListener, ItemListener {
 				   //CreatePetriNetByPnt(path);
 				   output1.removeAll();
 				   flag = "pnt";
+				   System.out.println(flag+"---------------------------");
 				   ptNet = createPetriNetByFile.CreatePetriNetByPnt(path);
+				   System.out.println(path);
 		    	   frame.setVisible(false);
 		    	  
 			   }else if(prefix.equals("txt")){
@@ -724,6 +793,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 				   //CreatePetriNetBytxt(path);
 				   flag = "txt";
 				   ptNet = createPetriNetByFile.CreatePetriNetBytxt(path);
+				   System.out.println(path);
 				   frame.setVisible(false); 
 			   }else{
 				   return;
@@ -735,20 +805,28 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	                   frame = createAndShowGUI(ptNet); // 显示PTNet对应的图形
 	               }
 	           });
+				
+				
+				//System.out.println(f.getAbsolutePath());
+				//txtLocalRoad.setText(f.getAbsolutePath());
 			}
 		}
+
 	}
 	//重写文件过滤器，设置打开类型中几种可选的文件类型，这里设了两种，一种pnt，一种txt
 	class TxtFileFilter extends FileFilter {
 	 @Override
 	 public boolean accept(File f) {
+	  // TODO Auto-generated method stub
 	  String nameString = f.getName();
 	  return nameString.toLowerCase().endsWith(".pnt");
 	 }
 	 @Override
 	 public String getDescription() {
+	  // TODO Auto-generated method stub
 	  return "*.pnt";
 	 }
+	 
 	}
 	class XlsFileFilter extends FileFilter {
 	 @Override
@@ -778,6 +856,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		
 		protected String ext = null; // .png,.jpg,...
 		
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public SaveAction(String text, String desc, Integer mnemonic) {
 			super(text);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -794,6 +878,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
 			mxGraph graph = ptnetGraphComponent.getGraph();
 			
 			Color bg = null; // .png文件 没有背景，才是原汁原味;  .jpg和.jpeg无背景不好看; .wbmp有无背景均不能保存; .bmp必须有背景才能保存
+			
+//			if ((!ext.equalsIgnoreCase(".gif") && !ext.equalsIgnoreCase(".png"))
+//					&& JOptionPane.showConfirmDialog(graphComponent, "transparentBackground") == JOptionPane.YES_OPTION)
+//			{
+//				bg = graphComponent.getBackground();
+//			}
 			if (ext.equalsIgnoreCase(".bmp") || ext.equalsIgnoreCase(".jpg") || ext.equalsIgnoreCase(".jpeg")) {  
 				bg = graphComponent.getBackground();
 			}
@@ -895,6 +985,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		
 		protected String ext = null; // .png,.jpg,...
 		
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public SaveAction1(String text, String desc, Integer mnemonic) {
 			super(text);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -930,6 +1026,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 				JOptionPane.showMessageDialog(null, "保存成功", "Welcome to SCA", 1);
 	            frame.setVisible(false);
 	            frame.dispose();
+				
 			}
 		}
 	}
@@ -984,6 +1081,16 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Print Graph */
 	@SuppressWarnings("serial")
 	public class PrintAction extends AbstractAction {
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * 
+		 * @param name
+		 *            the name (Action.NAME) for the action, a value of null is
+		 *            ignored
+		 * @param desc
+		 *            description for the action, used for tooltip text
+		 * @param mnemonic
+		 */
 		public PrintAction(String text, String desc, Integer mnemonic) {
 			super(text);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -1034,9 +1141,17 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	public class HistoryAction extends AbstractAction {
 		protected boolean undo;
 
+		/**
+		 * Creates an Action with the specified name and small icon.
+		 * @param name the name (Action.NAME) for the action, a value of null is ignored
+		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
+		 * @param desc description for the action, used for tooltip text
+		 * @param undo true,undo; false,redo
+		 */
 		public HistoryAction(String name, ImageIcon icon, String desc,boolean undo) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);
+			//putValue(MNEMONIC_KEY, mnemonic); // 在addBindings()定义了control-z and control-y
 			this.undo = undo;
 		}
 		
@@ -1112,7 +1227,17 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	 * toolBar和menu共用的动作在这里生成,按键助记符是Alt的组合键,在createAction()中定义
 	 */
     private void addBindings() {
+    	// The component has the keyboard focus
+    	//InputMap inputMap = ptnetGraphComponent.getInputMap();  // 无效
+    	
+    	// The component has the keyboard focus
+    	//InputMap inputMap = ptnetGraphComponent.getInputMap( JComponent.WHEN_FOCUSED ); // 无效，相当于无参的形式，组件获得焦点时
+    	
+    	// The component contains (or is) the component that has the focus. 
     	InputMap inputMap = ptnetGraphComponent.getInputMap( JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT); // 有效，当父组件获得焦点时
+    	
+    	// The component's window either has the focus or contains the component that has the focus. 
+    	//InputMap inputMap = ptnetGraphComponent.getInputMap( JComponent.WHEN_IN_FOCUSED_WINDOW); // 有效，尽量不用，因为窗口的子组件太多
     	
     	ActionMap actionMap = ptnetGraphComponent.getActionMap();
     	
@@ -1158,6 +1283,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		    	for (Map.Entry<String, JRadioButtonMenuItem> entry : markingOrientationRadioBtn.entrySet()) {
 		    	    if (source == entry.getValue()) {
 		    	    	selected = entry.getKey();
+		    	    	//System.out.println("Marking selected:" + selected);
 		    	    	int orientation = SwingConstants.NORTH;
 	        	    	if (selected.equalsIgnoreCase("WEST")) orientation = SwingConstants.WEST;
 	        	    	else if (selected.equalsIgnoreCase("EAST")) orientation = SwingConstants.EAST;
@@ -1171,6 +1297,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         
         // 菜单项,Open,Exit, 如果是上述JRadioButtonMenuItem实例的菜单项，也符合本条件，因此不必用instanceof区分菜单项。
         if (source instanceof JMenuItem) {
+        	//System.out.println("Menu item selected:" + source.getText());
         	if (source.getText().equalsIgnoreCase("Exit")) {
         		exit();
         	}
@@ -1260,14 +1387,24 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		JScrollPane markingPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		markingPane.setViewportView(ptMarkingGraphComponent);
 			
+		// JSplitPane is used to divide two (and only two) Components
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,netPane, markingPane);
+		// true to specify that the split pane should provide a collapse/expand widget
 		splitPane.setOneTouchExpandable(true);
+		// true if the components should continuously be redrawn as the divider changes position
 		splitPane.setContinuousLayout(true);
 		
-		contentPane.add(splitPane, BorderLayout.CENTER);  // 这一部分区域大小是动态的，随着窗口大小或内容大小动态改变，其他部分非动态
-          
-		contentPane.add(contentPane1, BorderLayout.PAGE_END);
+		//markingPane.setVisible(false);
+		//netPane.setVisible(false);
 		
+		//contentPane.add(splitPane, BorderLayout.LINE_START);
+		contentPane.add(splitPane, BorderLayout.CENTER);  // 这一部分区域大小是动态的，随着窗口大小或内容大小动态改变，其他部分非动态
+		//contentPane.add(splitPane, BorderLayout.LINE_END);
+          
+		
+		 contentPane.add(contentPane1, BorderLayout.PAGE_END);
+		
+		//Create a scrolled status text area.
         output2 = new JTextArea(15,50);
         output2.setEditable(false);
         JScrollPane statusPane = new JScrollPane(output2);
@@ -1374,6 +1511,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 		                frame = createAndShowGUI(ptnet); // 显示PTNet对应的图形
 		            }
 		        });
+    				
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
