@@ -9,7 +9,10 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTFlowRelation;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTNet;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S3PR.S3PR;
-
+/**
+ * 根据文件创建petri网对象
+ *
+ */
 public class CreatePetriNetByFile extends S3PR {
 
 	private handlePNTFile handleFile;

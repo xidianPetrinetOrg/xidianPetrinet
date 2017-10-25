@@ -18,13 +18,11 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTTransition;
 import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.traverse.RandomPTTraverser;
 import edu.xidian.petrinet.CreatePetriNet;
 import edu.xidian.petrinet.graph.PTNetGraphComponent;
-
-public class RandomTraversal extends PTNet{
-	/**
-	 * 随机遍历，在使能变迁中，随机选择一个变迁发射，可能刚开始的使能变迁好几个，这里只能随机选择一个使能变迁
-	 * 进行变迁演示，此处所谓的随机只是随机一部分变迁进行遍历，比如此处的刚开始的使能变迁可以是t1 或t2 而此处的
-	 * 选择刚好是t2 作为使能变迁的入口，并没有进行t1 的使能变迁演示，故称之为随机演示一个使能变迁。
-	 */
+/**
+ *  重写打印 
+ *
+ */
+public class DecoratePrint extends PTNet{
 	
 	private static ArrayList<PTNetTraversalStepInfo>  ptNetTraversalStepInfos =
 			new ArrayList<PTNetTraversalStepInfo>();
@@ -36,6 +34,29 @@ public class RandomTraversal extends PTNet{
 		return ptNetTraversalStepInfos;
 	}
 
+	@Override
+	public String toString(){
+		String placeFormat = "%s,%s,";
+		StringBuilder builder = new StringBuilder();
+		
+		List<String> placeNamesSorted = new ArrayList<String>(ptNet.getMarking().places());
+		Collections.sort(placeNamesSorted);
+		for(String pla: placeNamesSorted){
+			builder.append(String.format(placeFormat, pla, ptNet.getMarking().get(pla)));
+		}
+		return builder.toString();
+	}
+	public static String toPrint(PTNet ptnet){
+		 StringBuilder relationBuilder = new StringBuilder();
+		 Collection<PTFlowRelation> flowRelations = ptnet.getFlowRelations();
+		 for (PTFlowRelation relation : flowRelations) {
+			 relationBuilder.append("");
+			 relationBuilder.append(relation);
+			 relationBuilder.append(',');
+		}
+		
+		return String.format("%s %n", relationBuilder.toString());
+	}
 	public static void RandomPTTraverserTest(PTNet ptnet) {		
 		
 		ptNet = ptnet;
@@ -49,7 +70,6 @@ public class RandomTraversal extends PTNet{
 			PTNetTraversalStepInfo ptNetTraversalStepInfo = new PTNetTraversalStepInfo();
 			//<1>
 			ArrayList<String>  P = new ArrayList<String>();
-			//Collection<PTPlace> place = ptnet.initPlace();
 			
 			Collection<PTPlace> place = ptnet.getPlaces();
 			
@@ -59,8 +79,6 @@ public class RandomTraversal extends PTNet{
 				P.add(it.next().getName());
 			}
 
-			//Map<String, PTTransition> transition = ptnet.initTransition();
-			//Map<String, PTTransition> transition = (Map<String, PTTransition>) ptnet.getTransitions();
 			//<2>
 			Collection<PTTransition> transitions2 = ptnet.getTransitions();
 			ArrayList<String>  T = new ArrayList<String>();
@@ -68,18 +86,13 @@ public class RandomTraversal extends PTNet{
 			for (PTTransition ptTransition : transitions2) {
 				
 				String s1 = ptTransition.toString();
-				//System.out.println(s1);
-				
 				String[] split = s1.split("\\[");
-				//System.out.println(split[0]);
 				T.add(split[0]);
 			
 			}
 		    //<3>
 		    ArrayList<String> M = new ArrayList<String>();		    
-			//PTMarking string = ptnet.initMarking();
 			PTMarking string = ptnet.getInitialMarking();
-			//会调用哪个String
 			String[] str5 = string.toString().split(",");
 		
             for(int k = 0; k < str5.length;k++)
@@ -154,94 +167,6 @@ public class RandomTraversal extends PTNet{
 			 marking.set(temp_Marking[i][0], Integer.valueOf(temp_Marking[i][1])); //散列在hash Map中
 		 }
 	 }
-	public static void main(String[] args) {
-		PTNet ptnet = CreatePetriNet.createPTnet1();
-		System.out.println("ptnet\n" + ptnet);
-		RandomPTTraverserTest(ptnet);
-		
-		System.out.println(ptnet.getEnabledTransitions().size()); 
 	
-		for(int i = 0;i < ptNetTraversalStepInfos.size();i++)
-		{
-			//1 创建Petri网
-			PTNet ptNet = new PTNet();
-			
-			//2获取网的信息
-			ArrayList<String>  P = ptNetTraversalStepInfos.get(i).getKuSuo();
-			ArrayList<String>  T = ptNetTraversalStepInfos.get(i).getBianQian();
-			ArrayList<String>  M = ptNetTraversalStepInfos.get(i).getChuShiKuSuo();
-			String []       str4 = ptNetTraversalStepInfos.get(i).getLiuGuanXi();
-			
-			//3 给网中装配获取的信息
-			  //3.1 装配Place
-			equipmentPlaceTool(ptNet,P);
-			  //3.2装配Transition
-			equipmentTransitionTool(ptNet,T);
-			
-			  //3.3装配初始的Marking
-			PTMarking marking = new PTMarking();
-			  int len2 = M.size()/2;
-				String temp_Marking[][] = new String[len2][2];
-				int k2 = 0;
-				//把一维数组转换为二维数组n行2列，方便后面的对号入座：p1,1
-				for(int w = 0 ; w < len2; w++)
-				{
-					for(int j = 0; j < 2;j++)
-					{
-						temp_Marking[w][j] = M.get(k2);
-						k2++;
-					}
-				}
-		    equipmentMarkingTools(marking,temp_Marking);
-		    ptNet.setInitialMarking(marking);
-		       //3.4装配流关系
-			for(int x= 0; x < str4.length;x = x+3)
-			{
-				if(P.contains(str4[x]))
-				{
-					ptNet.addFlowRelationPT(str4[x],str4[x+2],Integer.valueOf(str4[x+1]));
-				}
-				if(T.contains(str4[x]))
-				{
-					ptNet.addFlowRelationTP(str4[x],str4[x+2],Integer.valueOf(str4[x+1]));
-				}
-			}
-			//4 重新创建一个线程将装配好的petri网发射
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	            public void run() {
-	            	PTNetGraphComponent component = new PTNetGraphComponent(ptNet);
-	        		try {
-	        			component.initialize();  // 初始化，由petriNet信息，装配visualGraph,图形元素中心布局
-	        		} catch (Exception e) {
-	        			e.printStackTrace();
-	        		}	
-	        	    new DisplayFrame(component,true);  // 显示图形元素
-	        	}       
-	        }); 
-		}
-	}
 	
-	@Override
-	public String toString(){
-		String placeFormat = "%s,%s,";
-		StringBuilder builder = new StringBuilder();
-		
-		List<String> placeNamesSorted = new ArrayList<String>(ptNet.getMarking().places());
-		Collections.sort(placeNamesSorted);
-		for(String pla: placeNamesSorted){
-			builder.append(String.format(placeFormat, pla, ptNet.getMarking().get(pla)));
-		}
-		return builder.toString();
-	}
-	public static String toPrint(PTNet ptnet){
-		 StringBuilder relationBuilder = new StringBuilder();
-		 Collection<PTFlowRelation> flowRelations = ptnet.getFlowRelations();
-		 for (PTFlowRelation relation : flowRelations) {
-			 relationBuilder.append("");
-			 relationBuilder.append(relation);
-			 relationBuilder.append(',');
-		}
-		
-		return String.format("%s %n", relationBuilder.toString());
-	}
 }

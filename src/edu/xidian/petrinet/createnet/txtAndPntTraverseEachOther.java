@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  txt 文件和关系流文件的相互转换
- *
+ *  pnt文件和资源关系流文件txt之间相互转换
  */
 public class txtAndPntTraverseEachOther {
 	//由网生成资源流关系文件
@@ -151,7 +150,6 @@ public class txtAndPntTraverseEachOther {
 			}
 			fos.print("@");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
 			fos.close();
@@ -170,7 +168,6 @@ public class txtAndPntTraverseEachOther {
 				buf = new BufferedReader(new InputStreamReader
 									(new FileInputStream(file), "GBK"));
 			} catch (UnsupportedEncodingException | FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			String line = null;
@@ -183,13 +180,11 @@ public class txtAndPntTraverseEachOther {
 						}
 					}
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}finally{
 					try {
 						buf.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -219,21 +214,17 @@ public class txtAndPntTraverseEachOther {
 						}
 					}	
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}				
 			} catch (UnsupportedEncodingException e) {				
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			finally{
 				try {
 					buf.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}				

@@ -137,9 +137,9 @@ public class handlePNTFile extends S2PR{
 
 				ptNet.setInitialMarking(marking);
 
-				RandomTraversal.RandomPTTraverserTest(ptNet);
+				DecoratePrint.RandomPTTraverserTest(ptNet);
 				// 获取遍历后的信息
-				aList = RandomTraversal.getPtNetTraversalStepInfos();
+				aList = DecoratePrint.getPtNetTraversalStepInfos();
 
 				System.out.println(aList.size());
 				PTNetGraphComponent component = new PTNetGraphComponent(ptNet);

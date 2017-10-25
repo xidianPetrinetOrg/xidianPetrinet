@@ -2,6 +2,10 @@ package edu.xidian.petrinet.createnet;
 
 import java.util.ArrayList;
 
+/**
+ *  辅助类 
+ *
+ */
 public class PTNetTraversalStepInfo {
 
 	private ArrayList<String> kuSuo;

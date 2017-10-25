@@ -560,11 +560,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         	String Siphons = calculateSMS.get(0);
         	String SiphonComs = calculateSMS.get(1);
         	String stringCmatrix = calculateSMS.get(2);
-        	/*System.out.println("dog");
-        	System.out.println("result:\n"+ Siphons);
-     	    System.out.println("result:\n"+ SiphonComs);
-     	    System.out.println(stringCmatrix);
-        	System.out.println("dog");*/
+        	
         	
         	status1(Siphons);
         	status1(SiphonComs);
