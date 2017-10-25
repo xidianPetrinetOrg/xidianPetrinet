@@ -1,6 +1,5 @@
 package edu.xidian.petrinet.createnet;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,54 +9,17 @@ import edu.xidian.math.InvariantMatrix;
 import edu.xidian.petrinet.S3PR.S3PR;
 import edu.xidian.petrinet.Utils.myUtils;
 
-public class SMS extends S3PR{
+/**
+ * 
+ * 根据s3pr网，来计算信标，补集，补集矩阵<br>
+ *
+ */
+public class calculateSMS extends S3PR{
 
 	protected  static S3PR s3pr;
 	protected  static List<Collection<PTPlace>> Siphons ;
 	protected  static List<Collection<PTPlace>> SiphonComs;
 	protected  static InvariantMatrix CMatrix;
-	
-	
-	/*public ArrayList<String> CalculateSMS()
-	{
-		
-		ArrayList<String> arrayList = new ArrayList<>();
-		//由资源关系流文件生成pnt文件
-		//PNT pnt = new PNT();
-		//C:/Users/xd/Desktop/ResourceRelationFile1.txt
-		//C:/Users/xd/Desktop/测试文件/ResourceRelationFile1.txt
-		String txtPath ="C:/Users/xd/Desktop/测试文件/ResourceRelationFile1.txt";
-		String pntPath = "D:/xidianPetriNet.pnt";
-		pnt.createPNT(txtPath, pntPath);
-		//由pnt文件生成S3PR网对象，计算信标
-		PetriNet net = new PetriNet();
-		
-		S3PR s3pr = net.getS3PR(pntPath);
-		//LS3PR网
-		s3pr.deleteN(true);
-		//DeleteN(s3pr, true);
-		Siphons = s3pr.getSiphons();
-		SiphonComs = s3pr.getSiphonComs();
-		InvariantMatrix cMatrix = s3pr.CMatrix();
-		
-		String  stringSiphons = CaculateSiphons(Siphons);
-	    String  stringSiphonComs = CalculateSiphoncoms(SiphonComs);
-	    //System.out.println("C-Matrix:");
-	    //myUtils.MatrixToFormatString("C-Matrix:",cMatrix.getArrayCopy());
-	    //cMatrix.print(2, 0);
-	    
-	    System.out.println("result:\n"+ stringSiphons);
-	    System.out.println("result:\n"+ stringSiphonComs);
-	    String stringCmatrix = myUtils.MatrixToFormatString("C-Matrix",cMatrix.getArrayCopy());
-	    System.out.println(stringCmatrix);
-	    
-	    arrayList.add(stringSiphons);
-	    arrayList.add(stringSiphonComs);
-	    arrayList.add(stringCmatrix);
-	    
-		return arrayList;
-		
-	}*/
 	
 	public ArrayList<String> calculateSMS(S3PR s3pr)
 	{

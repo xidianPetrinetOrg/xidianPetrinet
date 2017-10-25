@@ -1,4 +1,4 @@
-package edu.xidian.petrinet.CalculateSMS;
+package edu.xidian.petrinet.createnet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,8 +10,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PNT {
-	//有网生成资源流关系文件
+/**
+ *  txt 文件和关系流文件的相互转换
+ *
+ */
+public class txtAndPntTraverseEachOther {
+	//由网生成资源流关系文件
 	public static void createRelationResource(int[][] incMatObjectNet,int resourceStart) throws IOException{
 		
 		File file = new File("D:\\upload\\relationresource.txt");
@@ -34,7 +38,7 @@ public class PNT {
 		}
 		fos.close();
 	}
-	//生成LS3PR网，net.pnt;
+	// 由资源关系流文件生成pnt文件
 	public void createPNT(String txtPath,String pntPath){
 		int [][]rRMat = readResourceRelationFile(txtPath);
 		int count1=0;		

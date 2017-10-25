@@ -27,6 +27,11 @@ import edu.xidian.petrinet.CreatePetriNet;
 import edu.xidian.petrinet.S3PR.S2PR;
 import edu.xidian.petrinet.graph.PTNetGraphComponent;
 
+/**
+ *
+ * 对pnt文件的解析，生成网的对象
+ *
+ */
 public class handlePNTFile extends S2PR{
 	// 抓取文件中的库所，存入place
 	private static ArrayList<String> place = new ArrayList<String>();

@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,9 +81,7 @@ import edu.xidian.petrinet.graph.PTMarkingGraphComponent.IMarkingGraphReady;
 import edu.xidian.petrinet.graph.PTNetGraphComponent;
 
 /**
- * PTNet Graph and It's marking graph, 提供可视化编辑功能 ：<br>
- * 图形显示朝向：东、西、南、北<br>
- * 顶点Label的显示位置; undo,redo<br>
+ * 可视化的总图形界面，可进行基本的编辑功能<br>
  */
 public class PTNetGraph implements ActionListener, ItemListener {
 	/** 输出状态信息 */
@@ -127,6 +126,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
     protected mxUndoManager undoManager = null;
     /**flag how to create the net */
     protected static String flag = null; 
+    protected static String  sourcepath;
     
     /** 
      * 整合所有快捷键,
@@ -554,7 +554,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
         }else if(aString.equals("Calculate_SMS")){
         	S3PR createS3PR = createPetriNetByFile.s3pr;
         	System.out.println("s3pr"+createS3PR);
-        	ArrayList<String> calculateSMS = new SMS().calculateSMS(createS3PR);
+        	ArrayList<String> calculateSMS = new calculateSMS().calculateSMS(createS3PR);
         	
         	//存储为字符串的形式：
         	String Siphons = calculateSMS.get(0);
@@ -772,6 +772,7 @@ public class PTNetGraph implements ActionListener, ItemListener {
 			}else{
 			   //C:\Users\xd\Desktop\txt1.pnt
 			   String path = f.getAbsolutePath();
+			   
 			   //判断文件是txt还是pnt结尾
 			   String fileName=f.getName();
 			   String prefix=fileName.substring(fileName.lastIndexOf(".")+1);
@@ -791,9 +792,11 @@ public class PTNetGraph implements ActionListener, ItemListener {
 				   output1.removeAll();
 				   //采用工作流来创建网
 				   //CreatePetriNetBytxt(path);
+				   
+				   sourcepath = path;
+				   
 				   flag = "txt";
 				   ptNet = createPetriNetByFile.CreatePetriNetBytxt(path);
-				   System.out.println(path);
 				   frame.setVisible(false); 
 			   }else{
 				   return;
@@ -1010,6 +1013,8 @@ public class PTNetGraph implements ActionListener, ItemListener {
 				
 			}else{
 				path = f.getAbsolutePath()+".txt";
+				String targetpath = f.getAbsolutePath()+".pnt";
+				
 				String[] splitDoc = path.split("\\\\");
 	        	StringBuffer stringBuffer = new StringBuffer();
 	        	for(int i = 0; i < splitDoc.length-1; i++)
@@ -1019,7 +1024,12 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	        	}
 	        	stringBuffer.append(splitDoc[splitDoc.length-1]);
 	        	path = stringBuffer.toString();
-				System.out.println(path);
+				
+				System.out.println("sourcepath= "+sourcepath);
+				System.out.println("targetpath= "+targetpath);
+				new txtAndPntTraverseEachOther().createPNT(sourcepath, targetpath);
+				
+				String createPntBytxt = f.getAbsolutePath()+".pnt";
 				
 				String SaveInfo = output1.getText().toString();
 				write(SaveInfo,path);
@@ -1081,16 +1091,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	/** Print Graph */
 	@SuppressWarnings("serial")
 	public class PrintAction extends AbstractAction {
-		/**
-		 * Creates an Action with the specified name and small icon.
-		 * 
-		 * @param name
-		 *            the name (Action.NAME) for the action, a value of null is
-		 *            ignored
-		 * @param desc
-		 *            description for the action, used for tooltip text
-		 * @param mnemonic
-		 */
 		public PrintAction(String text, String desc, Integer mnemonic) {
 			super(text);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -1140,14 +1140,6 @@ public class PTNetGraph implements ActionListener, ItemListener {
 	@SuppressWarnings("serial")
 	public class HistoryAction extends AbstractAction {
 		protected boolean undo;
-
-		/**
-		 * Creates an Action with the specified name and small icon.
-		 * @param name the name (Action.NAME) for the action, a value of null is ignored
-		 * @param icon the small icon (Action.SMALL_ICON) for the action; a value of null is ignored
-		 * @param desc description for the action, used for tooltip text
-		 * @param undo true,undo; false,redo
-		 */
 		public HistoryAction(String name, ImageIcon icon, String desc,boolean undo) {
 			super(name, icon);
 			putValue(SHORT_DESCRIPTION, desc);

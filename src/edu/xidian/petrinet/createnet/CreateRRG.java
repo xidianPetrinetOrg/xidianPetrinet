@@ -22,7 +22,7 @@ import de.uni.freiburg.iig.telematik.sepia.petrinet.pt.PTPlace;
 import edu.xidian.petrinet.S3PR.S3PR;
 
 /**
- * 图形化显示资源关系流<br>
+ * 根据资源关系流文件，界面图形化显示资源关系流<br>
  *
  */
 public class CreateRRG extends JFrame

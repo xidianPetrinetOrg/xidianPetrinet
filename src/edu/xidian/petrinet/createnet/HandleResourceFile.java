@@ -1,6 +1,6 @@
 package edu.xidian.petrinet.createnet;
 /*
-* 作用：处理资源流文件<br>
+* 对资源关系流文件的解析，生成网对象<br>
 */
 
 import java.io.BufferedReader;
